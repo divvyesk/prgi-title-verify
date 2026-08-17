@@ -7,8 +7,32 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# CPU-only torch, installed BEFORE the rest so pip already sees torch
+# satisfied and never resolves the default CUDA build.
+#
+# sentence-transformers pulls torch transitively, and on Linux the default
+# wheel drags in the whole NVIDIA stack: measured on the previous image, 15
+# nvidia-* packages totalling 2.9GB of CUDA libraries in a container with no
+# GPU, for an 8.72GB image. That is a real deployment problem — image pulls
+# get slow and several PaaS providers cap image size outright.
+#
+# Pinned to the same version range the CPU index publishes; if this ever
+# fails to resolve, check https://download.pytorch.org/whl/cpu for the
+# available versions rather than dropping back to the default index.
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
 COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
+
+# agents/ has its own requirements (langgraph, groq, httpx) and they are NOT
+# a subset of the backend's. Without this the image built fine and the server
+# started, but ml/rag/explain.py imports agents.llm, so the whole agents
+# package failed to import with "No module named 'langgraph'" — taking the
+# RAG explainer and /v1/alternatives down to stubs inside the container while
+# the host, which happens to have them installed, worked perfectly.
+# Separate layer so it does not invalidate the expensive torch install above.
+COPY agents/requirements.txt agents/requirements.txt
+RUN pip install --no-cache-dir -r agents/requirements.txt
 
 COPY contracts/ contracts/
 COPY backend/ backend/
