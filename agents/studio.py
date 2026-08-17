@@ -4,23 +4,49 @@ The one public entry point Divvye's backend calls
 Also re-exported from agents/__init__.py as `from agents import run_studio`,
 so both import styles work.
 
-Placeholder today (Prompt 1 — scaffold only). Prompt 2 builds the LangGraph
-workflow this function will actually run; Prompt 6 is what makes it call
-the real graph end-to-end with a progress callback and swap in
-HttpVerifyClient. Until then this raises clearly rather than silently
-returning nothing, so nothing accidentally ships thinking this works.
+Real as of Prompt 6 — runs the compiled graph (agents/graph.py) end to end
+and returns its ranked survivors, which are already GeneratedCandidate-
+shaped dicts (agents/nodes/ranker.py).
 """
 
 from __future__ import annotations
 
+import logging
 from typing import Callable
+
+from agents.graph import GRAPH
+from agents.state import StudioState
+
+logger = logging.getLogger("agents.studio")
 
 
 def run_studio(details: dict, on_step: Callable[[str, dict], None] | None = None) -> list[dict]:
-    raise NotImplementedError(
-        "run_studio is scaffolded in Prompt 1 but not built yet — the graph "
-        "lands in Prompt 2, the real wiring (progress callback, live backend) "
-        "in Prompt 6. backend/app/routers/alternatives.py already falls back "
-        "to fixture data gracefully when this raises, so this is safe to ship "
-        "mid-build."
-    )
+    """Gurpreet's progress callback: on_step(node_name, state_delta), called
+    once per node as it completes — for the verifier node, state_delta
+    includes `rejected` (title + reason for each), which is what makes
+    "watching the Verifier reject candidates and send them back" visible in
+    the UI, per this prompt's own framing of it as the most impressive part
+    of the feature. A callback that raises is logged and skipped rather
+    than allowed to crash the graph — Gurpreet's UI code being buggy on a
+    given render must never take down title generation."""
+    initial_state: StudioState = {
+        "details": details,
+        "brief": "",
+        "candidates": [],
+        "verified": [],
+        "rejected": [],
+        "attempt": 0,
+    }
+
+    final_verified: list[dict] = []
+    for event in GRAPH.stream(initial_state, stream_mode="updates"):
+        for node_name, update in event.items():
+            if "verified" in update:
+                final_verified = update["verified"]
+            if on_step is not None:
+                try:
+                    on_step(node_name, update)
+                except Exception:
+                    logger.exception("run_studio: on_step callback raised for node %r — continuing", node_name)
+
+    return final_verified
