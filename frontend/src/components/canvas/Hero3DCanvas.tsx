@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Text, OrbitControls } from '@react-three/drei';
+import { Text, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface SceneProps {
@@ -9,396 +9,344 @@ interface SceneProps {
   isScanning?: boolean;
 }
 
-interface TextLayerProps {
-  text: string;
-  fontSize: number;
-  position: [number, number, number];
-  rotation?: [number, number, number];
-  faceColor: string;
-  bevelColor: string;
-  extrusionColor: string;
-  emissiveColor: string;
-  emissiveIntensity?: number;
+// Helper to create organic neon butterfly wing closed tube curve (matching reference image)
+function createButterflyWingCurve(isRightWing = false, scale = 1): THREE.CatmullRomCurve3 {
+  const dir = isRightWing ? 1 : -1;
+  const points = [
+    new THREE.Vector3(0.02 * dir * scale, 0.05 * scale, 0),
+    // Upper large wing loop
+    new THREE.Vector3(0.25 * dir * scale, 0.45 * scale, 0.02 * scale),
+    new THREE.Vector3(0.55 * dir * scale, 0.85 * scale, 0.04 * scale),
+    new THREE.Vector3(0.72 * dir * scale, 0.65 * scale, 0.03 * scale),
+    new THREE.Vector3(0.42 * dir * scale, 0.32 * scale, 0.01 * scale),
+    new THREE.Vector3(0.18 * dir * scale, 0.08 * scale, 0.005 * scale),
+    // Lower secondary wing loop
+    new THREE.Vector3(0.48 * dir * scale, -0.15 * scale, 0.02 * scale),
+    new THREE.Vector3(0.58 * dir * scale, -0.48 * scale, 0.03 * scale),
+    new THREE.Vector3(0.32 * dir * scale, -0.62 * scale, 0.02 * scale),
+    new THREE.Vector3(0.12 * dir * scale, -0.28 * scale, 0.01 * scale),
+    new THREE.Vector3(0.02 * dir * scale, -0.05 * scale, 0),
+  ];
+  return new THREE.CatmullRomCurve3(points, true);
 }
 
-// Pure 3D Extruded Beveled Word
-function Extruded3DWord({
-  text,
-  fontSize,
+// 3D Neon Butterfly Component (Matching Hot Pink / Cyan Neon Flex reference)
+function NeonButterfly({
   position,
   rotation = [0, 0, 0],
-  faceColor,
-  bevelColor,
-  extrusionColor,
-  emissiveColor,
-  emissiveIntensity = 0.2
-}: TextLayerProps) {
-  const depthSlices = [-0.04, -0.03, -0.02, -0.01, 0.0];
+  scale = 1,
+  color = '#FF1493',
+  glowColor = '#FF2E93',
+  wingAngleOffset = 0,
+  flutterSpeed = 2.5
+}: {
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: number;
+  color?: string;
+  glowColor?: string;
+  wingAngleOffset?: number;
+  flutterSpeed?: number;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+  const leftWingRef = useRef<THREE.Group>(null);
+  const rightWingRef = useRef<THREE.Group>(null);
 
-  return (
-    <group position={position} rotation={rotation}>
-      {/* 1. Deep 3D Extrusion Core */}
-      {depthSlices.map((zOffset, i) => (
-        <Text
-          key={`ext-${i}`}
-          position={[0, 0, zOffset]}
-          fontSize={fontSize}
-          maxWidth={4.4}
-          textAlign="center"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.032}
-          outlineColor={extrusionColor}
-          letterSpacing={0.04}
-        >
-          {text}
-          <meshStandardMaterial
-            color={extrusionColor}
-            roughness={0.45}
-            metalness={0.35}
-          />
-        </Text>
-      ))}
-
-      {/* 2. Golden Chamfer / Bevel Outline Layer */}
-      <Text
-        position={[0, 0, 0.012]}
-        fontSize={fontSize}
-        maxWidth={4.4}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.024}
-        outlineColor={bevelColor}
-        letterSpacing={0.04}
-      >
-        {text}
-        <meshStandardMaterial
-          color={bevelColor}
-          roughness={0.2}
-          metalness={0.65}
-          emissive={emissiveColor}
-          emissiveIntensity={emissiveIntensity * 0.5}
-        />
-      </Text>
-
-      {/* 3. Glossy Front Face */}
-      <Text
-        position={[0, 0, 0.022]}
-        fontSize={fontSize}
-        maxWidth={4.4}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.008}
-        outlineColor={bevelColor}
-        letterSpacing={0.04}
-      >
-        {text}
-        <meshStandardMaterial
-          color={faceColor}
-          roughness={0.12}
-          metalness={0.35}
-          emissive={emissiveColor}
-          emissiveIntensity={emissiveIntensity}
-        />
-      </Text>
-    </group>
-  );
-}
-
-// Aesthetic 3D Background Shapes Framing the 3D Text (Warm Beige / Sand / Amber)
-function AestheticBackgroundShapes({ accentColor }: { accentColor: string }) {
-  const bgGroupRef = useRef<THREE.Group>(null);
-  const cube1Ref = useRef<THREE.Mesh>(null);
-  const cube2Ref = useRef<THREE.Mesh>(null);
-  const ringRef = useRef<THREE.Mesh>(null);
+  const leftCurve = useMemo(() => createButterflyWingCurve(false, scale), [scale]);
+  const rightCurve = useMemo(() => createButterflyWingCurve(true, scale), [scale]);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    if (bgGroupRef.current) {
-      bgGroupRef.current.rotation.y = t * 0.1;
-      bgGroupRef.current.rotation.z = Math.sin(t * 0.15) * 0.05;
+    if (leftWingRef.current && rightWingRef.current) {
+      // Gentle subtle breathing flutter
+      const flutter = Math.sin(t * flutterSpeed + wingAngleOffset) * 0.12;
+      leftWingRef.current.rotation.y = flutter;
+      rightWingRef.current.rotation.y = -flutter;
     }
-    if (cube1Ref.current) {
-      cube1Ref.current.rotation.x = t * 0.2;
-      cube1Ref.current.rotation.y = t * 0.25;
-    }
-    if (cube2Ref.current) {
-      cube2Ref.current.rotation.y = -t * 0.18;
-      cube2Ref.current.rotation.z = t * 0.22;
-    }
-    if (ringRef.current) {
-      ringRef.current.rotation.x = Math.sin(t * 0.2) * 0.25 + 0.8;
-      ringRef.current.rotation.y = -t * 0.12;
+    if (groupRef.current) {
+      // Subtle hovering bob
+      groupRef.current.position.y = position[1] + Math.sin(t * 1.5 + wingAngleOffset) * 0.04;
     }
   });
 
   return (
-    <group ref={bgGroupRef} position={[0, 0, -1.0]}>
-      {/* 1. Large Frosted Sand Cube (Rear Right) */}
-      <mesh ref={cube1Ref} position={[1.4, 0.4, -0.6]}>
-        <boxGeometry args={[1.2, 1.2, 1.2]} />
-        <meshStandardMaterial
-          color="#E8DFC8"
-          roughness={0.35}
-          metalness={0.2}
+    <group ref={groupRef} position={position} rotation={rotation}>
+      {/* Acrylic Backing for Butterfly */}
+      <mesh position={[0, 0, -0.03]}>
+        <planeGeometry args={[1.6 * scale, 1.6 * scale]} />
+        <meshPhysicalMaterial
+          color="#1C1917"
           transparent
-          opacity={0.65}
+          opacity={0.08}
+          roughness={0.15}
+          transmission={0.8}
         />
       </mesh>
 
-      {/* 2. Secondary Warm Amber Cube (Rear Left) */}
-      <mesh ref={cube2Ref} position={[-1.5, -0.3, -0.4]}>
-        <boxGeometry args={[0.9, 0.9, 0.9]} />
+      {/* Center Body Tube */}
+      <mesh position={[0, 0, 0.01]}>
+        <capsuleGeometry args={[0.02 * scale, 0.45 * scale, 8, 16]} />
         <meshStandardMaterial
-          color="#D97706"
-          roughness={0.3}
-          metalness={0.3}
-          transparent
-          opacity={0.45}
+          color="#FFFFFF"
+          emissive={color}
+          emissiveIntensity={3.0}
+          roughness={0.1}
         />
       </mesh>
 
-      {/* 3. Golden Orbital Torus Ring (Encircling Background) */}
-      <mesh ref={ringRef} position={[0, 0, -0.2]}>
-        <torusGeometry args={[2.1, 0.04, 24, 64]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.4}
-          roughness={0.2}
-          metalness={0.7}
-          transparent
-          opacity={0.5}
-        />
-      </mesh>
+      {/* Left Wing Neon Loop */}
+      <group ref={leftWingRef}>
+        {/* Outer Vibrant Neon Glow Tube */}
+        <mesh>
+          <tubeGeometry args={[leftCurve, 64, 0.032 * scale, 12, true]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={glowColor}
+            emissiveIntensity={3.8}
+            roughness={0.15}
+            transparent
+            opacity={0.96}
+          />
+        </mesh>
+        {/* Inner White Gas Core Tube */}
+        <mesh position={[0, 0, 0.008]}>
+          <tubeGeometry args={[leftCurve, 64, 0.014 * scale, 8, true]} />
+          <meshBasicMaterial color="#FFFFFF" />
+        </mesh>
+      </group>
 
-      {/* 4. Soft Sand Sphere (Top Left) */}
-      <mesh position={[-1.2, 0.9, -0.8]}>
-        <sphereGeometry args={[0.35, 32, 32]} />
-        <meshStandardMaterial
-          color="#DDD1BF"
-          roughness={0.25}
-          metalness={0.3}
-          transparent
-          opacity={0.7}
-        />
-      </mesh>
+      {/* Right Wing Neon Loop */}
+      <group ref={rightWingRef}>
+        {/* Outer Vibrant Neon Glow Tube */}
+        <mesh>
+          <tubeGeometry args={[rightCurve, 64, 0.032 * scale, 12, true]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={glowColor}
+            emissiveIntensity={3.8}
+            roughness={0.15}
+            transparent
+            opacity={0.96}
+          />
+        </mesh>
+        {/* Inner White Gas Core Tube */}
+        <mesh position={[0, 0, 0.008]}>
+          <tubeGeometry args={[rightCurve, 64, 0.014 * scale, 8, true]} />
+          <meshBasicMaterial color="#FFFFFF" />
+        </mesh>
+      </group>
 
-      {/* 5. Honey Gold Sphere (Bottom Right) */}
-      <mesh position={[1.3, -0.8, -0.5]}>
-        <sphereGeometry args={[0.28, 32, 32]} />
-        <meshStandardMaterial
-          color="#F59E0B"
-          roughness={0.2}
-          metalness={0.5}
-          transparent
-          opacity={0.6}
-        />
-      </mesh>
+      {/* Butterfly Local Point Glow */}
+      <pointLight color={glowColor} intensity={1.8} distance={1.8} />
     </group>
   );
 }
 
-function StatutarySeal3D({
+// 3D Neon Text Title Component (Vibrant LED flex tube sign style)
+function NeonTitleSign({
   title,
   verdict,
   isScanning
 }: {
-  title?: string;
+  title: string;
   verdict?: 'APPROVED' | 'MANUAL_REVIEW' | 'REJECTED' | null;
   isScanning?: boolean;
 }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const scanLaserRef = useRef<THREE.Group>(null);
+  const signRef = useRef<THREE.Group>(null);
 
-  const cleanTitle = (title || '').trim();
-  const words = cleanTitle.split(/\s+/).filter(Boolean);
-
-  let line1 = '';
-  let line2 = '';
-
-  if (words.length === 0) {
-    line1 = 'PRGI';
-  } else if (words.length === 1) {
-    line1 = words[0];
-    line2 = '';
-  } else if (words.length <= 3) {
-    line1 = words[0];
-    line2 = words.slice(1).join(' ');
-  } else {
-    const mid = Math.ceil(words.length / 2);
-    line1 = words.slice(0, mid).join(' ');
-    line2 = words.slice(mid).join(' ');
-  }
-
-  const fontSize1 = line1.length > 14 ? 0.36 : line1.length > 9 ? 0.44 : 0.54;
-  const fontSize2 = line2.length > 14 ? 0.34 : line2.length > 9 ? 0.42 : 0.52;
-  const yPos1 = line2 ? 0.32 : 0;
-  const yPos2 = line2 ? -0.32 : 0;
-
-  const theme = useMemo(() => {
+  const { neonColor, glowColor, ambientGlow } = useMemo(() => {
     if (verdict === 'APPROVED') {
-      return {
-        line1Face: '#ECFDF5',
-        line1Bevel: '#10B981',
-        line1Extrude: '#064E3B',
-        line2Face: '#34D399',
-        line2Bevel: '#059669',
-        line2Extrude: '#065F46',
-        emissive: '#10B981',
-        laserColor: '#34D399',
-        accentColor: '#10B981'
-      };
+      return { neonColor: '#00FF88', glowColor: '#05DF72', ambientGlow: '#00FF88' };
     }
     if (verdict === 'REJECTED') {
-      return {
-        line1Face: '#FFF1F2',
-        line1Bevel: '#EF4444',
-        line1Extrude: '#881337',
-        line2Face: '#FCA5A5',
-        line2Bevel: '#EF4444',
-        line2Extrude: '#B91C1C',
-        emissive: '#EF4444',
-        laserColor: '#F87171',
-        accentColor: '#EF4444'
-      };
+      return { neonColor: '#FF0055', glowColor: '#FF2E7E', ambientGlow: '#FF0055' };
     }
     if (verdict === 'MANUAL_REVIEW') {
-      return {
-        line1Face: '#FFFBEB',
-        line1Bevel: '#FBBF24',
-        line1Extrude: '#78350F',
-        line2Face: '#FCD34D',
-        line2Bevel: '#F59E0B',
-        line2Extrude: '#92400E',
-        emissive: '#F59E0B',
-        laserColor: '#FBBF24',
-        accentColor: '#F59E0B'
-      };
+      return { neonColor: '#FFB800', glowColor: '#FFD043', ambientGlow: '#FFB800' };
     }
-
-    // Default Beige Theme: Porcelain White & Warm Honey Gold with Caramel Extrusions
-    return {
-      line1Face: '#FFFFFF',
-      line1Bevel: '#F59E0B',
-      line1Extrude: '#451A03',
-      line2Face: '#FBBF24',
-      line2Bevel: '#D97706',
-      line2Extrude: '#78350F',
-      emissive: '#F59E0B',
-      laserColor: '#D97706',
-      accentColor: '#F59E0B'
-    };
+    // Default Iconic Hot Pink / Cyan Multi-neon vibe
+    return { neonColor: '#FF1493', glowColor: '#FF007F', ambientGlow: '#FF1493' };
   }, [verdict]);
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    const targetTiltX = -state.pointer.y * 0.28 + Math.sin(t * 0.3) * 0.04;
-    const targetTiltZ = state.pointer.x * 0.18;
+  // Clean words for 2-line layout if title is long
+  const words = (title || 'Times India').toUpperCase().trim().split(' ');
+  let line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
+  let line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
+  if (words.length <= 1) {
+    line1 = words[0];
+    line2 = '';
+  }
 
-    if (groupRef.current) {
-      groupRef.current.rotation.y = t * 0.42 + state.pointer.x * 0.3;
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetTiltX, 0.06);
-      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, targetTiltZ, 0.06);
-    }
-
-    if (scanLaserRef.current) {
-      scanLaserRef.current.position.y = Math.sin(t * 1.3) * 0.95;
-    }
-  });
+  const fontSize = words.length > 3 ? 0.38 : 0.48;
 
   return (
-    <group position={[0, 0, 0]}>
-      {/* 3D Background Geometric Shapes (Aesthetic Depth behind the 3D Text) */}
-      <AestheticBackgroundShapes accentColor={theme.accentColor} />
+    <group ref={signRef}>
+      {/* 1. Clear Transparent Acrylic Backing Plate (Matching Reference Image 1 & 2) */}
+      <mesh position={[0, 0, -0.06]}>
+        <planeGeometry args={[4.4, 2.6]} />
+        <meshPhysicalMaterial
+          color="#FAF7F0"
+          transparent
+          opacity={0.25}
+          roughness={0.08}
+          transmission={0.92}
+          thickness={0.25}
+          ior={1.48}
+          reflectivity={0.6}
+        />
+      </mesh>
 
-      {/* Prominent 3D Text (Primary Focal Centerpiece) */}
-      <Float speed={1.1} rotationIntensity={0.1} floatIntensity={0.2}>
-        <group ref={groupRef}>
-          {/* Front Readable 3D Face */}
-          <group position={[0, 0, 0.04]}>
-            <Extruded3DWord
-              text={line1}
-              fontSize={fontSize1}
-              position={[0, yPos1, 0]}
-              faceColor={theme.line1Face}
-              bevelColor={theme.line1Bevel}
-              extrusionColor={theme.line1Extrude}
-              emissiveColor={theme.emissive}
-              emissiveIntensity={isScanning ? 0.7 : verdict ? 0.4 : 0.15}
-            />
-            {line2 && (
-              <Extruded3DWord
-                text={line2}
-                fontSize={fontSize2}
-                position={[0, yPos2, 0]}
-                faceColor={theme.line2Face}
-                bevelColor={theme.line2Bevel}
-                extrusionColor={theme.line2Extrude}
-                emissiveColor={theme.emissive}
-                emissiveIntensity={isScanning ? 0.7 : verdict ? 0.4 : 0.15}
-              />
-            )}
-          </group>
+      {/* Chrome Mounting Standoff Screws */}
+      {[
+        [-1.9, 0.95, -0.04],
+        [1.9, 0.95, -0.04],
+        [-1.9, -0.95, -0.04],
+        [1.9, -0.95, -0.04],
+      ].map((pos, i) => (
+        <mesh key={`screw-${i}`} position={pos as [number, number, number]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.04, 0.04, 0.05, 16]} />
+          <meshStandardMaterial color="#B0A89C" metalness={0.9} roughness={0.2} />
+        </mesh>
+      ))}
 
-          {/* Reverse Readable Face for Silky 360 Spin */}
-          <group position={[0, 0, -0.05]} rotation={[0, Math.PI, 0]}>
-            <Extruded3DWord
-              text={line1}
-              fontSize={fontSize1}
-              position={[0, yPos1, 0]}
-              faceColor={theme.line1Face}
-              bevelColor={theme.line1Bevel}
-              extrusionColor={theme.line1Extrude}
-              emissiveColor={theme.emissive}
-              emissiveIntensity={isScanning ? 0.7 : verdict ? 0.4 : 0.15}
+      {/* 2. Outer Neon Tube Border / Frame */}
+      <mesh position={[0, 0, -0.01]}>
+        <torusGeometry args={[1.95, 0.024, 16, 64]} />
+        <meshStandardMaterial
+          color="#00F0FF"
+          emissive="#00D2FF"
+          emissiveIntensity={3.2}
+          roughness={0.1}
+          transparent
+          opacity={0.95}
+        />
+      </mesh>
+
+      {/* Inner White Tube for Border */}
+      <mesh position={[0, 0, 0.005]}>
+        <torusGeometry args={[1.95, 0.01, 12, 64]} />
+        <meshBasicMaterial color="#FFFFFF" />
+      </mesh>
+
+      {/* 3. Main Neon Title Text (Line 1) */}
+      <group position={[0, line2 ? 0.22 : 0, 0.02]}>
+        {/* Deep Color Glow Outline */}
+        <Text
+          fontSize={fontSize}
+          maxWidth={3.6}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.045}
+          outlineColor={neonColor}
+          letterSpacing={0.06}
+          font="https://fonts.gstatic.com/s/syne/v22/8vIS7w4qzmVxsWxjBCHSnVk.woff"
+        >
+          {line1}
+          <meshStandardMaterial
+            color={neonColor}
+            emissive={glowColor}
+            emissiveIntensity={4.2}
+            roughness={0.1}
+          />
+        </Text>
+
+        {/* White Hot Center Tube Core */}
+        <Text
+          position={[0, 0, 0.018]}
+          fontSize={fontSize}
+          maxWidth={3.6}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.012}
+          outlineColor="#FFFFFF"
+          letterSpacing={0.06}
+          font="https://fonts.gstatic.com/s/syne/v22/8vIS7w4qzmVxsWxjBCHSnVk.woff"
+        >
+          {line1}
+          <meshBasicMaterial color="#FFFFFF" />
+        </Text>
+      </group>
+
+      {/* 4. Main Neon Title Text (Line 2 if exists) */}
+      {line2 && (
+        <group position={[0, -0.28, 0.02]}>
+          {/* Deep Color Glow Outline */}
+          <Text
+            fontSize={fontSize * 0.95}
+            maxWidth={3.6}
+            textAlign="center"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.045}
+            outlineColor="#00F0FF"
+            letterSpacing={0.06}
+            font="https://fonts.gstatic.com/s/syne/v22/8vIS7w4qzmVxsWxjBCHSnVk.woff"
+          >
+            {line2}
+            <meshStandardMaterial
+              color="#00F0FF"
+              emissive="#00D2FF"
+              emissiveIntensity={4.2}
+              roughness={0.1}
             />
-            {line2 && (
-              <Extruded3DWord
-                text={line2}
-                fontSize={fontSize2}
-                position={[0, yPos2, 0]}
-                faceColor={theme.line2Face}
-                bevelColor={theme.line2Bevel}
-                extrusionColor={theme.line2Extrude}
-                emissiveColor={theme.emissive}
-                emissiveIntensity={isScanning ? 0.7 : verdict ? 0.4 : 0.15}
-              />
-            )}
-          </group>
+          </Text>
+
+          {/* White Hot Center Tube Core */}
+          <Text
+            position={[0, 0, 0.018]}
+            fontSize={fontSize * 0.95}
+            maxWidth={3.6}
+            textAlign="center"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.012}
+            outlineColor="#FFFFFF"
+            letterSpacing={0.06}
+            font="https://fonts.gstatic.com/s/syne/v22/8vIS7w4qzmVxsWxjBCHSnVk.woff"
+          >
+            {line2}
+            <meshBasicMaterial color="#FFFFFF" />
+          </Text>
         </group>
-      </Float>
+      )}
 
-      {/* Silky Laser Scanning Plane */}
+      {/* 5. Subtitle Neon Tag (PRGI Statutory Clearance) */}
+      <Text
+        position={[0, -0.74, 0.02]}
+        fontSize={0.12}
+        letterSpacing={0.14}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.015}
+        outlineColor={neonColor}
+      >
+        [ PRGI STATUTORY CLEARANCE SPECIMEN ]
+        <meshStandardMaterial
+          color="#FFFDF7"
+          emissive={neonColor}
+          emissiveIntensity={2.0}
+        />
+      </Text>
+
+      {/* Neon Backlight Illuminators */}
+      <pointLight position={[0, 0, 0.4]} color={ambientGlow} intensity={3.5} distance={4.5} />
+      <pointLight position={[0, 0, -0.2]} color={glowColor} intensity={2.0} distance={3.0} />
+
+      {/* Laser Scanning Line during verification */}
       {isScanning && (
-        <group ref={scanLaserRef} position={[0, 0, 0]}>
-          <mesh position={[0, 0, 0.05]}>
-            <planeGeometry args={[3.8, 0.04]} />
-            <meshBasicMaterial
-              color={theme.laserColor}
-              transparent
-              opacity={0.9}
-              blending={THREE.AdditiveBlending}
-            />
+        <group position={[0, 0, 0.12]}>
+          <mesh>
+            <planeGeometry args={[4.0, 0.04]} />
+            <meshBasicMaterial color="#00F0FF" transparent opacity={0.9} />
           </mesh>
+          <pointLight color="#00F0FF" intensity={4} distance={2} />
         </group>
       )}
     </group>
   );
-}
-
-function CursorSpecularLight({ color }: { color: string }) {
-  const lightRef = useRef<THREE.PointLight>(null);
-  useFrame((state) => {
-    if (lightRef.current) {
-      lightRef.current.position.x = THREE.MathUtils.lerp(lightRef.current.position.x, state.pointer.x * 4.5, 0.1);
-      lightRef.current.position.y = THREE.MathUtils.lerp(lightRef.current.position.y, state.pointer.y * 3.5 + 1.5, 0.1);
-      lightRef.current.position.z = 3.5;
-    }
-  });
-  return <pointLight ref={lightRef} intensity={2.5} distance={7} color={color} />;
 }
 
 export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning }) => {
@@ -413,18 +361,11 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
     return () => mql.removeEventListener('change', handler);
   }, []);
 
-  const lightColor = useMemo(() => {
-    if (verdict === 'APPROVED') return '#10B981';
-    if (verdict === 'REJECTED') return '#EF4444';
-    if (verdict === 'MANUAL_REVIEW') return '#F59E0B';
-    return '#FBBF24';
-  }, [verdict]);
-
   if (reducedMotion) {
     return (
-      <div className="w-full h-full min-h-[300px] relative flex flex-col items-center justify-center p-6 text-center space-y-3">
+      <div className="w-full h-full min-h-[340px] relative flex flex-col items-center justify-center p-6 text-center space-y-3">
         <div className="text-xs font-mono uppercase tracking-widest text-[#78716C]">
-          PRGI Verification Specimen
+          PRGI Verification Neon Specimen
         </div>
         <h2 className="font-editorial text-4xl sm:text-5xl font-bold text-[#1C1917] tracking-tight">
           {title || 'Times India'}
@@ -441,23 +382,81 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
   }
 
   return (
-    <div className="w-full h-full min-h-[300px] relative flex items-center justify-center pointer-events-auto">
+    <div className="w-full h-full min-h-[340px] relative flex items-center justify-center pointer-events-auto select-none">
       <Canvas
-        camera={{ position: [0, 0, 4.0], fov: 42 }}
+        camera={{ position: [0, 0, 4.3], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={1.4} />
-        <directionalLight position={[5, 7, 6]} intensity={2.0} color="#FFFDF7" />
-        <directionalLight position={[-6, -4, 4]} intensity={0.9} color="#FED7AA" />
-        <directionalLight position={[0, 5, -5]} intensity={0.7} color="#DDD1BF" />
-        <CursorSpecularLight color={lightColor} />
-        <OrbitControls enableZoom={false} enablePan={false} maxPolarAngle={Math.PI / 1.7} minPolarAngle={Math.PI / 2.3} />
+        {/* Soft Warm Ambient Studio Lighting */}
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[4, 6, 5]} intensity={1.5} color="#FFFDF7" />
+        <directionalLight position={[-4, -3, 3]} intensity={0.8} color="#FFE4E6" />
+
+        {/* Orbit Controls: Rotatable by Mouse, Static Neon Sign */}
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          maxPolarAngle={Math.PI / 1.7}
+          minPolarAngle={Math.PI / 2.3}
+          maxAzimuthAngle={Math.PI / 3.5}
+          minAzimuthAngle={-Math.PI / 3.5}
+          dampingFactor={0.06}
+        />
+
         <Suspense fallback={null}>
-          <StatutarySeal3D
-            title={title}
-            verdict={verdict}
-            isScanning={isScanning}
-          />
+          <group position={[0, 0, 0]}>
+            {/* Center Neon Title Sign on Acrylic Plate */}
+            <NeonTitleSign
+              title={title || 'Times India'}
+              verdict={verdict}
+              isScanning={isScanning}
+            />
+
+            {/* Neon Butterflies Floating Naturally Around the Sign (Matching Reference Images) */}
+            {/* 1. Top-Right Majestic Hot Pink Butterfly */}
+            <NeonButterfly
+              position={[2.0, 0.95, 0.25]}
+              rotation={[0.1, -0.25, 0.2]}
+              scale={0.85}
+              color="#FF1493"
+              glowColor="#FF007F"
+              wingAngleOffset={0}
+              flutterSpeed={2.2}
+            />
+
+            {/* 2. Top-Left Electric Cyan Butterfly */}
+            <NeonButterfly
+              position={[-2.05, 0.85, 0.2]}
+              rotation={[0.15, 0.3, -0.25]}
+              scale={0.75}
+              color="#00F0FF"
+              glowColor="#00D2FF"
+              wingAngleOffset={1.2}
+              flutterSpeed={2.6}
+            />
+
+            {/* 3. Bottom-Left Warm Amber/Pink Butterfly */}
+            <NeonButterfly
+              position={[-1.95, -0.85, 0.3]}
+              rotation={[-0.1, 0.2, 0.15]}
+              scale={0.7}
+              color="#FF007F"
+              glowColor="#FF2E93"
+              wingAngleOffset={2.4}
+              flutterSpeed={2.0}
+            />
+
+            {/* 4. Bottom-Right Vibrant Butterfly */}
+            <NeonButterfly
+              position={[2.05, -0.75, 0.2]}
+              rotation={[-0.12, -0.22, -0.18]}
+              scale={0.68}
+              color="#FFB800"
+              glowColor="#FFD043"
+              wingAngleOffset={3.6}
+              flutterSpeed={2.4}
+            />
+          </group>
         </Suspense>
       </Canvas>
     </div>
