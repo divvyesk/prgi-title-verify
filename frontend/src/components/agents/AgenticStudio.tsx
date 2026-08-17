@@ -9,7 +9,10 @@ import {
   Check, 
   RefreshCw, 
   ShieldCheck, 
-  Flame 
+  Flame,
+  AlertTriangle,
+  FileQuestion,
+  RotateCcw
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { GeneratedCandidate } from '../../types';
@@ -45,6 +48,7 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
   const [activeAgentIndex, setActiveAgentIndex] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [generationTimeMs, setGenerationTimeMs] = useState<number | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   
   // Visible Retry & Collision Telemetry
   const [retryInfo, setRetryInfo] = useState<RetryTelemetry | null>({
@@ -109,6 +113,7 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
     const startTime = performance.now();
     sound.playScan();
     setIsGenerating(true);
+    setGenerationError(null);
     setRetryInfo(null);
 
     // Step 1: Interviewer Agent
@@ -150,7 +155,8 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
       }
     } catch (err) {
       console.warn('[AgenticStudio] Live endpoint fallback to embedded multi-agent synthesizer:', err);
-      
+      setGenerationError('Live generation endpoint unreachable — showing offline multi-agent candidates.');
+
       const prefixMap: Record<string, string[]> = {
         Hindi: [
           'Navin Krishi Sandarbh', 
@@ -338,6 +344,25 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
         </ScrollReveal>
       </section>
 
+      {/* Generation Error Banner */}
+      {generationError && (
+        <section className="py-4">
+          <div className="p-4 bg-amber-50/90 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+              <span className="font-medium">{generationError}</span>
+            </div>
+            <button
+              onClick={handleGenerate}
+              className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-lg font-bold flex items-center gap-1.5 self-start sm:self-auto cursor-pointer transition-colors shadow-2xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-amber-300" />
+              <span>Retry Generation</span>
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Chapter 03: Workspace & Generated Recommendations */}
       <section className="py-12 sm:py-20">
         <ScrollReveal direction="up" delayMs={100}>
@@ -470,58 +495,84 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
                 </h3>
               </div>
 
-              <div className="divide-y divide-[#EDE8DF]">
-                {candidates.map((candidate: GeneratedCandidate) => (
-                  <div
-                    key={candidate.id}
-                    className="py-6 flex flex-col md:flex-row md:items-baseline justify-between gap-6"
-                  >
-                    <div className="space-y-2 max-w-xl">
-                      <div className="flex items-baseline gap-3 flex-wrap">
-                        <span className="font-bold text-xl text-[#1C1917]">
-                          {candidate.title}
-                        </span>
-                        <span className="text-xs font-mono text-[#137333] font-bold">
-                          Verified Clear
-                        </span>
-                        <span className="text-xs font-mono text-[#78716C]">
-                          Uniqueness: {candidate.uniquenessScore}%
-                        </span>
+              {/* Loading Skeleton */}
+              {isGenerating && (
+                <div className="space-y-4 animate-pulse">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="py-6 space-y-2 border-b border-[#EDE8DF]">
+                      <div className="h-5 bg-[#EAE4DA] rounded w-1/3" />
+                      <div className="h-4 bg-[#EAE4DA] rounded w-2/3" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Empty State */}
+              {!isGenerating && candidates.length === 0 && (
+                <div className="py-16 text-center space-y-3">
+                  <FileQuestion className="w-8 h-8 text-[#A8A29E] mx-auto" />
+                  <h4 className="font-bold text-base text-[#1C1917]">No Alternatives Generated Yet</h4>
+                  <p className="text-xs text-[#78716C] max-w-sm mx-auto">
+                    Fill in your publication theme on the left and click "Generate Pre-Cleared Titles" to activate the 4-agent collaborative loop.
+                  </p>
+                </div>
+              )}
+
+              {/* Success State Candidates List */}
+              {!isGenerating && candidates.length > 0 && (
+                <div className="divide-y divide-[#EDE8DF]">
+                  {candidates.map((candidate: GeneratedCandidate) => (
+                    <div
+                      key={candidate.id}
+                      className="py-6 flex flex-col md:flex-row md:items-baseline justify-between gap-6"
+                    >
+                      <div className="space-y-2 max-w-xl">
+                        <div className="flex items-baseline gap-3 flex-wrap">
+                          <span className="font-bold text-xl text-[#1C1917]">
+                            {candidate.title}
+                          </span>
+                          <span className="text-xs font-mono text-[#137333] font-bold">
+                            Verified Clear
+                          </span>
+                          <span className="text-xs font-mono text-[#78716C]">
+                            Uniqueness: {candidate.uniquenessScore}%
+                          </span>
+                        </div>
+
+                        <p className="text-xs sm:text-sm text-[#57534E]">
+                          <strong className="text-[#1C1917]">Meaning:</strong> {candidate.meaning}
+                        </p>
+                        <p className="text-xs text-[#78716C] leading-relaxed">
+                          {candidate.rationale}
+                        </p>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-[#57534E]">
-                        <strong className="text-[#1C1917]">Meaning:</strong> {candidate.meaning}
-                      </p>
-                      <p className="text-xs text-[#78716C] leading-relaxed">
-                        {candidate.rationale}
-                      </p>
-                    </div>
+                      {/* Actions */}
+                      <div className="flex items-center gap-3 shrink-0">
+                        <button
+                          onClick={() => copyTitle(candidate.title, candidate.id)}
+                          className="hover:text-[#1C1917] text-xs font-semibold text-[#57534E] flex items-center gap-1 cursor-pointer"
+                          title="Copy title"
+                        >
+                          {copiedId === candidate.id ? <Check className="w-3.5 h-3.5 text-[#137333]" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{copiedId === candidate.id ? 'Copied' : 'Copy'}</span>
+                        </button>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-3 shrink-0">
-                      <button
-                        onClick={() => copyTitle(candidate.title, candidate.id)}
-                        className="hover:text-[#1C1917] text-xs font-semibold text-[#57534E] flex items-center gap-1 cursor-pointer"
-                        title="Copy title"
-                      >
-                        {copiedId === candidate.id ? <Check className="w-3.5 h-3.5 text-[#137333]" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{copiedId === candidate.id ? 'Copied' : 'Copy'}</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          sound.playClick();
-                          onSelectTitleForVerification(candidate.title);
-                        }}
-                        className="px-4 py-2 rounded-xl bg-[#1C1917] hover:bg-[#382E22] text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-                      >
-                        <span>Inspect in Verifier</span>
-                        <ArrowRight className="w-3 h-3 text-amber-300" />
-                      </button>
+                        <button
+                          onClick={() => {
+                            sound.playClick();
+                            onSelectTitleForVerification(candidate.title);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-[#1C1917] hover:bg-[#382E22] text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                        >
+                          <span>Inspect in Verifier</span>
+                          <ArrowRight className="w-3 h-3 text-amber-300" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </ScrollReveal>

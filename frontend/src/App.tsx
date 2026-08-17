@@ -8,6 +8,7 @@ import { RegistryExplorer } from './components/registry/RegistryExplorer';
 import { RoadmapModal } from './components/roadmap/RoadmapModal';
 import { DynamicBeigeBackground } from './components/canvas/DynamicBeigeBackground';
 import { LoadingIntro } from './components/loading/LoadingIntro';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 export function App() {
   const [showIntro, setShowIntro] = useState(true);
@@ -69,30 +70,32 @@ export function App() {
         setUseLiveApi={setUseLiveApi}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content Area with Top-Level Error Boundary */}
       <main className="flex-1 z-10 relative">
-        {activeTab === 'verifier' && (
-          <VerificationView
-            onNavigateToAgents={handleNavigateToAgents}
-            useLiveApi={useLiveApi}
-            initialTitle={verifierInitialTitle}
-          />
-        )}
+        <ErrorBoundary fallbackTitle="PRGI TitleGuard View Error">
+          {activeTab === 'verifier' && (
+            <VerificationView
+              onNavigateToAgents={handleNavigateToAgents}
+              useLiveApi={useLiveApi}
+              initialTitle={verifierInitialTitle}
+            />
+          )}
 
-        {activeTab === 'agents' && (
-          <AgenticStudio
-            initialSeed={agentSeedTitle}
-            onSelectTitleForVerification={handleSelectTitleForVerification}
-          />
-        )}
+          {activeTab === 'agents' && (
+            <AgenticStudio
+              initialSeed={agentSeedTitle}
+              onSelectTitleForVerification={handleSelectTitleForVerification}
+            />
+          )}
 
-        {activeTab === 'officer' && (
-          <OfficerDashboard />
-        )}
+          {activeTab === 'officer' && (
+            <OfficerDashboard />
+          )}
 
-        {activeTab === 'registry' && (
-          <RegistryExplorer />
-        )}
+          {activeTab === 'registry' && (
+            <RegistryExplorer />
+          )}
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}

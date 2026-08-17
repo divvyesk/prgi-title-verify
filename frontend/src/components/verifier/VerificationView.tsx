@@ -8,7 +8,10 @@ import {
   Copy, 
   Check, 
   ArrowRight,
-  RefreshCw
+  RefreshCw,
+  AlertTriangle,
+  FileQuestion,
+  RotateCcw
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Hero3DCanvas } from '../canvas/Hero3DCanvas';
@@ -16,6 +19,7 @@ import { useVerification } from '../../hooks/useVerification';
 import { PipelineProgress } from './PipelineProgress';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { detectScriptAndLanguage, transliterateToRoman } from '../../utils/transliteration';
+import { ApiError } from '../../api/client';
 import type { VerificationResult } from '../../types';
 import { sound } from '../../utils/audio';
 
@@ -102,18 +106,28 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [selectedState, setSelectedState] = useState('Maharashtra');
   const [copiedReport, setCopiedReport] = useState(false);
+  const [inlineError, setInlineError] = useState<string | null>(null);
 
   // Single unified verification hook
-  const { run, stage, result, engine, isRunning } = useVerification(INITIAL_DEMO_RESULT);
+  const { run, stage, result, engine, error, isRunning } = useVerification(INITIAL_DEMO_RESULT);
 
   const detected = detectScriptAndLanguage(inputTitle);
   const transliteratedPreview = transliterateToRoman(inputTitle);
 
   const handleVerify = async (titleToVerify?: string) => {
-    const target = (titleToVerify || inputTitle).trim();
-    if (!target) return;
+    const rawTarget = titleToVerify !== undefined ? titleToVerify : inputTitle;
+    const target = rawTarget.trim();
 
+    // Inline empty title validation (Requirement: "Enter a title to verify." — inline, next to the field, not a toast)
+    if (!target) {
+      setInlineError('Enter a title to verify.');
+      sound.playAlert();
+      return;
+    }
+
+    setInlineError(null);
     sound.playScan();
+
     try {
       const res = await run(target, {
         language: selectedLanguage,
@@ -162,6 +176,57 @@ Explanation: ${result.explanation}`;
     setTimeout(() => setCopiedReport(false), 2000);
   };
 
+  // Honest specific error copy formatting
+  const getSpecificErrorNotice = () => {
+    if (!error) return null;
+
+    if (error instanceof ApiError) {
+      if (error.code === 'TIMEOUT' || error.code === 'REQUEST_TIMEOUT') {
+        return {
+          message: 'The live engine took longer than 2.5 seconds. Showing the offline result.',
+          type: 'timeout'
+        };
+      }
+      if (error.code === 'VALIDATION_FAILED' || error.code === 'VALIDATION_ERROR' || error.code === 'INVALID_RESPONSE') {
+        console.error('[VerificationView] Validation failure details:', error.rawDetails || error.message);
+        return {
+          message: 'The server returned an unexpected response. Showing the offline result.',
+          type: 'validation'
+        };
+      }
+    }
+
+    const lowerMsg = (error.message || '').toLowerCase();
+    if (lowerMsg.includes('fetch') || lowerMsg.includes('failed to fetch') || lowerMsg.includes('network') || lowerMsg.includes('refused') || lowerMsg.includes('unreachable')) {
+      return {
+        message: 'Live engine unreachable — showing an offline result from the 2,500-title sample.',
+        type: 'unreachable'
+      };
+    }
+
+    if (lowerMsg.includes('timeout') || lowerMsg.includes('abort')) {
+      return {
+        message: 'The live engine took longer than 2.5 seconds. Showing the offline result.',
+        type: 'timeout'
+      };
+    }
+
+    if (lowerMsg.includes('validation') || lowerMsg.includes('unexpected') || lowerMsg.includes('json')) {
+      console.error('[VerificationView] Server response parsing error:', error);
+      return {
+        message: 'The server returned an unexpected response. Showing the offline result.',
+        type: 'validation'
+      };
+    }
+
+    return {
+      message: 'Live engine unreachable — showing an offline result from the 2,500-title sample.',
+      type: 'generic'
+    };
+  };
+
+  const errorNotice = getSpecificErrorNotice();
+
   return (
     <div className="max-w-7xl mx-auto px-6 sm:px-12 divide-y divide-[#EAE4DA]">
       
@@ -184,20 +249,28 @@ Explanation: ${result.explanation}`;
               </div>
 
               {/* Clean Functional Search Input */}
-              <div className="space-y-4 pt-2">
+              <div className="space-y-3 pt-2">
                 <div className="relative flex flex-col sm:flex-row gap-2.5">
                   <div className="relative flex-1">
                     <input
                       type="text"
                       value={inputTitle}
-                      onChange={(e) => setInputTitle(e.target.value)}
+                      onChange={(e) => {
+                        setInputTitle(e.target.value);
+                        if (inlineError) setInlineError(null);
+                      }}
                       onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
                       placeholder="Enter publication title..."
-                      className="w-full bg-white border border-[#DDD5C9] rounded-xl px-5 py-4 text-[#1C1917] placeholder-[#A8A29E] text-base font-semibold focus:outline-none shadow-2xs"
+                      className={`w-full bg-white border ${
+                        inlineError ? 'border-rose-500 ring-1 ring-rose-500' : 'border-[#DDD5C9]'
+                      } rounded-xl px-5 py-4 text-[#1C1917] placeholder-[#A8A29E] text-base font-semibold focus:outline-none shadow-2xs`}
                     />
                     {inputTitle && (
                       <button
-                        onClick={() => setInputTitle('')}
+                        onClick={() => {
+                          setInputTitle('');
+                          setInlineError(null);
+                        }}
                         className="absolute right-4 top-4 text-[#78716C] hover:text-[#1C1917] text-xs font-bold cursor-pointer"
                       >
                         Clear
@@ -207,7 +280,7 @@ Explanation: ${result.explanation}`;
 
                   <button
                     onClick={() => handleVerify()}
-                    disabled={isRunning || !inputTitle.trim()}
+                    disabled={isRunning}
                     className="px-8 py-4 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer"
                   >
                     {isRunning ? (
@@ -223,6 +296,14 @@ Explanation: ${result.explanation}`;
                     )}
                   </button>
                 </div>
+
+                {/* Inline Validation Error Requirement */}
+                {inlineError && (
+                  <div className="text-xs font-semibold text-rose-700 flex items-center gap-1.5 pt-0.5">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>{inlineError}</span>
+                  </div>
+                )}
 
                 {/* Filter Controls & Presets */}
                 <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-[#57534E] pt-1">
@@ -268,6 +349,7 @@ Explanation: ${result.explanation}`;
                         key={preset.value}
                         onClick={() => {
                           setInputTitle(preset.value);
+                          setInlineError(null);
                           sound.playClick();
                           handleVerify(preset.value);
                         }}
@@ -321,7 +403,48 @@ Explanation: ${result.explanation}`;
         </ScrollReveal>
       </section>
 
-      {/* CHAPTER 03: Primary Verdict Banner & Statutory Evidence */}
+      {/* Specific Honest Error Banner (When Live Engine Fails / Times out / Schema fails) */}
+      {errorNotice && (
+        <section className="py-4">
+          <div className="p-4 bg-amber-50/90 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+              <span className="font-medium">{errorNotice.message}</span>
+            </div>
+            <button
+              onClick={() => handleVerify()}
+              className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-lg font-bold flex items-center gap-1.5 self-start sm:self-auto cursor-pointer transition-colors shadow-2xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-amber-300" />
+              <span>Retry</span>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Loading Skeleton State */}
+      {isRunning && !result && (
+        <section className="py-12 sm:py-20 space-y-6">
+          <div className="p-8 sm:p-10 rounded-2xl bg-white border border-[#DDD5C9] space-y-4 animate-pulse">
+            <div className="h-6 bg-[#EAE4DA] rounded w-1/4" />
+            <div className="h-10 bg-[#EAE4DA] rounded w-2/3" />
+            <div className="h-4 bg-[#EAE4DA] rounded w-1/2" />
+          </div>
+        </section>
+      )}
+
+      {/* Empty State */}
+      {!isRunning && !result && (
+        <section className="py-16 text-center space-y-3">
+          <FileQuestion className="w-8 h-8 text-[#A8A29E] mx-auto" />
+          <h3 className="font-bold text-base text-[#1C1917]">No Title Verified Yet</h3>
+          <p className="text-xs text-[#78716C] max-w-sm mx-auto">
+            Enter a publication title above and click "Verify Title" to run statutory admissibility clearance.
+          </p>
+        </section>
+      )}
+
+      {/* CHAPTER 03: Success State — Primary Verdict Banner & Statutory Evidence */}
       {result && (
         <section className="py-12 sm:py-20 space-y-16">
           {/* Main Verdict Banner */}
