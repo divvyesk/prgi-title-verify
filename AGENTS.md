@@ -218,3 +218,34 @@ I also review every pull request and own `main`.
 
 My first three hours are the most important hours on the team, because until
 contracts and fixtures exist, five other people are guessing.
+
+## MY ROLE (Suhani — Agentic Studio, RAG, presentation)
+
+I am Suhani. I build the AI-agent side of the product and the presentation. I own:
+
+- `agents/` : a LangGraph workflow with four agents that invent alternative
+  titles when a proposed title is rejected: Interviewer -> writes a creative
+  brief from the publication's details; Generator -> proposes 15-20 candidate
+  titles; Verifier -> runs every candidate through the REAL verification
+  pipeline; Ranker -> returns only the survivors, ranked. One bounded retry
+  loop: if fewer than 5 candidates survive, go back to the Generator with the
+  rejection reasons, up to 3 attempts total.
+- `ml/rag/` : the explanation generator. It must RETRIEVE the real guideline
+  text first and only then ask a language model to phrase it. The model must
+  never answer from memory — that is how fabricated citations happen (Known
+  Problem #1 above).
+- `presentation/` : the Smart India Hackathon idea-submission deck.
+
+I do not touch the frontend, the backend orchestrator, or the algorithms.
+Contracts (`contracts/contracts.py`, `contracts/algo.py`) are already frozen
+and merged — I build against those, I don't redefine them.
+
+As of this section being written, `backend/app/services/pipeline.py` already
+has two dynamic-import wiring points waiting for my work: `ml.rules.engine`
+(not mine — Pruthviraj's) is one, but `ml.rag.explain.explain(title, verdict,
+clashing_titles, rule_violations) -> tuple[str, str, list[str]]` is exactly
+my RAG explainer's expected interface, and `/v1/alternatives`
+(`backend/app/routers/alternatives.py`) already tries `agents.studio.run_studio(
+genre, state, language, tone, audience) -> list[GeneratedCandidate]` and falls
+back to fixture data if it isn't there. Both fall back gracefully today —
+landing either module flips that endpoint real with no other code change.
