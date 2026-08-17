@@ -27,7 +27,7 @@ from ml.rules.types import RuleContext, RuleOutcome
 # Only the most explicit communal disharmony phrases.
 # Neutral community names (Hindu, Muslim, Sikh, Christian, etc.) are NOT in this list.
 _COMMUNAL_PHRASES = {
-    "anti-hindu", "anti-muslim", "anti-sikh", "anti-christian",
+    "anti-hindu", "anti-muslim", "anti-sikh", "anti-christian", "anti-community",
     "kill hindus", "kill muslims", "hindu vs muslim", "muslim vs hindu",
     "communal riot", "religious war",
 }

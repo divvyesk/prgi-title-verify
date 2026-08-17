@@ -2,8 +2,6 @@
 # Words indicating misleading government/institutional association.
 # Source: PRGI Guideline 11 and 12 (verbatim examples) + frontend/src/utils/rulesEngine.ts
 # One entry per line. Lowercase. Phrases matched as substrings.
-# IMPORTANT: Single common words like "police" must be used with a second signal
-# (see government.py for the two-signal guard to prevent over-firing).
 government
 sarkari
 sarkar
@@ -12,6 +10,7 @@ parliament
 sansad
 supreme court
 high court
+police
 cbi
 cid
 vigilance

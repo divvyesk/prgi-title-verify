@@ -236,9 +236,7 @@
     "source_clause": "Titles denoting the name of an individual should not be the names of the owner or publisher of the proposed periodical.",
     "source_clause_verified": true,
     "detection_hint": "name match with applicant",
-    "examples_fail": [
-      "Rajan Times"
-    ],
+    "examples_fail": [],
     "examples_pass": [
       "National Times"
     ],
@@ -736,7 +734,7 @@
     "source_clause_verified": false,
     "detection_hint": "length check",
     "examples_fail": [
-      "This is a ridiculously long title that goes on forever and ever and ever and ever and ever and ever"
+      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     ],
     "examples_pass": [
       "Normal Length Title"

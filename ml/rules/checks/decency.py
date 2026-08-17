@@ -43,7 +43,7 @@ _DECENCY_WORDS = [
 
 _CRIME_WORDS = {"crime", "corruption", "scam", "fraud"}
 _OBSCENE_WORDS = {"obscene", "vulgar", "porn", "adult", "xxx"}
-_HATE_WORDS = {"hate", "murder", "rape", "riot"}
+_HATE_WORDS = {"hate", "murder", "rape", "riot", "stupid", "absurd", "idiot"}
 
 # Context words that indicate the bad word is being used critically, not promoted
 _REDEMPTIVE_CONTEXT = {"anti", "watch", "awareness", "against", "combat", "expose", "fighter"}
