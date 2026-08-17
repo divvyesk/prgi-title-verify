@@ -26,6 +26,21 @@ def test_strip_markdown_removes_headers_and_emphasis():
     assert "a bullet" in cleaned
 
 
+def test_strip_markdown_removes_closed_and_unclosed_think_tags():
+    # Found live in agents/cache/: qwen/qwen3.6-27b sometimes puts its
+    # chain-of-thought inline in `content` as <think>...</think>, and a
+    # response truncated by max_tokens can leave the tag UNCLOSED with
+    # everything after it being raw, often mid-sentence, reasoning text —
+    # not a hypothetical, an actual cached response consisted entirely of
+    # this with no real answer at all.
+    closed = strip_markdown("<think>reasoning about the answer</think>The actual answer.")
+    assert closed == "The actual answer."
+
+    unclosed = strip_markdown("Some text <think>this reasoning trace never closes because")
+    assert "<think>" not in unclosed and "reasoning trace" not in unclosed
+    assert unclosed == "Some text"
+
+
 def test_real_call_returns_clean_text():
     # gpt-oss models spend part of max_tokens on an internal reasoning
     # trace before any `content` — too small a budget here starves the
@@ -52,10 +67,15 @@ def test_fallback_chain_actually_falls_back():
     # Break the primary model's name so the real API rejects it, and
     # confirm call_llm silently recovers via the next model in the list —
     # proving the fallback logic works, not just that it's written.
+    # Distinct prompt text from other tests in this file: agents/cache.py
+    # (wired into call_llm after this test was first written) would
+    # otherwise serve a cache hit for an identical prompt+temperature seen
+    # earlier in this same run, which would make this test pass without
+    # ever touching the fallback logic it exists to prove.
     original = llm_module.MODELS[:]
     llm_module.MODELS[:] = ["definitely-not-a-real-model-xyz"] + original[1:]
     try:
-        out = call_llm("Reply with exactly the word: hello", temperature=0.0, max_tokens=200)
+        out = call_llm("Reply with exactly the word: fallback-test-unique-prompt", temperature=0.0, max_tokens=200)
         assert isinstance(out, str) and len(out) > 0, f"got empty response: {out!r}"
     finally:
         llm_module.MODELS[:] = original
@@ -78,6 +98,7 @@ if __name__ == "__main__":
     print(f"Configured fallback chain: {MODELS}\n")
     checks = [
         ("strip_markdown removes headers/emphasis/code", test_strip_markdown_removes_headers_and_emphasis),
+        ("strip_markdown removes closed and unclosed think tags", test_strip_markdown_removes_closed_and_unclosed_think_tags),
         ("real call returns clean text", test_real_call_returns_clean_text),
         ("real call with markdown-prone prompt stays clean", test_real_call_with_markdown_prone_prompt_still_comes_out_clean),
         ("fallback chain actually falls back", test_fallback_chain_actually_falls_back),

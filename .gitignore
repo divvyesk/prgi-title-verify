@@ -42,4 +42,6 @@ models/
 # Tooling caches
 .playwright/
 .antigravity/
-agents/cache/
+agents/cache/*
+!agents/cache/seed
+!agents/cache/seed/*
