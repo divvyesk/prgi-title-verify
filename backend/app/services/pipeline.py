@@ -521,19 +521,32 @@ async def run_verification(
             verdict = "REJECTED"
             verdict_score = max(verdict_score, 90.0)
 
+        # run_rules() returns every rule's OUTCOME (36 of them), because the
+        # contract carries `passed` and the UI renders the full compliance
+        # checklist. The explainer means something narrower by the same word:
+        # ml/rag/explain.py builds its retrieval query from
+        # [v.rule_name for v in rule_violations], so handing it all 36 turns
+        # the query into every rule name in the system at once and retrieval
+        # returns near-arbitrary clauses. "Times India" genuinely fails
+        # R-GEN-04/R-GEN-05 (generic prefixing) but was being explained as a
+        # matrimonial-classifieds violation under R-COM-01 — a real clause,
+        # correctly quoted, attached to the wrong title. Pass only the rules
+        # that actually failed.
+        failed_violations = [v for v in rule_violations if not v.passed]
+
         if STUB["explain"]:
             explanation, recommended_action, guideline_citations = stub.template_explanation(
-                title, verdict, clashing_titles, rule_violations
+                title, verdict, clashing_titles, failed_violations
             )
         else:
             try:
                 explanation, recommended_action, guideline_citations = _real_explain(
-                    title, verdict, clashing_titles, rule_violations
+                    title, verdict, clashing_titles, failed_violations
                 )
             except Exception:
                 logger.exception("ml.rag.explain.explain() raised — falling back to templated prose for this request")
                 explanation, recommended_action, guideline_citations = stub.template_explanation(
-                    title, verdict, clashing_titles, rule_violations
+                    title, verdict, clashing_titles, failed_violations
                 )
         engine = "LIVE"
     timings["explain"] = round(stub.now_ms() - t4, 2)
