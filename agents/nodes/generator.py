@@ -20,6 +20,7 @@ import zlib
 from pathlib import Path
 
 from agents.config import settings
+from agents.fallback import generate_offline_candidates
 from agents.llm import call_llm
 from agents.state import StudioState
 
@@ -130,19 +131,30 @@ different candidates this time."""
 
 def generator_node(state: StudioState) -> dict:
     details = state["details"]
+    attempt = state.get("attempt", 0)
     local_titles = sample_local_titles(details.get("state", ""), details.get("language", ""), n=10)
     local_titles_block = "\n".join(f"- {t}" for t in local_titles) if local_titles else "(none found for this state/language)"
 
     retry_block = ""
-    if state.get("attempt", 0) > 0 and state.get("rejected"):
+    if attempt > 0 and state.get("rejected"):
         rejected_list = "\n".join(f"- \"{r['title']}\" — {r['reason']}" for r in state["rejected"])
         retry_block = _RETRY_BLOCK.format(rejected_list=rejected_list)
 
     prompt = _PROMPT.format(brief=state["brief"], local_titles=local_titles_block, retry_block=retry_block)
-    # 2048, not 1024: verified live that 18 titles in a non-Latin script
-    # (e.g. Devanagari for Marathi) plus a model's internal reasoning trace
-    # (see agents/llm.py) can exhaust a 1024 budget before any JSON comes
-    # out, forcing an avoidable fallback to a weaker model on every call.
-    raw = call_llm(prompt, temperature=settings.generator_temperature, max_tokens=2048)
-    candidates = _parse_candidates(raw)
+    try:
+        # 2048, not 1024: verified live that 18 titles in a non-Latin script
+        # (e.g. Devanagari for Marathi) plus a model's internal reasoning
+        # trace (see agents/llm.py) can exhaust a 1024 budget before any
+        # JSON comes out, forcing an avoidable fallback to a weaker model.
+        raw = call_llm(prompt, temperature=settings.generator_temperature, max_tokens=2048)
+        candidates = _parse_candidates(raw)
+        if not candidates:
+            raise ValueError("LLM returned nothing usable after defensive parsing")
+    except Exception:
+        # Every model in the fallback chain (agents/llm.py) failed, timed
+        # out, or returned nothing parseable — hackathon venue wifi fails,
+        # an untested fallback is not a fallback, so this path is real and
+        # tested (agents/test_fallback.py), not a bare `except: pass`.
+        logger.exception("generator: real LLM path failed entirely, falling back to offline wordlist generation")
+        candidates = generate_offline_candidates(details, attempt=attempt)
     return {"candidates": candidates}

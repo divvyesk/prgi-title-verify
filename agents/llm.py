@@ -23,6 +23,8 @@ import re
 
 from groq import Groq
 
+from agents import cache
+
 logger = logging.getLogger("agents.llm")
 
 # Primary first, then fallbacks in order. openai/gpt-oss-120b is the
@@ -53,12 +55,29 @@ _MD_BULLET = re.compile(r"^\s*[-*+]\s+", re.MULTILINE)
 _MD_CODE_FENCE = re.compile(r"```[a-zA-Z]*\n?|```")
 _MD_INLINE_CODE = re.compile(r"`([^`]*)`")
 
+# Some models (verified live: qwen/qwen3.6-27b) put their chain-of-thought
+# inline in `content` itself as <think>...</think>, rather than in a
+# separate `reasoning` field the way gpt-oss does (see call_llm's
+# empty-content handling below — a different failure mode of the same
+# underlying "budget spent on reasoning" problem). CLOSED first: a matched
+# pair anywhere in the text. UNCLOSED second, for a response truncated
+# mid-thought — verified live that this happens (max_tokens hit before the
+# model ever got to close the tag or start the real answer), and without
+# this second pattern the entire "response" would just be raw, often
+# mid-sentence, reasoning text with no closing tag to anchor a match on.
+_THINK_CLOSED = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+_THINK_UNCLOSED = re.compile(r"<think>.*\Z", re.DOTALL | re.IGNORECASE)
+
 
 def strip_markdown(text: str) -> str:
-    """Removes markdown syntax, keeps the content. Order matters: bold/
-    italic markers first (so a bulleted, bolded line doesn't leave a
-    stray leading `*` behind once the bullet regex also runs), then
-    headers and bullets, then code fences/backticks."""
+    """Removes markdown syntax and inline reasoning-trace tags, keeps the
+    content. Order matters: think-tags first (their content is a paragraph
+    of prose that could otherwise trip the header/bullet regexes), then
+    bold/italic markers (so a bulleted, bolded line doesn't leave a stray
+    leading `*` behind once the bullet regex also runs), then headers and
+    bullets, then code fences/backticks."""
+    text = _THINK_CLOSED.sub("", text)
+    text = _THINK_UNCLOSED.sub("", text)
     text = _MD_BOLD_ITALIC.sub(r"\2", text)
     text = _MD_HEADER.sub("", text)
     text = _MD_BULLET.sub("", text)
@@ -81,7 +100,18 @@ def call_llm(prompt: str, temperature: float, max_tokens: int = 1024) -> str:
     whole budget on reasoning and leave `content` empty with
     finish_reason="length" — that is a failure, not a valid empty answer,
     so it's treated as one here and falls through to the next model
-    rather than returning "" silently."""
+    rather than returning "" silently.
+
+    Checks agents/cache/ before calling any model at all, and writes a
+    successful response there before returning — repeated demo runs of the
+    same prompt+temperature become instant and free, and a mid-demo rate
+    limit is survivable for anything already asked once this session (or
+    committed ahead of time, see agents/cache/README.md)."""
+    cached = cache.get(prompt, temperature)
+    if cached is not None:
+        logger.info("call_llm: cache hit")
+        return cached
+
     last_error: Exception | None = None
     for model in MODELS:
         try:
@@ -100,6 +130,7 @@ def call_llm(prompt: str, temperature: float, max_tokens: int = 1024) -> str:
                 )
             if model != MODELS[0]:
                 logger.warning("call_llm: primary model(s) failed, served by fallback %s", model)
+            cache.set(prompt, temperature, text)
             return text
         except Exception as exc:
             logger.warning("call_llm: model %s failed (%s), trying next", model, exc)

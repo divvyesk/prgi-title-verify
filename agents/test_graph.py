@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import agents.graph as graph_module
+import agents.nodes.verifier as verifier_module
 from agents.config import settings
 from agents.graph import build_graph
 
@@ -38,8 +38,8 @@ def test_terminates_when_verifier_rejects_everything():
     actually running it with a client that always rejects, under a wall-
     clock timeout — a real assertion, not just trusting the attempt bound
     logic by inspection."""
-    original_client = graph_module._verify_client
-    graph_module._verify_client = _AlwaysRejectClient()
+    original_client = verifier_module._default_client
+    verifier_module._default_client = _AlwaysRejectClient()
     try:
         g = build_graph()
         t0 = time.time()
@@ -65,7 +65,7 @@ def test_terminates_when_verifier_rejects_everything():
         assert final_state["verified"] == [], "always-reject client should leave verified empty"
         assert len(final_state["rejected"]) == 18, "the last attempt's 18 candidates should all be recorded as rejected"
     finally:
-        graph_module._verify_client = original_client
+        verifier_module._default_client = original_client
 
 
 def test_normal_run_reaches_ranker_with_survivors():
