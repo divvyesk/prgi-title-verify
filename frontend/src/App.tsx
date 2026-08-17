@@ -23,7 +23,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'verifier' | 'agents' | 'officer' | 'registry'>('verifier');
   const [roadmapOpen, setRoadmapOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [useLiveApi, setUseLiveApi] = useState(false);
+  const [useLiveApi, setUseLiveApi] = useState(true);
   const [agentSeedTitle, setAgentSeedTitle] = useState('');
   const [verifierInitialTitle, setVerifierInitialTitle] = useState('Times India');
 
