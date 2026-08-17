@@ -1,0 +1,29 @@
+# rules/wordlists/foreign_locations.txt
+# Foreign country/city names that would trigger R-LOC-01 (Guideline 13).
+# Titles suggesting association with a foreign location not matching place of
+# publication shall not be registered.
+# One entry per line. Lowercase.
+south africa
+canada
+new york
+london
+paris
+dubai
+singapore
+usa
+united states
+america
+britain
+england
+australia
+china
+pakistan
+sri lanka
+bangladesh
+nepal
+germany
+france
+italy
+russia
+japan
+korea

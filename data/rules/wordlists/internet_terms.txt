@@ -1,0 +1,24 @@
+# rules/wordlists/internet_terms.txt
+# URL patterns, domain suffixes, and internet terminology (R-URL-01, R-URL-02).
+# NOTE: source_clause_verified=False — not explicitly in PRGI guidelines doc.
+# One entry per line. Lowercase.
+.com
+.org
+.net
+.in
+.co
+.io
+.gov
+.edu
+www.
+http
+https
+dot com
+dot in
+@gmail
+@yahoo
+lol
+brb
+omg
+wtf
+rofl
