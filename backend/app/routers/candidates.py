@@ -8,5 +8,5 @@ router = APIRouter(tags=["candidates"])
 
 
 @router.post("/v1/candidates", response_model=CandidatesResponse)
-def candidates(body: CandidatesRequest) -> CandidatesResponse:
-    return CandidatesResponse(candidates=pipeline.run_shortlist(body.title, body.limit))
+async def candidates(body: CandidatesRequest) -> CandidatesResponse:
+    return CandidatesResponse(candidates=await pipeline.run_shortlist(body.title, body.limit))

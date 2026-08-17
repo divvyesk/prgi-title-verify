@@ -21,6 +21,7 @@ from pathlib import Path
 from contracts.contracts import (
     Candidate,
     CandidateScore,
+    ClashingTitle,
     GeneratedCandidate,
     OfficerCase,
     RuleViolation,
@@ -168,6 +169,54 @@ def check_rules(title: str) -> list[RuleViolation]:
         violation = _verify_fixtures()["REJECTED"].rule_violations[0]
         return [violation]
     return []
+
+
+def template_explanation(
+    title: str,
+    verdict: str,
+    clashing_titles: list[ClashingTitle],
+    rule_violations: list[RuleViolation],
+) -> tuple[str, str, list[str]]:
+    """Prose for a REAL verdict (Prompt 6 onward: verdict/scores/clashes are
+    computed for real from the registered scorers and retrievers) — but the
+    human-readable sentence explaining that verdict is still templated,
+    because real retrieval-grounded explanation is Suhani's RAG explainer
+    (ml/rag/), not built yet. Returns (explanation, recommended_action,
+    guideline_citations). Every citation returned here is a placeholder,
+    not a real guideline quote — never present this as a verified source."""
+    if verdict == "REJECTED" and rule_violations:
+        v = next((r for r in rule_violations if r.severity == "CRITICAL" and not r.passed), rule_violations[0])
+        return (
+            f"The title \"{title}\" is rejected due to violation of the {v.rule_name}. {v.description}",
+            "Remove the restricted terms before resubmitting, or use the Agentic Title Studio to generate distinctive, pre-verified alternatives.",
+            [v.clause],
+        )
+
+    if verdict == "REJECTED":
+        top = clashing_titles[0] if clashing_titles else None
+        detail = f" with existing registered title \"{top.title}\" ({top.similarity:.0f}% similarity)" if top else ""
+        return (
+            f"The title \"{title}\" is rejected due to high similarity{detail}.",
+            "Try a substantially different title, or use the Agentic Title Studio to generate distinctive alternatives.",
+            ["PLACEHOLDER — real guideline citation pending ml/rag/ (Suhani)."],
+        )
+
+    if verdict == "MANUAL_REVIEW" and clashing_titles:
+        top = clashing_titles[0]
+        return (
+            f"The proposed title \"{title}\" has moderate similarity ({top.similarity:.0f}%) with "
+            f"existing registered title \"{top.title}\". Requires scrutiny by the District "
+            "Magistrate / PRGI reviewing officer.",
+            "Consider adding an authorized geographic prefix or distinctive institutional qualifier.",
+            ["PLACEHOLDER — real guideline citation pending ml/rag/ (Suhani)."],
+        )
+
+    return (
+        f"Title \"{title}\" is distinct and fully compliant. No conflicting registered titles "
+        "found within the similarity threshold, and all PRGI statutory rules passed.",
+        "Proceed with Aadhaar e-Sign filing on the Press Sewa Portal.",
+        ["PLACEHOLDER — real guideline citation pending ml/rag/ (Suhani)."],
+    )
 
 
 def get_alternatives() -> list[GeneratedCandidate]:
