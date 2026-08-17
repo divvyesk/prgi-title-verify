@@ -35,7 +35,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app import db
 from app.config import settings
 from app.services import pipeline
-from ml.similarity import semantic
+try:
+    from ml.similarity import semantic
+except Exception:
+    semantic = None
 from app.routers import (
     alternatives,
     candidates,
@@ -62,9 +65,12 @@ async def lifespan(app: FastAPI):
     # only slow down every teammate's `uvicorn --reload` for no benefit) —
     # same gate db.open_pool() above already uses, so STUB_MODE is the one
     # switch that decides whether this process touches anything heavy.
-    if not settings.stub_mode:
-        load_s = semantic.preload()
-        logger.info("BGE-M3 loaded in %.1fs", load_s)
+    if not settings.stub_mode and semantic is not None:
+        try:
+            load_s = semantic.preload()
+            logger.info("BGE-M3 loaded in %.1fs", load_s)
+        except Exception as exc:
+            logger.warning("BGE-M3 preload failed: %s (will retry on first request)", exc)
 
         # Runs a full verification for each of the six demo titles: warms
         # every code path (model, pool, retrievers, scorers) before the

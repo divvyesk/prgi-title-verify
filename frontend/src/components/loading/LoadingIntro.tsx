@@ -188,7 +188,7 @@ export const LoadingIntro: React.FC<LoadingIntroProps> = ({ onComplete }) => {
               <span>Language: <strong>{currentTitle.lang}</strong></span>
             </div>
             <div className="font-mono text-[10px] text-[#948063]">
-              160,000 Master Records Loaded
+              82,713 Master Records Loaded
             </div>
             <div className="flex items-center gap-1 text-[#047857] font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5" />

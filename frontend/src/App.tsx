@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 import { VerificationView } from './components/verifier/VerificationView';
@@ -8,20 +8,41 @@ import { RegistryExplorer } from './components/registry/RegistryExplorer';
 import { RoadmapModal } from './components/roadmap/RoadmapModal';
 import { DynamicBeigeBackground } from './components/canvas/DynamicBeigeBackground';
 import { LoadingIntro } from './components/loading/LoadingIntro';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 export function App() {
   const [showIntro, setShowIntro] = useState(() => {
     if (typeof window !== 'undefined') {
-      return new URLSearchParams(window.location.search).get('skipIntro') !== '1';
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('skipIntro') === '1' || params.get('skipIntro') === 'true') {
+        return false;
+      }
     }
     return true;
   });
   const [activeTab, setActiveTab] = useState<'verifier' | 'agents' | 'officer' | 'registry'>('verifier');
   const [roadmapOpen, setRoadmapOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [useLiveApi, setUseLiveApi] = useState(false);
+  const [useLiveApi, setUseLiveApi] = useState(true);
   const [agentSeedTitle, setAgentSeedTitle] = useState('');
   const [verifierInitialTitle, setVerifierInitialTitle] = useState('Times India');
+
+  // Interactive Card Spotlight Cursor Tracker
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest?.('.beige-card, .mouse-spotlight, .interactive-card') as HTMLElement | null;
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        target.style.setProperty('--mouse-x', `${x}px`);
+        target.style.setProperty('--mouse-y', `${y}px`);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const handleNavigateToAgents = (seedTitle?: string) => {
     if (seedTitle) setAgentSeedTitle(seedTitle);
@@ -57,30 +78,32 @@ export function App() {
         setUseLiveApi={setUseLiveApi}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content Area with Top-Level Error Boundary */}
       <main className="flex-1 z-10 relative">
-        {activeTab === 'verifier' && (
-          <VerificationView
-            onNavigateToAgents={handleNavigateToAgents}
-            useLiveApi={useLiveApi}
-            initialTitle={verifierInitialTitle}
-          />
-        )}
+        <ErrorBoundary fallbackTitle="PRGI TitleGuard View Error">
+          {activeTab === 'verifier' && (
+            <VerificationView
+              onNavigateToAgents={handleNavigateToAgents}
+              useLiveApi={useLiveApi}
+              initialTitle={verifierInitialTitle}
+            />
+          )}
 
-        {activeTab === 'agents' && (
-          <AgenticStudio
-            initialSeed={agentSeedTitle}
-            onSelectTitleForVerification={handleSelectTitleForVerification}
-          />
-        )}
+          {activeTab === 'agents' && (
+            <AgenticStudio
+              initialSeed={agentSeedTitle}
+              onSelectTitleForVerification={handleSelectTitleForVerification}
+            />
+          )}
 
-        {activeTab === 'officer' && (
-          <OfficerDashboard />
-        )}
+          {activeTab === 'officer' && (
+            <OfficerDashboard />
+          )}
 
-        {activeTab === 'registry' && (
-          <RegistryExplorer />
-        )}
+          {activeTab === 'registry' && (
+            <RegistryExplorer />
+          )}
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}

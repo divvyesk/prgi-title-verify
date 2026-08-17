@@ -17,30 +17,44 @@ export type LanguageCode =
 export type VerdictStatus = 'APPROVED' | 'MANUAL_REVIEW' | 'REJECTED';
 
 export interface TitleRecord {
-  id: string;
+  id?: string;
+  title_id?: number | string;
   title: string;
-  language: string;
-  state: string;
-  regNo: string;
-  regDate: string;
+  language?: string;
+  language_normalized?: string;
+  state?: string;
+  publication_state?: string;
+  district?: string;
+  publication_district?: string;
+  regNo?: string;
+  registration_number?: string;
+  regDate?: string;
+  registration_date?: string;
   publisher?: string;
   owner?: string;
   periodicity?: string;
+  script?: string;
+  title_transliterated?: string;
+  title_core?: string;
+  data_quality_status?: string;
 }
 
 export interface SimilarityScores {
-  lexicalScore: number;     // 0-100 (Edit distance / Levenshtein)
+  lexicalScore: number;     // 0-100 (Edit distance / Levenshtein / pg_trgm)
   phoneticScore: number;    // 0-100 (Metaphone / Soundex)
-  semanticScore: number;    // 0-100 (Vector / Multilingual cross-lingual)
+  semanticScore: number;    // 0-100 (BGE-M3 Vector / Multilingual cross-lingual)
   coreWordScore: number;    // 0-100 (Root token clash after stopword removal)
   blendedScore: number;     // Combined aggregate conflict probability
 }
 
 export interface ClashingTitle {
   title: string;
-  regNo: string;
-  language: string;
-  state: string;
+  regNo?: string;
+  registration_number?: string;
+  language?: string;
+  state?: string;
+  publication_state?: string;
+  district?: string;
   similarity: number; // 0 - 100
   matchType: 'LEXICAL' | 'PHONETIC' | 'SEMANTIC' | 'CORE_WORD' | 'COMBINATION';
   matchedCoreWord?: string;
@@ -71,6 +85,9 @@ export interface VerificationResult {
   explanation: string;
   recommendedAction: string;
   guidelineCitations: string[];
+  stageTimings?: Record<string, number>;
+  engine?: 'LIVE' | 'OFFLINE';
+  cached?: boolean;
   processingTimeMs: number;
   timestamp: string;
 }

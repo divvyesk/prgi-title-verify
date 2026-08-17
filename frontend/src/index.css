@@ -4,20 +4,24 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #F8F6F0;
-    color: #292524;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #FBF9F4;
+    color: #1C1917;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
   
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.02em;
-    color: #1C1917;
+  .font-editorial {
+    font-family: 'Cormorant Garamond', 'Newsreader', serif;
   }
 
-  .font-editorial {
-    font-family: 'Playfair Display', 'Newsreader', serif;
+  .font-luxury {
+    font-family: 'Syne', 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .font-sans {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   }
 
   code, pre, .font-mono {
@@ -30,69 +34,83 @@
   }
 }
 
-/* Warm Beige Glass Panels & Card Styles */
-.beige-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid #E8E0D2;
-  box-shadow: 0 4px 20px -2px rgba(45, 38, 28, 0.04), 0 1px 3px 0 rgba(45, 38, 28, 0.02);
+/* Luxury Editorial & Sculpted Layout Styles */
+.section-anchor {
+  position: relative;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
 }
 
-.beige-card-subtle {
-  background: rgba(250, 247, 242, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid #EFE8DC;
+@media (min-width: 640px) {
+  .section-anchor {
+    padding-top: 6.5rem;
+    padding-bottom: 6.5rem;
+  }
+}
+
+/* Subtle Section Divider Rails */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #E7E0D5 20%, #E7E0D5 80%, transparent 100%);
+}
+
+/* Subtle Minimal Cards for Essential Interaction Only */
+.beige-card {
+  background: #FFFFFF;
+  border: 1px solid #EAE4DA;
+  box-shadow: 0 1px 3px 0 rgba(28, 25, 23, 0.03);
 }
 
 .beige-card-elevated {
   background: #FFFFFF;
-  border: 1px solid #E2D7C5;
-  box-shadow: 0 12px 36px -4px rgba(45, 38, 28, 0.08), 0 2px 6px -1px rgba(45, 38, 28, 0.04);
+  border: 1px solid #DDD5C9;
+  box-shadow: 0 8px 24px -4px rgba(28, 25, 23, 0.05);
 }
 
-.beige-card-gold {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.5) 0%, rgba(255, 255, 255, 0.9) 100%);
-  border: 1px solid #FCD34D;
-  box-shadow: 0 8px 30px -4px rgba(180, 83, 9, 0.08);
-}
-
+/* Solid, High-Contrast Verdict Surfaces */
 .beige-card-success {
-  background: linear-gradient(135deg, rgba(209, 250, 229, 0.5) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid #6EE7B7;
-  box-shadow: 0 8px 30px -4px rgba(4, 120, 87, 0.08);
+  background: #FFFFFF;
+  border: 1.5px solid #059669;
+  box-shadow: 0 4px 16px -2px rgba(5, 150, 105, 0.06);
 }
 
 .beige-card-warning {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.5) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid #FCD34D;
-  box-shadow: 0 8px 30px -4px rgba(180, 83, 9, 0.08);
+  background: #FFFFFF;
+  border: 1.5px solid #D97706;
+  box-shadow: 0 4px 16px -2px rgba(217, 119, 6, 0.06);
 }
 
 .beige-card-danger {
-  background: linear-gradient(135deg, rgba(254, 226, 226, 0.5) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid #FCA5A5;
-  box-shadow: 0 8px 30px -4px rgba(185, 28, 28, 0.08);
+  background: #FFFFFF;
+  border: 1.5px solid #DC2626;
+  box-shadow: 0 4px 16px -2px rgba(220, 38, 38, 0.06);
 }
 
-/* Custom Scrollbar for Beige Theme */
+/* Focus and input styling */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #1C1917 !important;
+  box-shadow: 0 0 0 1px #1C1917;
+}
+
+/* Smooth Minimal Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F0EBE0;
+  background: #FBF9F4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CFC0A8;
-  border-radius: 4px;
+  background: #DDD5C9;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #B5A285;
+  background: #B5A997;
 }
 
 /* Subtle Warm Dot Mesh Background */
@@ -213,4 +231,3 @@
     break-inside: avoid !important;
   }
 }
-

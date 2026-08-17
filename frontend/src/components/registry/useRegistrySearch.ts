@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { TitleRecord } from '../../types';
 import sampleTitlesRaw from '../../data/titleMasterSample.json';
 
-const sampleTitles = sampleTitlesRaw as TitleRecord[];
+const sampleTitles = sampleTitlesRaw as unknown as TitleRecord[];
 
 export interface RegistrySearchParams {
   query: string;
@@ -29,9 +29,10 @@ export interface UseRegistrySearchResult {
 export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySearchResult => {
   const { query, state, language, periodicity, page, size } = params;
 
-  const [records, setRecords] = useState<TitleRecord[]>([]);
-  const [total, setTotal] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // Initialize with the first 50 sample titles so the screen is NEVER blank
+  const [records, setRecords] = useState<TitleRecord[]>(() => sampleTitles.slice(0, size || 50));
+  const [total, setTotal] = useState<number>(() => sampleTitles.length);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'LIVE' | 'OFFLINE'>('OFFLINE');
 
@@ -40,19 +41,19 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
 
   // Extract unique filter choices from base sample
   const languages = useRef<string[]>(
-    Array.from(new Set(sampleTitles.map((t) => (t.language ? t.language.split(',')[0].trim() : ''))))
+    Array.from(new Set(sampleTitles.map((t: any) => (t.language ? t.language.split(',')[0].trim() : ''))))
       .filter(Boolean)
       .sort()
   ).current;
 
   const states = useRef<string[]>(
-    Array.from(new Set(sampleTitles.map((t) => (t.state ? t.state.trim() : ''))))
+    Array.from(new Set(sampleTitles.map((t: any) => (t.state || t.publication_state ? (t.state || t.publication_state).trim() : ''))))
       .filter(Boolean)
       .sort()
   ).current;
 
   const periodicities = useRef<string[]>(
-    Array.from(new Set(sampleTitles.map((t) => (t.periodicity ? t.periodicity.trim() : ''))))
+    Array.from(new Set(sampleTitles.map((t: any) => (t.periodicity ? t.periodicity.trim() : ''))))
       .filter(Boolean)
       .sort()
   ).current;
@@ -60,21 +61,28 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
   // Offline client-side search fallback
   const performOfflineSearch = useCallback(() => {
     const q = query.toLowerCase().trim();
-    const filtered = sampleTitles.filter((item) => {
+    const filtered = sampleTitles.filter((item: any) => {
+      const title = item.title || '';
+      const reg = item.regNo || item.registration_number || item.id || '';
+      const pub = item.publisher || item.owner || '';
+      const lang = item.language || '';
+      const st = item.state || item.publication_state || '';
+      const per = item.periodicity || '';
+
       const matchesSearch =
         !q ||
-        (item.title && item.title.toLowerCase().includes(q)) ||
-        (item.regNo && item.regNo.toLowerCase().includes(q)) ||
-        (item.publisher && item.publisher.toLowerCase().includes(q));
+        title.toLowerCase().includes(q) ||
+        reg.toLowerCase().includes(q) ||
+        pub.toLowerCase().includes(q);
 
       const matchesLang =
-        language === 'ALL' || (item.language && item.language.includes(language));
+        language === 'ALL' || lang.includes(language);
 
       const matchesState =
-        state === 'ALL' || item.state === state;
+        state === 'ALL' || st === state;
 
       const matchesPeriodicity =
-        periodicity === 'ALL' || item.periodicity === periodicity;
+        periodicity === 'ALL' || per === periodicity;
 
       return matchesSearch && matchesLang && matchesState && matchesPeriodicity;
     });
@@ -109,19 +117,28 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
       urlParams.set('page', String(page));
       urlParams.set('size', String(size));
 
-      const response = await fetch(`/v1/registry/search?${urlParams.toString()}`, {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+      let response: Response | null = null;
+      
+      // 1. Try Vite proxy route
+      try {
+        response = await fetch(`/api/v1/registry/search?${urlParams.toString()}`, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+      } catch {
+        // Fallback to direct port 8000
+        response = await fetch(`http://127.0.0.1:8000/v1/registry/search?${urlParams.toString()}`, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+      }
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      if (!response || !response.ok) {
+        throw new Error(`HTTP error: ${response?.statusText || 'failed'}`);
       }
 
       const data = await response.json();
-      if (data && Array.isArray(data.results)) {
+      if (data && Array.isArray(data.results) && data.results.length > 0) {
         setRecords(data.results);
         setTotal(typeof data.total === 'number' ? data.total : data.results.length);
         setMode('LIVE');
@@ -133,7 +150,6 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
       if (err instanceof Error && err.name === 'AbortError') {
         return; // Request was aborted due to new input
       }
-      // Silently fall back to offline client-side search
       const msg = err instanceof Error ? err.message : 'Server unreachable';
       setError(msg);
       performOfflineSearch();

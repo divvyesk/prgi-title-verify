@@ -57,13 +57,16 @@ export async function runTitleVerification(
   }
 
   // --- STAGE 1: CLEAN & NORMALIZE ---
+  const tNormStart = performance.now();
   const rawClean = inputTitle.trim();
   const { language: detectedLang } = detectScriptAndLanguage(rawClean);
   const transliterated = transliterateToRoman(rawClean);
   const normalized = normalizeTitle(transliterated);
   const coreWords = extractCoreWords(normalized);
+  const tNormDuration = Math.max(1, Math.round(performance.now() - tNormStart));
 
-  // --- STAGE 2 & 3: SHORTLIST & 4-DIMENSIONAL SCORING ---
+  // --- STAGE 2: SHORTLIST CANDIDATES ---
+  const tShortlistStart = performance.now();
   const clashingCandidates: ClashingTitle[] = [];
 
   for (const record of sampleTitles) {
@@ -111,8 +114,10 @@ export async function runTitleVerification(
   // Sort by highest clash similarity
   clashingCandidates.sort((a, b) => b.similarity - a.similarity);
   const topClashing = clashingCandidates.slice(0, 5);
+  const tShortlistDuration = Math.max(1, Math.round(performance.now() - tShortlistStart));
 
-  // Highest conflict metric
+  // --- STAGE 3: 4-DIMENSIONAL SCORING ---
+  const tScoreStart = performance.now();
   const highestClash = topClashing.length > 0 ? topClashing[0].similarity : 0;
 
   // Calculate detailed aggregated similarity metrics
@@ -132,15 +137,19 @@ export async function runTitleVerification(
     coreWordScore: avgCore,
     blendedScore: highestClash
   };
+  const tScoreDuration = Math.max(1, Math.round(performance.now() - tScoreStart));
 
   // --- STAGE 4: DETERMINISTIC RULES CHECK ---
+  const tRulesStart = performance.now();
   const ruleViolations = evaluateGovernmentRules(rawClean);
   const criticalRuleFailed = ruleViolations.some(r => !r.passed && r.severity === 'CRITICAL');
   const warningRuleFailed = ruleViolations.some(r => !r.passed && r.severity === 'WARNING');
+  const tRulesDuration = Math.max(1, Math.round(performance.now() - tRulesStart));
 
-  // --- STAGE 5: VERDICT & EXPLANATION ---
-  let verdict: VerificationResult['verdict'] = 'APPROVED';
-  let verdictScore = highestClash; // 0 to 100 conflict risk
+  // --- STAGE 5: EXPLAIN & VERDICT SYNTHESIS ---
+  const tExplainStart = performance.now();
+  let verdict: 'APPROVED' | 'MANUAL_REVIEW' | 'REJECTED';
+  let verdictScore = 0;
 
   if (criticalRuleFailed || highestClash >= 75) {
     verdict = 'REJECTED';
@@ -178,6 +187,7 @@ export async function runTitleVerification(
     recommendedAction = 'Proceed with Aadhaar e-Sign filing on the Press Sewa Portal.';
     citations.push('PRGI Title Verification Guidelines 2025, Clear Status Clause 1.4');
   }
+  const tExplainDuration = Math.max(1, Math.round(performance.now() - tExplainStart));
 
   const processingTimeMs = Math.round(performance.now() - startTime);
 
@@ -195,6 +205,15 @@ export async function runTitleVerification(
     explanation,
     recommendedAction,
     guidelineCitations: citations,
+    stageTimings: {
+      normalize: tNormDuration,
+      shortlist: tShortlistDuration,
+      score: tScoreDuration,
+      check: tRulesDuration,
+      explain: tExplainDuration,
+    },
+    engine: 'OFFLINE',
+    cached: false,
     processingTimeMs,
     timestamp: new Date().toISOString()
   };

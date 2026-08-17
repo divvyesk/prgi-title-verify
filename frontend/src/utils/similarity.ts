@@ -198,10 +198,6 @@ export function calculateSemanticSimilarity(t1: string, t2: string): number {
   return Math.min(100, Math.max(0, score));
 }
 
-/**
- * Core-word matching score (0 to 100)
- * Strips filler words. Example: "The Vidarbha Daily Express" and "Vidarbha Patrika" -> "vidarbha" -> 100% clash!
- */
 export function calculateCoreWordSimilarity(t1: string, t2: string): { score: number; matchedCoreWord?: string } {
   const c1 = extractCoreWords(t1);
   const c2 = extractCoreWords(t2);
@@ -210,18 +206,36 @@ export function calculateCoreWordSimilarity(t1: string, t2: string): { score: nu
     return { score: 0 };
   }
 
-  // Exact core token overlap
+  let matchedWord = '';
+  let matchCount = 0;
+
   for (const w1 of c1) {
     for (const w2 of c2) {
       if (w1 === w2 && w1.length > 2) {
-        return { score: 100, matchedCoreWord: w1 };
-      }
-      // High phonetic or substring match on core root
-      if (calculateLexicalSimilarity(w1, w2) >= 85 || calculatePhoneticSimilarity(w1, w2) >= 85) {
-        return { score: 90, matchedCoreWord: `${w1} ≈ ${w2}` };
+        matchCount++;
+        matchedWord = w1;
+        break;
+      } else if (calculateLexicalSimilarity(w1, w2) >= 88 || calculatePhoneticSimilarity(w1, w2) >= 88) {
+        matchCount += 0.9;
+        matchedWord = `${w1} ≈ ${w2}`;
+        break;
       }
     }
   }
 
-  return { score: 0 };
+  if (matchCount === 0) {
+    return { score: 0 };
+  }
+
+  // If either title has only 1 core word and that single core word matches, it's a direct root clash (e.g. "The Vidarbha Daily Express" -> ["vidarbha"] vs "Adbhut Vidharbha" -> ["adbhut", "vidharbha"])
+  if (c1.length === 1 || c2.length === 1) {
+    return { score: 90, matchedCoreWord: matchedWord };
+  }
+
+  // Proportional overlap based on max core tokens
+  const maxTokens = Math.max(c1.length, c2.length);
+  const overlapRatio = matchCount / maxTokens;
+  const score = Math.round(overlapRatio * 100);
+
+  return { score, matchedCoreWord: matchedWord };
 }
