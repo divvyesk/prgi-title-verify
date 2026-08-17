@@ -116,4 +116,7 @@ export interface OfficerCase {
   primaryConflict?: string;
   status: 'PENDING' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED';
   copilotDecisionNote?: string;
+  decisionToken?: string;
+  decisionTimestamp?: string;
+  decisionOfficer?: string;
 }

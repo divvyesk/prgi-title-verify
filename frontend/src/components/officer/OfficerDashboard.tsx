@@ -1,336 +1,648 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   UserCheck, 
   CheckCircle2, 
   XCircle, 
   Copy, 
   Check, 
+  Filter, 
   ShieldAlert, 
-  Edit3
+  Edit3,
+  RotateCcw,
+  Layers,
+  AlertTriangle,
+  Flame,
+  Activity,
+  Globe,
+  MapPin,
+  Calendar,
+  X,
+  ExternalLink,
+  ChevronRight
 } from 'lucide-react';
-import type { OfficerCase } from '../../types';
+import type { OfficerCase, VerdictStatus } from '../../types';
+import { useCases } from './useCases';
+import { CaseDetailDrawer } from './CaseDetailDrawer';
 import { sound } from '../../utils/audio';
-import { ScrollReveal } from '../common/ScrollReveal';
 
 export const OfficerDashboard: React.FC = () => {
-  const [filter, setFilter] = useState<'ALL' | 'MANUAL_REVIEW' | 'REJECTED' | 'APPROVED'>('ALL');
+  const { 
+    cases, 
+    isLoading, 
+    error, 
+    source, 
+    updateCaseNote, 
+    recordDecision,
+    fetchDraftMemo,
+    reloadCases 
+  } = useCases();
+
+  // Filters state
+  const [verdictFilter, setVerdictFilter] = useState<'ALL' | VerdictStatus>('ALL');
+  const [stateFilter, setStateFilter] = useState<string>('ALL');
+  const [languageFilter, setLanguageFilter] = useState<string>('ALL');
+  const [dateFilter, setDateFilter] = useState<string>('ALL');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const [cases, setCases] = useState<OfficerCase[]>([
-    {
-      id: 'CASE-2026-0811',
-      applicantName: 'M/s Vidarbha Media Network LLP',
-      proposedTitle: 'The Vidarbha Daily Express',
-      language: 'Marathi, English',
-      state: 'Maharashtra',
-      periodicity: 'Daily',
-      submissionDate: '15 Aug 2026',
-      riskScore: 78,
-      verdict: 'MANUAL_REVIEW',
-      primaryConflict: 'Vidarbha Patrika (MAHMAR/2015/64294) — Shares primary core root token "Vidarbha"',
-      status: 'UNDER_REVIEW',
-      copilotDecisionNote: `OFFICIAL PRGI DECISION MEMORANDUM
-Application ID: CASE-2026-0811
-Proposed Title: "The Vidarbha Daily Express" (State: Maharashtra)
+  // Selected case & Drawer state
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const [editableNote, setEditableNote] = useState<string>('');
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [activeTriggerElement, setActiveTriggerElement] = useState<HTMLElement | null>(null);
 
-FINDING & CITATION:
-Under PRGI Guidelines 2023, Clause 2.3(c) (Core Token Protection in Jurisdiction), the applicant's title shares the core root identifier "Vidarbha" with registered publication "Vidarbha Patrika" (MAHMAR/2015/64294). Adding generic prefixes like "The" and periodicity "Daily Express" is insufficient to prevent public deception.
+  // Extract unique filter dropdown values
+  const availableStates = useMemo(() => {
+    const set = new Set<string>();
+    cases.forEach((c) => c.state && set.add(c.state.trim()));
+    return Array.from(set).sort();
+  }, [cases]);
 
-RECOMMENDED DISPOSITION:
-Recommend conditional rejection or request addition of a distinctive sub-district qualifier.`
-    },
-    {
-      id: 'CASE-2026-0812',
-      applicantName: 'Suresh Kumar Agrawal',
-      proposedTitle: 'The Royal Matrimonial Classifieds',
-      language: 'Hindi, English',
-      state: 'Uttar Pradesh',
-      periodicity: 'Weekly',
-      submissionDate: '14 Aug 2026',
-      riskScore: 92,
-      verdict: 'REJECTED',
-      primaryConflict: 'PRGI Rule 4.1a Commercial & Matrimonial Catalog Ban',
-      status: 'REJECTED',
-      copilotDecisionNote: `OFFICIAL PRGI DECISION MEMORANDUM
-Application ID: CASE-2026-0812
-Proposed Title: "The Royal Matrimonial Classifieds"
+  const availableLanguages = useMemo(() => {
+    const set = new Set<string>();
+    cases.forEach((c) => c.language && set.add(c.language.trim()));
+    return Array.from(set).sort();
+  }, [cases]);
 
-FINDING & CITATION:
-The proposed title contains explicit commercial advertising catalogue terminology ("Matrimonial Classifieds"). This directly violates PRGI Title Verification Guidelines 2023, Section 4.1(a) prohibiting periodical registrations for dedicated commercial advertising or matrimonial listings.
+  const availableDates = useMemo(() => {
+    const set = new Set<string>();
+    cases.forEach((c) => c.submissionDate && set.add(c.submissionDate.trim()));
+    return Array.from(set).sort();
+  }, [cases]);
 
-RECOMMENDED DISPOSITION:
-Summary rejection under Rule 4.1a.`
-    },
-    {
-      id: 'CASE-2026-0813',
-      applicantName: 'Ananya Roy & Associates',
-      proposedTitle: 'Bengal Heritage & Policy Review',
-      language: 'Bengali, English',
-      state: 'West Bengal',
-      periodicity: 'Monthly',
-      submissionDate: '13 Aug 2026',
-      riskScore: 12,
-      verdict: 'APPROVED',
-      primaryConflict: 'No registered conflicts found within state/language registry',
-      status: 'APPROVED',
-      copilotDecisionNote: `OFFICIAL PRGI DECISION MEMORANDUM
-Application ID: CASE-2026-0813
-Proposed Title: "Bengal Heritage & Policy Review"
+  // Compute active filters count
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (verdictFilter !== 'ALL') count++;
+    if (stateFilter !== 'ALL') count++;
+    if (languageFilter !== 'ALL') count++;
+    if (dateFilter !== 'ALL') count++;
+    return count;
+  }, [verdictFilter, stateFilter, languageFilter, dateFilter]);
 
-FINDING & CITATION:
-Title passes all 6 statutory rulebook checks under Press and Registration of Periodicals Act 2023. 4-D similarity score is 12% (well below the 45% threshold).
-
-RECOMMENDED DISPOSITION:
-Approved for issuance of Certificate of Title Verification.`
-    }
-  ]);
-
-  const [selectedCase, setSelectedCase] = useState<OfficerCase>(cases[0]);
-  const [editableNote, setEditableNote] = useState<string>(cases[0].copilotDecisionNote || '');
-
-  const handleSelectCase = (c: OfficerCase) => {
+  const handleClearAllFilters = () => {
     sound.playClick();
-    setSelectedCase(c);
-    setEditableNote(c.copilotDecisionNote || '');
+    setVerdictFilter('ALL');
+    setStateFilter('ALL');
+    setLanguageFilter('ALL');
+    setDateFilter('ALL');
   };
 
-  const handleStatusUpdate = (newStatus: OfficerCase['status']) => {
+  // 1. Risk-First Ordering & Filtering
+  // Priority: MANUAL_REVIEW (Amber) desc by riskScore -> REJECTED desc by riskScore -> APPROVED desc by riskScore
+  const filteredAndSortedCases = useMemo(() => {
+    const verdictPriority: Record<string, number> = {
+      MANUAL_REVIEW: 1,
+      REJECTED: 2,
+      APPROVED: 3
+    };
+
+    return cases
+      .filter((c) => {
+        const matchesVerdict = verdictFilter === 'ALL' || c.verdict === verdictFilter;
+        const matchesState = stateFilter === 'ALL' || c.state === stateFilter;
+        const matchesLang = languageFilter === 'ALL' || c.language === languageFilter;
+        const matchesDate = dateFilter === 'ALL' || c.submissionDate === dateFilter;
+        return matchesVerdict && matchesState && matchesLang && matchesDate;
+      })
+      .sort((a, b) => {
+        const priorityA = verdictPriority[a.verdict] ?? 99;
+        const priorityB = verdictPriority[b.verdict] ?? 99;
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB;
+        }
+        return b.riskScore - a.riskScore;
+      });
+  }, [cases, verdictFilter, stateFilter, languageFilter, dateFilter]);
+
+  // Sync selected case
+  const selectedCase = useMemo(() => {
+    if (!filteredAndSortedCases.length) return null;
+    const found = filteredAndSortedCases.find((c) => c.id === selectedCaseId);
+    return found || filteredAndSortedCases[0];
+  }, [filteredAndSortedCases, selectedCaseId]);
+
+  useEffect(() => {
+    if (selectedCase) {
+      setEditableNote(selectedCase.copilotDecisionNote || '');
+      setSelectedCaseId((prevId) => (prevId !== selectedCase.id ? selectedCase.id : prevId));
+    } else {
+      setEditableNote('');
+    }
+  }, [selectedCase]);
+
+  // Summary Metrics calculations
+  const totalCasesCount = cases.length;
+  const awaitingReviewCount = useMemo(() => {
+    return cases.filter((c) => c.status === 'UNDER_REVIEW' || c.status === 'PENDING').length;
+  }, [cases]);
+
+  const amberCasesCount = useMemo(() => {
+    return cases.filter((c) => c.verdict === 'MANUAL_REVIEW').length;
+  }, [cases]);
+
+  const medianRiskScore = useMemo(() => {
+    if (!cases.length) return 0;
+    const sorted = [...cases.map((c) => c.riskScore)].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+  }, [cases]);
+
+  const handleSelectCase = (c: OfficerCase, triggerEl?: HTMLElement | null, openDrawer = true) => {
     sound.playClick();
-    const updated = cases.map((item) =>
-      item.id === selectedCase.id
-        ? { ...item, status: newStatus, copilotDecisionNote: editableNote }
-        : item
-    );
-    setCases(updated);
-    setSelectedCase({ ...selectedCase, status: newStatus, copilotDecisionNote: editableNote });
+    setSelectedCaseId(c.id);
+    setEditableNote(c.copilotDecisionNote || '');
+    if (triggerEl) {
+      setActiveTriggerElement(triggerEl);
+    }
+    if (openDrawer) {
+      setIsDrawerOpen(true);
+    }
+  };
+
+  const handleNoteChange = (newNote: string) => {
+    setEditableNote(newNote);
+    if (selectedCase) {
+      updateCaseNote(selectedCase.id, newNote);
+    }
   };
 
   const copyDecisionNote = () => {
+    if (!selectedCase) return;
     sound.playClick();
     navigator.clipboard.writeText(editableNote);
     setCopiedId(selectedCase.id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const filteredCases = cases.filter((c) => {
-    if (filter === 'ALL') return true;
-    return c.verdict === filter;
-  });
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16">
-      {/* Chapter 01: Header */}
-      <ScrollReveal className="space-y-4">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#B45309]">
-            01 / PRGI Officer Docket
-          </span>
-          <span className="h-px flex-1 bg-[#E8E0D2]" />
-          <div className="flex items-center gap-1.5 text-xs text-[#78716C] font-mono">
-            <UserCheck className="w-3.5 h-3.5 text-emerald-700" />
-            <span>Officer Authentication Active</span>
+    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Header */}
+      <div className="border-b border-[#E8E0D2] pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 border border-purple-300 text-purple-900 text-xs font-bold mb-2">
+            <UserCheck className="w-3.5 h-3.5 text-purple-700" />
+            <span>Member 6 • Officer Review Docket &amp; Decision Drafter</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-editorial font-extrabold text-[#1C1917]">
+            PRGI Officer Review Docket
+          </h1>
+          <p className="text-xs sm:text-sm text-amber-900 font-semibold mt-1 max-w-3xl leading-relaxed bg-amber-50/80 px-3 py-1.5 rounded-lg border border-amber-200">
+            Priority Docket Queue: Borderline Manual Review (Amber) cases are prioritized at the top by descending risk score to focus officer scrutiny where human discretion is most critical.
+          </p>
+        </div>
+
+        {/* Source Badge & Refresh Control */}
+        <div className="flex items-center gap-2">
+          <div 
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD1BF] shadow-sm text-xs"
+            title={error ? `Note: ${error} (using fixture fallback)` : undefined}
+          >
+            <span 
+              aria-hidden="true" 
+              className={`w-2 h-2 rounded-full ${source === 'LIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}
+            />
+            <span className="font-mono text-[#564735]">Source:</span>
+            <span className="font-bold text-[#1C1917]">{source === 'LIVE' ? 'Live API' : 'Fixture Data'}</span>
+            {error && <span className="text-[10px] text-amber-900 font-mono">(Fallback)</span>}
+          </div>
+          <button
+            onClick={() => {
+              sound.playClick();
+              reloadCases();
+            }}
+            aria-label="Reload case docket from data source"
+            title="Reload cases from source"
+            className="p-2 rounded-xl bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] shadow-sm cursor-pointer transition-colors focus:ring-2 focus:ring-amber-700"
+          >
+            <RotateCcw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-800' : ''}`} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      {/* 3. Summary Strip at the Top */}
+      <section 
+        role="region" 
+        aria-label="Docket Summary Metrics" 
+        aria-live="polite"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+      >
+        <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-950" aria-hidden="true">
+            <Layers className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Total Docket</div>
+            <div className="text-xl sm:text-2xl font-bold font-mono text-[#1C1917]">{totalCasesCount} Cases</div>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-950" aria-hidden="true">
+            <AlertTriangle className="w-5 h-5 text-amber-800" />
+          </div>
           <div>
-            <h1 className="font-editorial text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917]">
-              Adjudication &amp; Decision Queue
-            </h1>
-            <p className="text-sm text-[#57534E] mt-2 max-w-2xl leading-relaxed">
-              Risk-prioritized docket evaluating borderline amber collisions and statutory admissibility under the Press and Registration of Periodicals Act, 2023.
-            </p>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Awaiting Review</div>
+            <div className="text-xl sm:text-2xl font-bold font-mono text-amber-900">{awaitingReviewCount} Pending</div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-amber-50 text-amber-950" aria-hidden="true">
+            <Flame className="w-5 h-5 text-amber-800" />
+          </div>
+          <div>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Borderline Amber</div>
+            <div className="text-xl sm:text-2xl font-bold font-mono text-amber-900">{amberCasesCount} High-Touch</div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-purple-100 text-purple-950" aria-hidden="true">
+            <Activity className="w-5 h-5 text-purple-800" />
+          </div>
+          <div>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Median Risk Score</div>
+            <div className="text-xl sm:text-2xl font-bold font-mono text-purple-950">{medianRiskScore}%</div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Comprehensive Filter Toolbar */}
+      <div className="beige-card rounded-2xl p-4 sm:p-5 space-y-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E8E0D2] pb-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#1C1917]">
+            <Filter className="w-4 h-4 text-amber-700" />
+            <span>Filter Docket Queue</span>
+            {activeFilterCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-mono font-extrabold">
+                {activeFilterCount} active
+              </span>
+            )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-[#78716C]">Filter Queue:</span>
+          {activeFilterCount > 0 && (
+            <button
+              onClick={handleClearAllFilters}
+              className="text-xs font-semibold text-rose-700 hover:text-rose-900 flex items-center gap-1 cursor-pointer transition-colors px-2 py-1 rounded-lg hover:bg-rose-50 border border-transparent hover:border-rose-200"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Clear all filters</span>
+            </button>
+          )}
+        </div>
+
+        {/* Filter Controls Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          {/* Verdict Filter Chips */}
+          <div>
+            <label className="block text-[#564735] font-semibold mb-1">Verdict Status</label>
             <div className="flex items-center gap-1">
-              {(['ALL', 'MANUAL_REVIEW', 'REJECTED', 'APPROVED'] as const).map((f) => (
+              {(['ALL', 'MANUAL_REVIEW', 'REJECTED', 'APPROVED'] as const).map((v) => (
                 <button
-                  key={f}
+                  key={v}
                   onClick={() => {
                     sound.playClick();
-                    setFilter(f);
+                    setVerdictFilter(v);
                   }}
-                  className={`px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                    filter === f
-                      ? 'text-[#1C1917] font-bold border-b-2 border-[#1C1917]'
-                      : 'text-[#78716C] hover:text-[#1C1917]'
+                  className={`flex-1 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer text-center ${
+                    verdictFilter === v
+                      ? 'bg-[#1C1917] text-white shadow-sm'
+                      : 'bg-white hover:bg-[#F0EBE0] text-[#75634B] border border-[#DDD1BF]'
                   }`}
                 >
-                  {f === 'MANUAL_REVIEW' ? 'Amber Cases' : f === 'ALL' ? 'All Dossiers' : f}
+                  {v === 'ALL' ? 'All' : v === 'MANUAL_REVIEW' ? 'Amber' : v === 'REJECTED' ? 'Reject' : 'Approve'}
                 </button>
               ))}
             </div>
           </div>
-        </div>
-      </ScrollReveal>
 
-      {/* Chapter 02: Docket Two-Column Workflow */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left Column: Case Stream (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#E8E0D2] text-xs font-mono text-[#78716C]">
-            <span className="font-bold text-[#1C1917] uppercase tracking-wider">
-              Pending Docket ({filteredCases.length})
-            </span>
-            <span>Sorted by Risk Priority</span>
+          {/* State Filter */}
+          <div>
+            <label className="block text-[#564735] font-semibold mb-1">Jurisdiction / State</label>
+            <div className="relative">
+              <MapPin className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-[#A8A29E]" />
+              <select
+                value={stateFilter}
+                onChange={(e) => {
+                  sound.playClick();
+                  setStateFilter(e.target.value);
+                }}
+                className="w-full bg-white border border-[#DDD1BF] rounded-lg pl-7 pr-2.5 py-1.5 text-xs text-[#1C1917] font-medium focus:outline-none focus:border-amber-600 shadow-sm"
+              >
+                <option value="ALL">All States ({availableStates.length})</option>
+                {availableStates.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="divide-y divide-[#E8E0D2]">
-            {filteredCases.map((c) => {
-              const isSelected = selectedCase.id === c.id;
-              return (
-                <div
-                  key={c.id}
-                  onClick={() => handleSelectCase(c)}
-                  className={`py-4 px-3 -mx-3 rounded-xl transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-amber-50/70 border-l-4 border-amber-600 pl-4'
-                      : 'hover:bg-stone-100/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span className="font-mono text-xs font-bold text-[#78716C]">
-                      {c.id}
-                    </span>
-                    <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full ${
-                      c.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' :
-                      c.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-800' :
-                      'bg-amber-100 text-amber-800'
-                    }`}>
-                      {c.verdict === 'MANUAL_REVIEW' ? 'Amber Borderline' : c.verdict}
-                    </span>
-                  </div>
+          {/* Language Filter */}
+          <div>
+            <label className="block text-[#564735] font-semibold mb-1">Publication Language</label>
+            <div className="relative">
+              <Globe className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-[#A8A29E]" />
+              <select
+                value={languageFilter}
+                onChange={(e) => {
+                  sound.playClick();
+                  setLanguageFilter(e.target.value);
+                }}
+                className="w-full bg-white border border-[#DDD1BF] rounded-lg pl-7 pr-2.5 py-1.5 text-xs text-[#1C1917] font-medium focus:outline-none focus:border-amber-600 shadow-sm"
+              >
+                <option value="ALL">All Languages ({availableLanguages.length})</option>
+                {availableLanguages.map((l) => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-                  <h3 className="font-editorial text-lg font-bold text-[#1C1917] leading-snug">
-                    {c.proposedTitle}
-                  </h3>
-
-                  <div className="flex items-center gap-2 text-xs text-[#78716C] mt-1">
-                    <span className="truncate">{c.applicantName}</span>
-                    <span>·</span>
-                    <span>{c.state}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs mt-2 pt-2 border-t border-[#E8E0D2]/60">
-                    <span className="truncate max-w-[200px] text-[#A8A29E] font-mono text-[11px]">
-                      {c.primaryConflict}
-                    </span>
-                    <span className="font-mono font-bold text-amber-900 text-xs">
-                      Risk {c.riskScore}%
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+          {/* Submission Date Filter */}
+          <div>
+            <label className="block text-[#564735] font-semibold mb-1">Submission Date</label>
+            <div className="relative">
+              <Calendar className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-[#A8A29E]" />
+              <select
+                value={dateFilter}
+                onChange={(e) => {
+                  sound.playClick();
+                  setDateFilter(e.target.value);
+                }}
+                className="w-full bg-white border border-[#DDD1BF] rounded-lg pl-7 pr-2.5 py-1.5 text-xs text-[#1C1917] font-medium focus:outline-none focus:border-amber-600 shadow-sm"
+              >
+                <option value="ALL">All Dates ({availableDates.length})</option>
+                {availableDates.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Right Column: Case Dossier & Official Decision Note (7 cols) */}
-        <div className="lg:col-span-7 space-y-8">
-          <ScrollReveal className="space-y-6">
-            {/* Dossier Header */}
-            <div className="space-y-2 pb-4 border-b border-[#E8E0D2]">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#B45309]">
-                  Application Case File • {selectedCase.id}
-                </span>
-                <span className={`text-xs font-mono font-bold uppercase px-3 py-1 rounded-full ${
-                  selectedCase.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' :
-                  selectedCase.status === 'REJECTED' ? 'bg-rose-100 text-rose-800' :
-                  'bg-amber-100 text-amber-800'
-                }`}>
-                  Status: {selectedCase.status}
-                </span>
-              </div>
-              <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#1C1917]">
-                "{selectedCase.proposedTitle}"
-              </h2>
-            </div>
-
-            {/* Structured Metadata Flow */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 text-xs border-b border-[#E8E0D2]">
-              <div>
-                <div className="text-[#A8A29E] font-mono text-[10px] uppercase">Applicant</div>
-                <div className="font-semibold text-[#1C1917] mt-0.5 truncate">{selectedCase.applicantName}</div>
-              </div>
-              <div>
-                <div className="text-[#A8A29E] font-mono text-[10px] uppercase">State / Jurisdiction</div>
-                <div className="font-semibold text-[#1C1917] mt-0.5">{selectedCase.state}</div>
-              </div>
-              <div>
-                <div className="text-[#A8A29E] font-mono text-[10px] uppercase">Language</div>
-                <div className="font-semibold text-[#1C1917] mt-0.5">{selectedCase.language}</div>
-              </div>
-              <div>
-                <div className="text-[#A8A29E] font-mono text-[10px] uppercase">Periodicity</div>
-                <div className="font-semibold text-[#1C1917] mt-0.5">{selectedCase.periodicity}</div>
-              </div>
-            </div>
-
-            {/* Conflict Evidence Note */}
-            <div className="p-4 rounded-xl bg-[#F8F6F0] border-l-2 border-amber-600 space-y-1">
-              <div className="text-xs font-mono font-bold text-amber-900 flex items-center gap-1.5">
-                <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
-                <span>Statutory Collision Evidence:</span>
-              </div>
-              <p className="text-xs text-[#57534E] leading-relaxed">
-                {selectedCase.primaryConflict}
-              </p>
-            </div>
-
-            {/* AI Copilot Decision Note Drafter */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 font-bold text-[#1C1917]">
-                  <Edit3 className="w-4 h-4 text-[#B45309]" />
-                  <span>Official Decision Memorandum (Editable)</span>
-                </div>
-                <button
-                  onClick={copyDecisionNote}
-                  className="px-3 py-1 text-xs font-mono font-semibold text-[#78716C] hover:text-[#1C1917] hover:bg-[#EFEAE1] rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  {copiedId === selectedCase.id ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedId === selectedCase.id ? 'Copied' : 'Copy Memo'}</span>
-                </button>
-              </div>
-
-              <textarea
-                rows={9}
-                value={editableNote}
-                onChange={(e) => setEditableNote(e.target.value)}
-                className="w-full bg-[#FCFBF8] border border-[#E8E0D2] rounded-xl p-4 font-mono text-xs text-[#1C1917] focus:outline-none focus:border-stone-500 leading-relaxed shadow-inner"
-              />
-            </div>
-
-            {/* Adjudication Actions */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#E8E0D2]">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleStatusUpdate('APPROVED')}
-                  className="px-5 py-2.5 rounded-full text-xs font-semibold bg-[#1C1917] hover:bg-[#292524] text-white flex items-center gap-2 shadow-sm transition-all cursor-pointer"
-                >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Endorse &amp; Approve</span>
-                </button>
-
-                <button
-                  onClick={() => handleStatusUpdate('REJECTED')}
-                  className="px-5 py-2.5 rounded-full text-xs font-semibold bg-white border border-[#E8E0D2] hover:bg-rose-50 text-rose-800 flex items-center gap-2 transition-all cursor-pointer"
-                >
-                  <XCircle className="w-4 h-4 text-rose-600" />
-                  <span>Issue Rejection Order</span>
-                </button>
-              </div>
-
-              <span className="text-xs text-[#A8A29E] font-mono">
-                Cryptographically Signed via Officer E-Token
-              </span>
-            </div>
-          </ScrollReveal>
+        <div className="flex items-center justify-between text-xs text-[#75634B] pt-1">
+          <span>Showing <strong>{filteredAndSortedCases.length}</strong> of {cases.length} cases matching filters</span>
+          <span className="font-mono text-[11px]">Ranked by Borderline Risk Priority</span>
         </div>
       </div>
+
+      {/* Case Queue & Detail Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left: Queue List */}
+        <div className="lg:col-span-5 beige-card rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
+            <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
+              <UserCheck className="w-4 h-4 text-amber-700" />
+              <span>Prioritized Queue ({filteredAndSortedCases.length})</span>
+            </div>
+            <span className="text-[11px] text-[#75634B] font-mono">Amber First</span>
+          </div>
+
+          {filteredAndSortedCases.length === 0 ? (
+            <div className="p-8 text-center text-[#75634B] space-y-2">
+              <CheckCircle2 className="w-8 h-8 text-amber-600 mx-auto" />
+              <p className="font-bold text-[#1C1917]">No cases match active filters</p>
+              <p className="text-xs text-[#75634B]">Try adjusting or clearing the filter chips above.</p>
+              <button
+                onClick={handleClearAllFilters}
+                className="mt-2 px-3 py-1.5 rounded-lg bg-white border border-[#DDD1BF] text-xs font-semibold text-[#1C1917] hover:bg-[#F8F6F0] cursor-pointer"
+              >
+                Clear all filters
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-[700px] overflow-y-auto pr-1">
+              {filteredAndSortedCases.map((c) => {
+                const isSelected = selectedCase?.id === c.id;
+                return (
+                  <div
+                    key={c.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Case ${c.id}: ${c.proposedTitle}. Verdict: ${c.verdict}, Risk Score: ${c.riskScore} percent`}
+                    onClick={(e) => handleSelectCase(c, e.currentTarget, true)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSelectCase(c, e.currentTarget, true);
+                      }
+                    }}
+                    className={`p-4 rounded-xl border transition-all cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-700 ${
+                      isSelected
+                        ? 'bg-amber-50/90 border-amber-500 shadow-md ring-1 ring-amber-400/40'
+                        : 'bg-white border-[#DDD1BF] hover:border-[#CFC0A8]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-mono font-bold text-[#564735]">
+                          {c.id}
+                        </span>
+                        <span className="text-[10px] text-[#564735] font-mono">
+                          {c.submissionDate}
+                        </span>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 border ${
+                        c.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-950 border-emerald-400' :
+                        c.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-950 border-rose-400' :
+                        'bg-amber-100 text-amber-950 border-amber-400'
+                      }`}>
+                        {c.verdict === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-800" aria-hidden="true" />}
+                        {c.verdict === 'REJECTED' && <XCircle className="w-3 h-3 text-rose-800" aria-hidden="true" />}
+                        {c.verdict === 'MANUAL_REVIEW' && <AlertTriangle className="w-3 h-3 text-amber-800" aria-hidden="true" />}
+                        <span>{c.verdict === 'MANUAL_REVIEW' ? 'MANUAL REVIEW' : c.verdict}</span>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="font-bold text-[#1C1917] text-sm mb-1 font-display group-hover:text-amber-900 transition-colors">
+                        {c.proposedTitle}
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-[#78716C] group-hover:text-amber-800 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                    </div>
+
+                    <div className="text-[11px] text-[#564735] flex items-center gap-2">
+                      <span>{c.applicantName}</span>
+                      <span aria-hidden="true">•</span>
+                      <span>{c.state}</span>
+                      <span aria-hidden="true">•</span>
+                      <span>{c.language}</span>
+                    </div>
+
+                    <div className="mt-2 pt-2 border-t border-[#F0EBE0] text-[11px] text-[#564735] flex items-center justify-between">
+                      <span className="truncate max-w-[200px] text-[#564735] font-medium">{c.primaryConflict || 'No registered conflict'}</span>
+                      <span className={`font-mono font-bold ${
+                        c.riskScore >= 75 ? 'text-rose-800' :
+                        c.riskScore >= 45 ? 'text-amber-900' : 'text-emerald-800'
+                      }`}>
+                        Risk: {c.riskScore}%
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Right: Selected Case File & Copilot Decision Drafter */}
+        <div className="lg:col-span-7 beige-card rounded-2xl p-6 sm:p-8 space-y-6">
+          {selectedCase ? (
+            <>
+              <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
+                <div>
+                  <div className="text-xs font-mono text-[#75634B] font-bold flex items-center gap-2">
+                    <span>{selectedCase.id}</span>
+                    <span>•</span>
+                    <span>Submitted: {selectedCase.submissionDate}</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-editorial font-bold text-[#1C1917] mt-0.5">
+                    "{selectedCase.proposedTitle}"
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {selectedCase.decisionToken && (
+                    <span className="text-xs font-mono font-extrabold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-950 border border-emerald-300">
+                      Token: {selectedCase.decisionToken}
+                    </span>
+                  )}
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
+                    selectedCase.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                    selectedCase.status === 'REJECTED' ? 'bg-rose-100 text-rose-900 border-rose-300' :
+                    'bg-amber-100 text-amber-900 border-amber-300'
+                  }`}>
+                    Current: {selectedCase.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Details Overview */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                <div className="p-3 rounded-lg bg-white border border-[#DDD1BF] shadow-sm">
+                  <div className="text-[#75634B] text-[10px] font-semibold">Applicant</div>
+                  <div className="font-bold text-[#1C1917] truncate">{selectedCase.applicantName}</div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-white border border-[#DDD1BF] shadow-sm">
+                  <div className="text-[#75634B] text-[10px] font-semibold">Jurisdiction</div>
+                  <div className="font-bold text-[#1C1917] truncate">{selectedCase.state}</div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-white border border-[#DDD1BF] shadow-sm">
+                  <div className="text-[#75634B] text-[10px] font-semibold">Language</div>
+                  <div className="font-bold text-[#1C1917] truncate">{selectedCase.language}</div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-white border border-[#DDD1BF] shadow-sm">
+                  <div className="text-[#75634B] text-[10px] font-semibold">Periodicity</div>
+                  <div className="font-bold text-[#1C1917] truncate">{selectedCase.periodicity}</div>
+                </div>
+              </div>
+
+              {/* Primary Conflict Evidence & Quick Trigger */}
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-2">
+                <div className="text-xs font-bold text-amber-900 flex items-center justify-between font-mono">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Conflict Flag Evidence:</span>
+                  </div>
+                  <span className="font-bold text-amber-800">Assessed Risk: {selectedCase.riskScore}%</span>
+                </div>
+                <p className="text-xs text-[#564735] leading-relaxed font-sans">
+                  {selectedCase.primaryConflict || 'No severe statutory clash detected in national database.'}
+                </p>
+                <div className="pt-2 flex justify-end">
+                  <button
+                    onClick={(e) => {
+                      sound.playClick();
+                      setActiveTriggerElement(e.currentTarget);
+                      setIsDrawerOpen(true);
+                    }}
+                    className="text-xs font-bold text-amber-900 hover:text-[#1C1917] flex items-center gap-1 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-amber-300 shadow-sm hover:bg-amber-100 transition-colors focus:ring-2 focus:ring-amber-600 focus:outline-none"
+                  >
+                    <span>Inspect Evidence &amp; Issue Endorsement</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* AI Copilot Decision Note Drafter */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[#1C1917] flex items-center gap-1.5">
+                    <Edit3 className="w-3.5 h-3.5 text-amber-700" />
+                    <span>AI Copilot Official Decision Note (Editable)</span>
+                  </span>
+                  <button
+                    onClick={copyDecisionNote}
+                    className="px-2.5 py-1 rounded bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] flex items-center gap-1 cursor-pointer font-semibold shadow-sm"
+                  >
+                    {copiedId === selectedCase.id ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedId === selectedCase.id ? 'Copied' : 'Copy Memo'}</span>
+                  </button>
+                </div>
+
+                <textarea
+                  rows={7}
+                  value={editableNote}
+                  onChange={(e) => handleNoteChange(e.target.value)}
+                  placeholder="Officer decision notes and statutory findings..."
+                  className="w-full bg-white border border-[#DDD1BF] rounded-xl p-3.5 font-mono text-xs text-[#1C1917] focus:outline-none focus:border-amber-600 leading-relaxed shadow-sm"
+                />
+              </div>
+
+              {/* Officer Action Buttons */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#E8E0D2]">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      sound.playClick();
+                      setActiveTriggerElement(e.currentTarget);
+                      setIsDrawerOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Review &amp; Endorse</span>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      sound.playClick();
+                      setActiveTriggerElement(e.currentTarget);
+                      setIsDrawerOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-rose-50 text-rose-700 border-2 border-rose-600 flex items-center gap-1.5 shadow-sm transition-all cursor-pointer focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    <span>Review &amp; Reject</span>
+                  </button>
+                </div>
+
+                <span className="text-[11px] text-[#948063] font-mono">
+                  Signed via PRGI Officer E-Token
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="p-12 text-center text-[#75634B]">
+              <p className="font-bold text-[#1C1917]">No case selected</p>
+              <p className="text-xs text-[#75634B] mt-1">Select a case from the queue to view dossier details.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Case Evidence Detail Drawer */}
+      <CaseDetailDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        caseData={selectedCase}
+        triggerElement={activeTriggerElement}
+        onRecordDecision={recordDecision}
+        fetchDraftMemo={fetchDraftMemo}
+      />
     </div>
   );
 };

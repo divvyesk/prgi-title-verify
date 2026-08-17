@@ -34,6 +34,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import db
 from app.config import settings
+from app.services import pipeline
+from ml.similarity import semantic
 from app.routers import (
     alternatives,
     candidates,
@@ -53,8 +55,26 @@ logger = logging.getLogger("app.main")
 async def lifespan(app: FastAPI):
     start = time.perf_counter()
     db.open_pool()
-    # Prompt 5 loads BGE-M3 here too, once, before the first request —
-    # loading it per-request costs 10-30s and would sink the demo.
+
+    # BGE-M3 loads once, here, before the first request — loading it inside
+    # a request costs 10-30s and would sink the demo. Skipped in STUB_MODE
+    # (nothing calls the real semantic scorer yet, and the ~2GB model would
+    # only slow down every teammate's `uvicorn --reload` for no benefit) —
+    # same gate db.open_pool() above already uses, so STUB_MODE is the one
+    # switch that decides whether this process touches anything heavy.
+    if not settings.stub_mode:
+        load_s = semantic.preload()
+        logger.info("BGE-M3 loaded in %.1fs", load_s)
+
+        # Runs a full verification for each of the six demo titles: warms
+        # every code path (model, pool, retrievers, scorers) before the
+        # first real request, and leaves those exact titles in-cache so
+        # they answer in single-digit ms in front of judges. Same STUB_MODE
+        # gate as above — nothing to warm up while everything is stubbed.
+        warm_start = time.perf_counter()
+        await pipeline.warm_up()
+        logger.info("warm-up complete in %.1fs", time.perf_counter() - warm_start)
+
     logger.info("startup complete in %.1f ms (stub_mode=%s)", (time.perf_counter() - start) * 1000, settings.stub_mode)
     yield
     db.close_pool()

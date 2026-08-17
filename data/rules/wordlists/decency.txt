@@ -1,0 +1,24 @@
+# rules/wordlists/decency.txt
+# Words that could be misused per PRGI Guideline 3.
+# CRITICAL guard: only flag if word appears as standalone or in combination
+# with a second offensive signal (see decency.py).
+# One entry per line. Lowercase.
+crime
+corruption
+scam
+fraud
+terror
+terrorist
+cheat
+illegal
+bribe
+bribery
+obscene
+vulgar
+porn
+adult
+xxx
+hate
+riot
+murder
+rape

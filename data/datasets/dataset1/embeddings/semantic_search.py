@@ -1,56 +1,93 @@
+import sys
+
 import psycopg2
 from sentence_transformers import SentenceTransformer
 
+
 MODEL_NAME = "BAAI/bge-m3"
+TOP_K = 10
 
-print("Loading BGE-M3...")
-model = SentenceTransformer(MODEL_NAME)
+DB_CONFIG = {
+    "host": "localhost",
+    "port": 5432,
+    "dbname": "dataset1",
+    "user": "pruthv",
+}
 
-query = "bharat samay"
 
-print(f"Searching for: {query}")
+def main():
+    if len(sys.argv) < 2:
+        print('Usage: python embeddings/semantic_search.py "TITLE"')
+        sys.exit(1)
 
-query_vector = model.encode(
-    query,
-    normalize_embeddings=True
-)
+    query = " ".join(sys.argv[1:]).strip()
 
-conn = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    dbname="dataset1",
-    user="pruthv"
-)
+    if not query:
+        print("Error: query cannot be empty.")
+        sys.exit(1)
 
-cur = conn.cursor()
+    print("Loading BGE-M3...")
+    model = SentenceTransformer(MODEL_NAME)
 
-cur.execute(
-    """
-    SELECT
-        title_id,
-        title,
-        language_normalized,
-        1 - (embedding <=> %s::vector) AS similarity
-    FROM titles
-    WHERE embedding IS NOT NULL
-    ORDER BY embedding <=> %s::vector
-    LIMIT 10;
-    """,
-    (query_vector.tolist(), query_vector.tolist())
-)
+    print(f"Searching for: {query}")
 
-results = cur.fetchall()
-
-print("\nSemantic results:")
-print("-" * 80)
-
-for title_id, title, language, similarity in results:
-    print(
-        f"{title_id:<8} "
-        f"{title:<40} "
-        f"{str(language):<20} "
-        f"{similarity * 100:.2f}%"
+    query_vector = model.encode(
+        query,
+        normalize_embeddings=True,
     )
 
-cur.close()
-conn.close()
+    if len(query_vector) != 1024:
+        raise ValueError(
+            f"Query embedding has {len(query_vector)} dimensions; "
+            "expected 1024."
+        )
+
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            title_id,
+            title,
+            language_normalized,
+            1 - (embedding <=> %s::vector) AS similarity
+        FROM titles
+        WHERE embedding IS NOT NULL
+        ORDER BY embedding <=> %s::vector
+        LIMIT %s;
+        """,
+        (
+            query_vector.tolist(),
+            query_vector.tolist(),
+            TOP_K,
+        ),
+    )
+
+    results = cur.fetchall()
+
+    print()
+    print("=" * 90)
+    print("DATASET 1 SEMANTIC SEARCH")
+    print("=" * 90)
+    print(f"Query: {query}")
+    print(f"Top-K: {TOP_K}")
+    print("=" * 90)
+
+    for rank, (title_id, title, language, similarity) in enumerate(
+        results, start=1
+    ):
+        print(
+            f"[{rank:2}] "
+            f"{title_id:<8} "
+            f"{str(title):<45} "
+            f"{str(language):<15} "
+            f"{similarity * 100:>7.2f}%"
+        )
+
+    cur.close()
+    conn.close()
+
+
+if __name__ == "__main__":
+    main()
