@@ -14,7 +14,8 @@ import {
   Check,
   Edit3,
   Award,
-  FileSignature
+  FileSignature,
+  Printer
 } from 'lucide-react';
 import type { OfficerCase, VerificationResult } from '../../types';
 import { 
@@ -23,6 +24,7 @@ import {
   RuleViolationsGrid, 
   VerdictBanner 
 } from '../shared';
+import { Memorandum } from '../../export/Memorandum';
 import reviewFixtureRaw from '../../data/verify_review.json';
 import rejectedFixtureRaw from '../../data/verify_rejected.json';
 import approvedFixtureRaw from '../../data/verify_approved.json';
@@ -66,6 +68,7 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
   const [copiedMemo, setCopiedMemo] = useState<boolean>(false);
   const [pendingConfirmation, setPendingConfirmation] = useState<'APPROVED' | 'REJECTED' | null>(null);
   const [recordedDecision, setRecordedDecision] = useState<DecisionResultInfo | null>(null);
+  const [isMemoOpen, setIsMemoOpen] = useState<boolean>(false);
 
   // Load and adapt evidence based on the case verdict
   const evidence = useMemo<VerificationResult | null>(() => {
@@ -504,9 +507,21 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
           {/* Action Bar (When not in confirmation state) */}
           {!pendingConfirmation && (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs font-mono text-[#75634B]">
-                <Clock className="w-3.5 h-3.5 text-amber-700" />
-                <span>PRGI Officer E-Token Authenticated</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setIsMemoOpen(true);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#F8F6F0] text-[#1C1917] border border-[#DDD1BF] font-semibold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <Printer className="w-3.5 h-3.5 text-amber-700" />
+                  <span>Official Memorandum (PDF)</span>
+                </button>
+                <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-[#75634B]">
+                  <Clock className="w-3 h-3 text-amber-700" />
+                  <span>E-Token Auth</span>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -538,6 +553,15 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
           )}
         </div>
       </div>
+
+      {/* Printable Official Government Audit Memorandum Modal */}
+      {evidence && (
+        <Memorandum
+          result={evidence}
+          isOpen={isMemoOpen}
+          onClose={() => setIsMemoOpen(false)}
+        />
+      )}
     </div>
   );
 };

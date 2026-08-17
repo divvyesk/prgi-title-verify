@@ -10,7 +10,8 @@ import {
   Globe, 
   RefreshCw, 
   Cpu,
-  MapPin
+  MapPin,
+  Printer
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Hero3DCanvas } from '../canvas/Hero3DCanvas';
@@ -24,6 +25,7 @@ import {
   RuleViolationsGrid, 
   VerdictBanner 
 } from '../shared';
+import { Memorandum } from '../../export/Memorandum';
 
 interface VerificationViewProps {
   onNavigateToAgents: (seedTitle?: string) => void;
@@ -109,6 +111,7 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
   });
   const [activeStage, setActiveStage] = useState(5);
   const [copiedReport, setCopiedReport] = useState(false);
+  const [isMemoOpen, setIsMemoOpen] = useState(false);
 
   // Live transliteration preview while typing
   const detected = detectScriptAndLanguage(inputTitle);
@@ -432,11 +435,22 @@ Timestamp: ${result.timestamp}`;
             processingTimeMs={result.processingTimeMs}
           >
             <button
+              onClick={() => {
+                sound.playClick();
+                setIsMemoOpen(true);
+              }}
+              className="px-3.5 py-1.5 rounded-lg bg-[#1C1917] hover:bg-stone-800 text-white flex items-center gap-1.5 transition-colors cursor-pointer font-bold shadow-sm text-xs"
+            >
+              <Printer className="w-3.5 h-3.5 text-amber-300" />
+              <span>Official Memorandum (PDF / Print)</span>
+            </button>
+
+            <button
               onClick={copyVerificationReport}
-              className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] flex items-center gap-1.5 transition-colors cursor-pointer font-semibold shadow-sm"
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] flex items-center gap-1.5 transition-colors cursor-pointer font-semibold shadow-sm text-xs"
             >
               {copiedReport ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedReport ? 'Copied' : 'Copy Report'}</span>
+              <span>{copiedReport ? 'Copied' : 'Quick Summary'}</span>
             </button>
 
             {result.verdict === 'REJECTED' && (
@@ -445,7 +459,7 @@ Timestamp: ${result.timestamp}`;
                   sound.playClick();
                   onNavigateToAgents(result.inputTitle);
                 }}
-                className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 text-white font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 text-white font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer text-xs"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 <span>Generate Safe Alternatives</span>
@@ -471,6 +485,13 @@ Timestamp: ${result.timestamp}`;
 
           {/* Deterministic PRGI Government Rules Matrix */}
           <RuleViolationsGrid ruleViolations={result.ruleViolations} />
+
+          {/* Printable Official Government Audit Memorandum Modal */}
+          <Memorandum
+            result={result}
+            isOpen={isMemoOpen}
+            onClose={() => setIsMemoOpen(false)}
+          />
         </div>
       )}
     </div>
