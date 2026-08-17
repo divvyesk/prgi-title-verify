@@ -1,7 +1,6 @@
 import csv
 from pathlib import Path
-import psycopg2
-from psycopg2.extras import execute_values
+import psycopg
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 CSV_FILE = BASE_DIR / "data" / "datasets" / "dataset2" / "native_sample.csv"
@@ -18,7 +17,7 @@ def load_data():
         print(f"File not found: {CSV_FILE}")
         return
 
-    conn = psycopg2.connect(**DB_CONFIG)
+    conn = psycopg.connect(**DB_CONFIG)
     cur = conn.cursor()
 
     try:
@@ -60,10 +59,10 @@ def load_data():
             INSERT INTO titles (
                 title_id, title, title_original, title_normalized, 
                 language_normalized, script, title_transliterated, source, title_core
-            ) VALUES %s
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
-        execute_values(cur, query, values)
+        cur.executemany(query, values)
         
         conn.commit()
         print(f"✅ Successfully inserted {len(rows)} rows into 'titles' table with source='SYNTHETIC_NATIVE'.")
