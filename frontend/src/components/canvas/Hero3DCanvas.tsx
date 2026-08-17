@@ -9,29 +9,29 @@ interface SceneProps {
   isScanning?: boolean;
 }
 
-// Helper to create organic neon butterfly wing closed tube curve (matching reference image)
+// Organic 3D Neon Butterfly Wing Curve (Matching Hot Pink / Cyan reference images)
 function createButterflyWingCurve(isRightWing = false, scale = 1): THREE.CatmullRomCurve3 {
   const dir = isRightWing ? 1 : -1;
   const points = [
-    new THREE.Vector3(0.01 * dir * scale, 0.04 * scale, 0),
+    new THREE.Vector3(0.01 * dir * scale, 0.03 * scale, 0),
     // Upper large wing loop
-    new THREE.Vector3(0.22 * dir * scale, 0.38 * scale, 0.02 * scale),
-    new THREE.Vector3(0.52 * dir * scale, 0.74 * scale, 0.04 * scale),
-    new THREE.Vector3(0.65 * dir * scale, 0.54 * scale, 0.03 * scale),
-    new THREE.Vector3(0.38 * dir * scale, 0.24 * scale, 0.01 * scale),
-    new THREE.Vector3(0.14 * dir * scale, 0.06 * scale, 0.005 * scale),
+    new THREE.Vector3(0.24 * dir * scale, 0.42 * scale, 0.03 * scale),
+    new THREE.Vector3(0.58 * dir * scale, 0.82 * scale, 0.05 * scale),
+    new THREE.Vector3(0.72 * dir * scale, 0.60 * scale, 0.04 * scale),
+    new THREE.Vector3(0.42 * dir * scale, 0.28 * scale, 0.02 * scale),
+    new THREE.Vector3(0.16 * dir * scale, 0.08 * scale, 0.01 * scale),
     // Lower secondary wing loop
-    new THREE.Vector3(0.42 * dir * scale, -0.14 * scale, 0.02 * scale),
-    new THREE.Vector3(0.5 * dir * scale, -0.44 * scale, 0.03 * scale),
-    new THREE.Vector3(0.28 * dir * scale, -0.54 * scale, 0.02 * scale),
-    new THREE.Vector3(0.1 * dir * scale, -0.22 * scale, 0.01 * scale),
-    new THREE.Vector3(0.01 * dir * scale, -0.04 * scale, 0),
+    new THREE.Vector3(0.46 * dir * scale, -0.16 * scale, 0.02 * scale),
+    new THREE.Vector3(0.56 * dir * scale, -0.48 * scale, 0.03 * scale),
+    new THREE.Vector3(0.32 * dir * scale, -0.60 * scale, 0.02 * scale),
+    new THREE.Vector3(0.12 * dir * scale, -0.25 * scale, 0.01 * scale),
+    new THREE.Vector3(0.01 * dir * scale, -0.03 * scale, 0),
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }
 
-// 3D Neon Butterfly Component (Matching Hot Pink / Cyan Neon Flex reference)
-function NeonButterfly({
+// 3D Pure Neon Butterfly (No plates or boxes — pure glowing neon tubes)
+function PureNeonButterfly({
   position,
   rotation = [0, 0, 0],
   scale = 1,
@@ -58,91 +58,83 @@ function NeonButterfly({
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (leftWingRef.current && rightWingRef.current) {
-      // Gentle subtle breathing flutter
-      const flutter = Math.sin(t * flutterSpeed + wingAngleOffset) * 0.14;
+      // Gentle rhythmic wing flutter
+      const flutter = Math.sin(t * flutterSpeed + wingAngleOffset) * 0.18;
       leftWingRef.current.rotation.y = flutter;
       rightWingRef.current.rotation.y = -flutter;
     }
     if (groupRef.current) {
-      // Subtle hovering bob
-      groupRef.current.position.y = position[1] + Math.sin(t * 1.5 + wingAngleOffset) * 0.03;
+      // Gentle spatial hover
+      groupRef.current.position.y = position[1] + Math.sin(t * 1.6 + wingAngleOffset) * 0.05;
+      groupRef.current.rotation.z = rotation[2] + Math.cos(t * 1.2 + wingAngleOffset) * 0.04;
     }
   });
 
   return (
     <group ref={groupRef} position={position} rotation={rotation}>
-      {/* Acrylic Backing for Butterfly */}
-      <mesh position={[0, 0, -0.02]}>
-        <planeGeometry args={[1.5 * scale, 1.5 * scale]} />
-        <meshStandardMaterial
-          color="#FAF7F0"
-          transparent
-          opacity={0.12}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Center Body Tube */}
-      <mesh position={[0, 0, 0.01]}>
-        <capsuleGeometry args={[0.022 * scale, 0.38 * scale, 8, 16]} />
+      {/* 1. Center Glowing Body Tube */}
+      <mesh position={[0, 0, 0]}>
+        <capsuleGeometry args={[0.026 * scale, 0.42 * scale, 12, 16]} />
         <meshStandardMaterial
           color="#FFFFFF"
           emissive={color}
-          emissiveIntensity={3.5}
-          roughness={0.1}
+          emissiveIntensity={6.0}
+          roughness={0.05}
         />
       </mesh>
 
-      {/* Left Wing Neon Loop */}
+      {/* 2. Left Wing Neon Tubes */}
       <group ref={leftWingRef}>
-        {/* Outer Vibrant Neon Glow Tube */}
+        {/* Outer Radiant Glow Halo Tube */}
         <mesh>
-          <tubeGeometry args={[leftCurve, 48, 0.028 * scale, 8, true]} />
+          <tubeGeometry args={[leftCurve, 64, 0.042 * scale, 12, true]} />
           <meshStandardMaterial
             color={color}
             emissive={glowColor}
-            emissiveIntensity={4.0}
-            roughness={0.15}
+            emissiveIntensity={6.5}
+            roughness={0.1}
             transparent
-            opacity={0.96}
+            opacity={0.95}
           />
         </mesh>
-        {/* Inner White Gas Core Tube */}
-        <mesh position={[0, 0, 0.006]}>
-          <tubeGeometry args={[leftCurve, 48, 0.012 * scale, 6, true]} />
+
+        {/* Inner White-Hot Gas Core Filament */}
+        <mesh position={[0, 0, 0.008]}>
+          <tubeGeometry args={[leftCurve, 64, 0.016 * scale, 8, true]} />
           <meshBasicMaterial color="#FFFFFF" />
         </mesh>
       </group>
 
-      {/* Right Wing Neon Loop */}
+      {/* 3. Right Wing Neon Tubes */}
       <group ref={rightWingRef}>
-        {/* Outer Vibrant Neon Glow Tube */}
+        {/* Outer Radiant Glow Halo Tube */}
         <mesh>
-          <tubeGeometry args={[rightCurve, 48, 0.028 * scale, 8, true]} />
+          <tubeGeometry args={[rightCurve, 64, 0.042 * scale, 12, true]} />
           <meshStandardMaterial
             color={color}
             emissive={glowColor}
-            emissiveIntensity={4.0}
-            roughness={0.15}
+            emissiveIntensity={6.5}
+            roughness={0.1}
             transparent
-            opacity={0.96}
+            opacity={0.95}
           />
         </mesh>
-        {/* Inner White Gas Core Tube */}
-        <mesh position={[0, 0, 0.006]}>
-          <tubeGeometry args={[rightCurve, 48, 0.012 * scale, 6, true]} />
+
+        {/* Inner White-Hot Gas Core Filament */}
+        <mesh position={[0, 0, 0.008]}>
+          <tubeGeometry args={[rightCurve, 64, 0.016 * scale, 8, true]} />
           <meshBasicMaterial color="#FFFFFF" />
         </mesh>
       </group>
 
-      {/* Butterfly Local Point Glow */}
-      <pointLight color={glowColor} intensity={2.0} distance={1.8} />
+      {/* High-Intensity Butterfly Point Light */}
+      <pointLight color={glowColor} intensity={3.5} distance={2.5} />
     </group>
   );
 }
 
-// 3D Neon Text Title Component (Vibrant LED flex tube sign style)
-function NeonTitleSign({
+// 3D Pure Neon Title Text (No background plate — just brilliant glowing 3D letters)
+function PureNeonTitle({
   title,
   verdict,
   isScanning
@@ -153,21 +145,41 @@ function NeonTitleSign({
 }) {
   const signRef = useRef<THREE.Group>(null);
 
-  const { neonColor, glowColor, ambientGlow } = useMemo(() => {
+  const { primaryColor, glowColor, secondaryColor, secondaryGlow } = useMemo(() => {
     if (verdict === 'APPROVED') {
-      return { neonColor: '#00FF88', glowColor: '#05DF72', ambientGlow: '#00FF88' };
+      return { 
+        primaryColor: '#00FF88', 
+        glowColor: '#39FF14', 
+        secondaryColor: '#00F0FF', 
+        secondaryGlow: '#00D2FF' 
+      };
     }
     if (verdict === 'REJECTED') {
-      return { neonColor: '#FF0055', glowColor: '#FF2E7E', ambientGlow: '#FF0055' };
+      return { 
+        primaryColor: '#FF007F', 
+        glowColor: '#FF1493', 
+        secondaryColor: '#FF0055', 
+        secondaryGlow: '#FF3366' 
+      };
     }
     if (verdict === 'MANUAL_REVIEW') {
-      return { neonColor: '#FFB800', glowColor: '#FFD043', ambientGlow: '#FFB800' };
+      return { 
+        primaryColor: '#FFB800', 
+        glowColor: '#FF9900', 
+        secondaryColor: '#FF007F', 
+        secondaryGlow: '#FF1493' 
+      };
     }
-    // Default Iconic Hot Pink / Cyan Multi-neon vibe
-    return { neonColor: '#FF1493', glowColor: '#FF007F', ambientGlow: '#FF1493' };
+    // Default Iconic Hot Pink & Electric Cyan Multi-Neon (like reference images)
+    return { 
+      primaryColor: '#FF007F', 
+      glowColor: '#FF1493', 
+      secondaryColor: '#00F0FF', 
+      secondaryGlow: '#00D2FF' 
+    };
   }, [verdict]);
 
-  // Clean words for 2-line layout if title is long
+  // Clean words for 2-line layout if title is multi-word
   const rawText = (title || 'Times India').toUpperCase().trim();
   const words = rawText.split(' ');
   let line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
@@ -177,85 +189,48 @@ function NeonTitleSign({
     line2 = '';
   }
 
-  const fontSize = words.length > 3 ? 0.36 : 0.46;
+  const fontSize = words.length > 3 ? 0.44 : 0.54;
+
+  // 3D Depth slice offsets for thick volumetric neon extrusion
+  const depthLayers = [-0.06, -0.04, -0.02, 0.0];
 
   return (
     <group ref={signRef}>
-      {/* 1. Clear Transparent Acrylic Backing Plate (Matching Reference Image 1 & 2) */}
-      <mesh position={[0, 0, -0.06]}>
-        <planeGeometry args={[4.4, 2.5]} />
-        <meshStandardMaterial
-          color="#FAF7F0"
-          transparent
-          opacity={0.16}
-          roughness={0.1}
-          metalness={0.1}
-        />
-      </mesh>
+      {/* Line 1: Primary Glowing 3D Neon Text */}
+      <group position={[0, line2 ? 0.32 : 0, 0]}>
+        {/* Volumetric 3D Neon Extrusion Tube Slices */}
+        {depthLayers.map((zOffset, idx) => (
+          <Text
+            key={`l1-ext-${idx}`}
+            position={[0, 0, zOffset]}
+            fontSize={fontSize}
+            maxWidth={4.0}
+            textAlign="center"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.055}
+            outlineColor={primaryColor}
+            letterSpacing={0.06}
+          >
+            {line1}
+            <meshStandardMaterial
+              color={primaryColor}
+              emissive={glowColor}
+              emissiveIntensity={5.5}
+              roughness={0.1}
+            />
+          </Text>
+        ))}
 
-      {/* Chrome Mounting Standoff Screws */}
-      {[
-        [-2.0, 1.05, -0.04],
-        [2.0, 1.05, -0.04],
-        [-2.0, -1.05, -0.04],
-        [2.0, -1.05, -0.04],
-      ].map((pos, i) => (
-        <mesh key={`screw-${i}`} position={pos as [number, number, number]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.04, 0.04, 0.05, 16]} />
-          <meshStandardMaterial color="#B0A89C" metalness={0.9} roughness={0.2} />
-        </mesh>
-      ))}
-
-      {/* 2. Outer Neon Tube Border / Frame */}
-      <mesh position={[0, 0, -0.01]}>
-        <torusGeometry args={[1.85, 0.022, 16, 64]} />
-        <meshStandardMaterial
-          color="#00F0FF"
-          emissive="#00D2FF"
-          emissiveIntensity={3.5}
-          roughness={0.1}
-          transparent
-          opacity={0.95}
-        />
-      </mesh>
-
-      {/* Inner White Tube for Border */}
-      <mesh position={[0, 0, 0.005]}>
-        <torusGeometry args={[1.85, 0.009, 12, 64]} />
-        <meshBasicMaterial color="#FFFFFF" />
-      </mesh>
-
-      {/* 3. Main Neon Title Text (Line 1) */}
-      <group position={[0, line2 ? 0.24 : 0, 0.02]}>
-        {/* Deep Color Glow Outline */}
+        {/* Front White-Hot Gas Core Filament */}
         <Text
+          position={[0, 0, 0.022]}
           fontSize={fontSize}
-          maxWidth={3.5}
+          maxWidth={4.0}
           textAlign="center"
           anchorX="center"
           anchorY="middle"
-          outlineWidth={0.045}
-          outlineColor={neonColor}
-          letterSpacing={0.06}
-        >
-          {line1}
-          <meshStandardMaterial
-            color={neonColor}
-            emissive={glowColor}
-            emissiveIntensity={4.2}
-            roughness={0.1}
-          />
-        </Text>
-
-        {/* White Hot Center Tube Core */}
-        <Text
-          position={[0, 0, 0.016]}
-          fontSize={fontSize}
-          maxWidth={3.5}
-          textAlign="center"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.012}
+          outlineWidth={0.016}
           outlineColor="#FFFFFF"
           letterSpacing={0.06}
         >
@@ -264,38 +239,41 @@ function NeonTitleSign({
         </Text>
       </group>
 
-      {/* 4. Main Neon Title Text (Line 2 if exists) */}
+      {/* Line 2: Secondary Cyan/Multi Glowing 3D Neon Text */}
       {line2 && (
-        <group position={[0, -0.28, 0.02]}>
-          {/* Deep Color Glow Outline */}
-          <Text
-            fontSize={fontSize * 0.92}
-            maxWidth={3.5}
-            textAlign="center"
-            anchorX="center"
-            anchorY="middle"
-            outlineWidth={0.045}
-            outlineColor="#00F0FF"
-            letterSpacing={0.06}
-          >
-            {line2}
-            <meshStandardMaterial
-              color="#00F0FF"
-              emissive="#00D2FF"
-              emissiveIntensity={4.2}
-              roughness={0.1}
-            />
-          </Text>
+        <group position={[0, -0.34, 0]}>
+          {depthLayers.map((zOffset, idx) => (
+            <Text
+              key={`l2-ext-${idx}`}
+              position={[0, 0, zOffset]}
+              fontSize={fontSize * 0.94}
+              maxWidth={4.0}
+              textAlign="center"
+              anchorX="center"
+              anchorY="middle"
+              outlineWidth={0.055}
+              outlineColor={secondaryColor}
+              letterSpacing={0.06}
+            >
+              {line2}
+              <meshStandardMaterial
+                color={secondaryColor}
+                emissive={secondaryGlow}
+                emissiveIntensity={5.5}
+                roughness={0.1}
+              />
+            </Text>
+          ))}
 
-          {/* White Hot Center Tube Core */}
+          {/* Front White-Hot Gas Core Filament */}
           <Text
-            position={[0, 0, 0.016]}
-            fontSize={fontSize * 0.92}
-            maxWidth={3.5}
+            position={[0, 0, 0.022]}
+            fontSize={fontSize * 0.94}
+            maxWidth={4.0}
             textAlign="center"
             anchorX="center"
             anchorY="middle"
-            outlineWidth={0.012}
+            outlineWidth={0.016}
             outlineColor="#FFFFFF"
             letterSpacing={0.06}
           >
@@ -305,37 +283,38 @@ function NeonTitleSign({
         </group>
       )}
 
-      {/* 5. Subtitle Neon Tag (PRGI Statutory Clearance) */}
+      {/* Subtitle Minimal Neon Caption */}
       <Text
-        position={[0, -0.76, 0.02]}
-        fontSize={0.11}
-        letterSpacing={0.12}
+        position={[0, line2 ? -0.84 : -0.62, 0.01]}
+        fontSize={0.13}
+        letterSpacing={0.16}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.012}
-        outlineColor={neonColor}
+        outlineWidth={0.014}
+        outlineColor={primaryColor}
       >
-        [ PRGI STATUTORY CLEARANCE SPECIMEN ]
+        ✦ PRGI STATUTORY CLEARANCE ✦
         <meshStandardMaterial
           color="#FFFDF7"
-          emissive={neonColor}
-          emissiveIntensity={2.2}
+          emissive={primaryColor}
+          emissiveIntensity={3.5}
         />
       </Text>
 
-      {/* Neon Backlight Illuminators */}
-      <pointLight position={[0, 0, 0.4]} color={ambientGlow} intensity={3.5} distance={4.5} />
-      <pointLight position={[0, 0, -0.2]} color={glowColor} intensity={2.0} distance={3.0} />
+      {/* High-Power Front & Back Radiance Lights */}
+      <pointLight position={[0, 0.2, 0.8]} color={glowColor} intensity={5.0} distance={5.5} />
+      <pointLight position={[0, -0.3, 0.8]} color={secondaryGlow} intensity={4.5} distance={5.5} />
+      <pointLight position={[0, 0, -0.5]} color={glowColor} intensity={3.0} distance={4.0} />
 
       {/* Laser Scanning Line during verification */}
       {isScanning && (
-        <group position={[0, 0, 0.12]}>
+        <group position={[0, 0, 0.16]}>
           <mesh>
-            <planeGeometry args={[3.8, 0.04]} />
-            <meshBasicMaterial color="#00F0FF" transparent opacity={0.9} />
+            <planeGeometry args={[4.2, 0.05]} />
+            <meshBasicMaterial color="#00F0FF" transparent opacity={0.95} />
           </mesh>
-          <pointLight color="#00F0FF" intensity={4} distance={2} />
+          <pointLight color="#00F0FF" intensity={6} distance={3} />
         </group>
       )}
     </group>
@@ -377,77 +356,88 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
   return (
     <div className="w-full h-full min-h-[340px] relative flex items-center justify-center pointer-events-auto select-none">
       <Canvas
-        camera={{ position: [0, 0, 4.3], fov: 45 }}
+        camera={{ position: [0, 0, 4.2], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
       >
-        {/* Soft Warm Ambient Studio Lighting */}
-        <ambientLight intensity={1.4} />
-        <directionalLight position={[4, 6, 5]} intensity={1.5} color="#FFFDF7" />
-        <directionalLight position={[-4, -3, 3]} intensity={0.8} color="#FFE4E6" />
+        {/* Soft Ambient Lighting */}
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[4, 6, 5]} intensity={1.6} color="#FFFDF7" />
+        <directionalLight position={[-4, -3, 3]} intensity={0.9} color="#FFE4E6" />
 
-        {/* Orbit Controls: Rotatable by Mouse, Static Neon Sign */}
+        {/* Orbit Controls: Rotatable by Mouse, Static Sign */}
         <OrbitControls
           enableZoom={false}
           enablePan={false}
           maxPolarAngle={Math.PI / 1.7}
           minPolarAngle={Math.PI / 2.3}
-          maxAzimuthAngle={Math.PI / 3.5}
-          minAzimuthAngle={-Math.PI / 3.5}
+          maxAzimuthAngle={Math.PI / 3.2}
+          minAzimuthAngle={-Math.PI / 3.2}
           dampingFactor={0.06}
         />
 
         <Suspense fallback={null}>
           <group position={[0, 0, 0]}>
-            {/* Center Neon Title Sign on Acrylic Plate */}
-            <NeonTitleSign
+            {/* Center Pure 3D Neon Title (No background plate) */}
+            <PureNeonTitle
               title={title || 'Times India'}
               verdict={verdict}
               isScanning={isScanning}
             />
 
-            {/* Neon Butterflies Floating Naturally Around the Sign (Matching Reference Images) */}
-            {/* 1. Top-Right Majestic Hot Pink Butterfly */}
-            <NeonButterfly
-              position={[1.9, 0.9, 0.25]}
-              rotation={[0.1, -0.25, 0.2]}
-              scale={0.85}
-              color="#FF1493"
-              glowColor="#FF007F"
+            {/* Surrounding Brilliant 3D Neon Butterflies (Hot Pink, Cyan, Golden Amber) */}
+            {/* 1. Top-Right Radiant Hot Pink Butterfly */}
+            <PureNeonButterfly
+              position={[1.85, 0.88, 0.3]}
+              rotation={[0.12, -0.28, 0.22]}
+              scale={0.9}
+              color="#FF007F"
+              glowColor="#FF1493"
               wingAngleOffset={0}
               flutterSpeed={2.2}
             />
 
             {/* 2. Top-Left Electric Cyan Butterfly */}
-            <NeonButterfly
-              position={[-1.95, 0.8, 0.2]}
-              rotation={[0.15, 0.3, -0.25]}
-              scale={0.75}
+            <PureNeonButterfly
+              position={[-1.9, 0.82, 0.25]}
+              rotation={[0.15, 0.32, -0.26]}
+              scale={0.8}
               color="#00F0FF"
               glowColor="#00D2FF"
               wingAngleOffset={1.2}
               flutterSpeed={2.6}
             />
 
-            {/* 3. Bottom-Left Warm Magenta Butterfly */}
-            <NeonButterfly
-              position={[-1.85, -0.8, 0.3]}
-              rotation={[-0.1, 0.2, 0.15]}
-              scale={0.7}
-              color="#FF007F"
-              glowColor="#FF2E93"
+            {/* 3. Bottom-Left Vibrant Magenta Butterfly */}
+            <PureNeonButterfly
+              position={[-1.8, -0.78, 0.35]}
+              rotation={[-0.1, 0.22, 0.16]}
+              scale={0.76}
+              color="#FF1493"
+              glowColor="#FF007F"
               wingAngleOffset={2.4}
               flutterSpeed={2.0}
             />
 
             {/* 4. Bottom-Right Radiant Golden Butterfly */}
-            <NeonButterfly
-              position={[1.95, -0.72, 0.2]}
-              rotation={[-0.12, -0.22, -0.18]}
-              scale={0.68}
+            <PureNeonButterfly
+              position={[1.9, -0.72, 0.28]}
+              rotation={[-0.12, -0.24, -0.18]}
+              scale={0.74}
               color="#FFB800"
-              glowColor="#FFD043"
+              glowColor="#FF9900"
               wingAngleOffset={3.6}
               flutterSpeed={2.4}
+            />
+
+            {/* 5. Center-Top Floating Mini Cyan Butterfly */}
+            <PureNeonButterfly
+              position={[0.0, 1.15, 0.15]}
+              rotation={[0.05, 0.1, -0.08]}
+              scale={0.55}
+              color="#00F0FF"
+              glowColor="#00D2FF"
+              wingAngleOffset={4.8}
+              flutterSpeed={2.8}
             />
           </group>
         </Suspense>
