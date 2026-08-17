@@ -1,0 +1,52 @@
+[
+  {
+    "id": "GC-001",
+    "title": "Konkan Kinara Vaarta",
+    "meaning": "\"Konkan Coastal News\" — Konkan is the coastal region of Maharashtra; vaarta is Marathi for news/tidings.",
+    "uniquenessScore": 90.4,
+    "verificationPassed": true,
+    "riskScore": 6.8,
+    "category": "Regional daily",
+    "rationale": "Grounds the title in a specific, real sub-region rather than a generic state-wide claim, which keeps it distinctive from the many state-wide Marathi dailies already registered."
+  },
+  {
+    "id": "GC-002",
+    "title": "Sahyadri Divas Patra",
+    "meaning": "\"Sahyadri Daily Paper\" — the Sahyadri (Western Ghats) mountain range running through Maharashtra.",
+    "uniquenessScore": 93.0,
+    "verificationPassed": true,
+    "riskScore": 7.8,
+    "category": "Regional daily",
+    "rationale": "Uses a well-known regional landmark as the core word, giving the title a strong, defensible structural core distinct from filler-word variants of existing titles."
+  },
+  {
+    "id": "GC-003",
+    "title": "Godavari Kinara Sandesh",
+    "meaning": "\"Godavari Riverside Message\" — the Godavari river basin spans several Marathi-speaking districts.",
+    "uniquenessScore": 95.8,
+    "verificationPassed": true,
+    "riskScore": 4.3,
+    "category": "Regional daily",
+    "rationale": "A river-basin identity anchors the title to a specific readership area without overlapping any registered Godavari-named title in the shortlist."
+  },
+  {
+    "id": "GC-004",
+    "title": "Vidarbha Prabhat Awaaz",
+    "meaning": "\"Vidarbha Dawn Voice\" — Vidarbha is the eastern region of Maharashtra; prabhat is dawn/morning.",
+    "uniquenessScore": 94.6,
+    "verificationPassed": true,
+    "riskScore": 5.1,
+    "category": "Regional daily",
+    "rationale": "Combines a region word with a time-of-day word rather than a stock media-suffix, avoiding the common \"X Patrika\"/\"X Times\" collision pattern."
+  },
+  {
+    "id": "GC-005",
+    "title": "Marathwada Jantechi Hak",
+    "meaning": "\"Marathwada People's Voice\" — Marathwada is the south-central region of Maharashtra; jantechi hak, the people's right/voice.",
+    "uniquenessScore": 82.6,
+    "verificationPassed": true,
+    "riskScore": 7.8,
+    "category": "Regional daily",
+    "rationale": "A rights/advocacy framing distinguishes it in tone from the mostly commercial or news-brand titles already registered under similar regional names."
+  }
+]

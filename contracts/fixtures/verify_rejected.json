@@ -1,0 +1,77 @@
+{
+  "inputTitle": "Royal Matrimonial Classifieds",
+  "normalizedTitle": "royal matrimonial classifieds",
+  "detectedLanguage": "English",
+  "transliteratedTitle": "royal matrimonial classifieds",
+  "coreWords": [
+    "royal",
+    "matrimonial",
+    "classifieds"
+  ],
+  "verdict": "REJECTED",
+  "verdictScore": 92.0,
+  "similarityBreakdown": {
+    "lexicalScore": 46.0,
+    "phoneticScore": 30.0,
+    "semanticScore": 38.0,
+    "coreWordScore": 41.0,
+    "blendedScore": 92.0
+  },
+  "clashingTitles": [
+    {
+      "title": "A TO Z FREE CLASSIFIEDS",
+      "regNo": "KERBIL/2010/32470",
+      "language": "English",
+      "state": "Kerala",
+      "similarity": 52.0,
+      "matchType": "LEXICAL",
+      "reason": "Shares the classifieds-listing structure and a common token."
+    },
+    {
+      "title": "AVADH CLASSIFIED",
+      "regNo": "UPBIL/2006/19064",
+      "language": "English",
+      "state": "Uttar Pradesh",
+      "similarity": 47.0,
+      "matchType": "LEXICAL",
+      "reason": "Shares the token \"classified\" and a commercial-listing framing."
+    },
+    {
+      "title": "BUSINESS AND TENDER CLASSIFIED",
+      "regNo": "UTTBIL/2008/28724",
+      "language": "English",
+      "state": "Uttarakhand",
+      "similarity": 41.0,
+      "matchType": "COMBINATION",
+      "reason": "Similar commercial-classifieds naming pattern."
+    }
+  ],
+  "ruleViolations": [
+    {
+      "ruleId": "R-COM-01",
+      "ruleName": "Commercial and matrimonial catalogue ban",
+      "severity": "CRITICAL",
+      "description": "A title that presents itself as a classifieds, matrimonial or product-listing service is not admissible as a periodical title.",
+      "clause": "PENDING VERIFICATION — Pruthviraj is extracting the verbatim clause from the official PRGI Guidelines into data/rules/rules.json. Do not treat this text as a real citation until source_clause_verified is true there.",
+      "passed": false,
+      "triggerPhrase": "Matrimonial Classifieds",
+      "requiresHumanConfirmation": false
+    }
+  ],
+  "explanation": "The title \"Royal Matrimonial Classifieds\" is rejected due to violation of the Commercial and matrimonial catalogue ban. A title that presents itself as a classifieds or matrimonial-listing service is not admissible as a periodical title.",
+  "recommendedAction": "Remove restricted commercial/matrimonial-listing terms before resubmitting, or use the Agentic Title Studio to generate distinctive, pre-verified alternatives.",
+  "guidelineCitations": [
+    "PENDING VERIFICATION — see ruleViolations[0].clause; Pruthviraj replaces this with the verbatim guideline citation once data/rules/rules.json is built."
+  ],
+  "stageTimings": {
+    "normalize": 2.6,
+    "shortlist": 44.0,
+    "score": 241.3,
+    "check": 9.1,
+    "explain": 58.7
+  },
+  "engine": "LIVE",
+  "cached": false,
+  "processingTimeMs": 356,
+  "timestamp": "2026-08-17T09:16:47Z"
+}
