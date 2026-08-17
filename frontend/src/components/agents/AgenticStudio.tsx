@@ -14,6 +14,7 @@ import {
 import confetti from 'canvas-confetti';
 import type { GeneratedCandidate } from '../../types';
 import { generateAlternatives } from '../../api/endpoints';
+import { ScrollReveal } from '../common/ScrollReveal';
 import { sound } from '../../utils/audio';
 
 interface AgenticStudioProps {
@@ -211,308 +212,320 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
   };
 
   return (
-    <div className="space-y-10 max-w-7xl mx-auto px-6 sm:px-12 py-8">
-      {/* Header Info */}
-      <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 border-b border-[#EDE8DF] pb-6">
-        <div className="space-y-2">
-          <h1 className="font-editorial text-3xl sm:text-5xl text-[#1C1917]">
-            Autonomous Title Studio
-          </h1>
-          <p className="text-sm sm:text-base text-[#57534E] max-w-3xl leading-relaxed">
-            When a title clashes, our 4-agent collaborative loop generates 15–20 candidates, verifies them against 82,713 registered titles, prunes collisions, and delivers 100% pre-cleared alternatives.
-          </p>
-        </div>
+    <div className="max-w-7xl mx-auto px-6 sm:px-12 divide-y divide-[#EAE4DA]">
+      
+      {/* Chapter 01: Header & Agentic Mission */}
+      <section className="py-12 sm:py-20">
+        <ScrollReveal direction="up" delayMs={50}>
+          <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-6">
+            <div className="space-y-3">
+              <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                01 / Generative Statutory Clearance
+              </div>
+              <h1 className="font-editorial text-5xl sm:text-7xl text-[#1C1917] tracking-tight leading-[1.04]">
+                Autonomous Title Studio
+              </h1>
+              <p className="text-[#57534E] text-base sm:text-lg max-w-3xl leading-relaxed font-normal">
+                When a title clashes, our 4-agent collaborative loop generates 15–20 candidates, verifies them against 82,713 registered titles, prunes collisions, and delivers 100% pre-cleared alternatives.
+              </p>
+            </div>
 
-        {generationTimeMs && (
-          <div className="text-xs font-mono text-[#78716C]">
-            Latency: <span className="font-bold text-[#1C1917]">{generationTimeMs} ms</span>
+            {generationTimeMs && (
+              <div className="text-xs font-mono text-[#78716C] self-start md:self-auto">
+                Latency: <span className="font-bold text-[#1C1917]">{generationTimeMs} ms</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </ScrollReveal>
+      </section>
 
-      {/* 4-Agent Pipeline Progression Stream (Linear Whitespace, No Card Grid) */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-[#1C1917] uppercase tracking-wider">
-            Multi-Cycle Autonomous Workflow
-          </span>
-          {isGenerating && (
-            <span className="font-mono text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded font-bold motion-safe:animate-pulse">
-              Workflow Active
-            </span>
+      {/* Chapter 02: 4-Agent Pipeline Progression */}
+      <section className="py-12 sm:py-16 space-y-8">
+        <ScrollReveal direction="up" delayMs={80}>
+          <div className="space-y-2 mb-4">
+            <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+              02 / Multi-Cycle Autonomous Loop
+            </div>
+            <h2 className="font-editorial text-3xl sm:text-4xl text-[#1C1917]">
+              Continuous Generation &amp; Collision Pruning
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pt-2">
+            {[
+              {
+                num: '01',
+                role: 'Interviewer Agent',
+                desc: 'Analyzes brief, domain constraints, jurisdiction, and target tone.',
+                icon: Bot,
+              },
+              {
+                num: '02',
+                role: 'Generator Agent',
+                desc: 'Proposes 15–20 linguistically rich names across root tokens.',
+                icon: Sparkles,
+              },
+              {
+                num: '03',
+                role: 'Verifier Agent',
+                desc: 'Pipes candidates through 82k registry & rules, pruning clashes.',
+                icon: ShieldCheck,
+              },
+              {
+                num: '04',
+                role: 'Ranker Agent',
+                desc: 'Scores and ranks clean survivors by distinctiveness and clarity.',
+                icon: Cpu,
+              }
+            ].map((agent, idx) => {
+              const isAgentActive = activeAgentIndex === idx;
+              const isAgentPassed = activeAgentIndex !== null && activeAgentIndex > idx;
+              return (
+                <div
+                  key={agent.role}
+                  className={`space-y-2 transition-all ${
+                    isAgentActive ? 'opacity-100' : isAgentPassed ? 'opacity-100' : 'opacity-40'
+                  }`}
+                >
+                  <div className="w-full h-1 rounded-full bg-[#EAE6DF] overflow-hidden mb-2">
+                    <div 
+                      className={`h-full transition-all duration-300 ${
+                        isAgentActive ? 'bg-amber-600 w-full motion-safe:animate-pulse' :
+                        isAgentPassed ? 'bg-[#1C1917] w-full' : 'w-0'
+                      }`}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-mono text-[#78716C]">{agent.num}</span>
+                    {isAgentPassed && <CheckCircle2 className="w-3.5 h-3.5 text-[#137333]" />}
+                  </div>
+
+                  <div className="font-bold text-sm text-[#1C1917]">
+                    {agent.role}
+                  </div>
+                  <p className="text-xs text-[#57534E] leading-relaxed">
+                    {agent.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Collision & Self-Regeneration Notice */}
+          {retryInfo && (
+            <div className="mt-8 p-6 bg-white rounded-2xl border border-[#DDD5C9] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+              <div className="flex items-start gap-4">
+                <Flame className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-bold text-sm text-[#1C1917]">
+                    Automated Collision Pruning (Cycle {retryInfo.cycle})
+                  </div>
+                  <p className="text-[#57534E] mt-1 text-xs">
+                    <strong>{retryInfo.collidedCount} of {retryInfo.totalGenerated}</strong> proposals collided during 4-D testing and were pruned before reaching you.
+                  </p>
+                  <p className="text-xs text-[#78716C] font-mono mt-0.5">
+                    Pruned sample: <em>"{retryInfo.collisionSample}"</em>
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-xs font-mono font-bold text-[#137333] shrink-0 self-end sm:self-center">
+                {retryInfo.survivingCount} Verified Clean Titles
+              </div>
+            </div>
           )}
-        </div>
+        </ScrollReveal>
+      </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              num: '01',
-              role: 'Interviewer Agent',
-              desc: 'Analyzes brief, domain constraints, jurisdiction, and target tone.',
-              icon: Bot,
-            },
-            {
-              num: '02',
-              role: 'Generator Agent',
-              desc: 'Proposes 15–20 linguistically rich names across root tokens.',
-              icon: Sparkles,
-            },
-            {
-              num: '03',
-              role: 'Verifier Agent',
-              desc: 'Pipes candidates through 82k registry & rules, pruning clashes.',
-              icon: ShieldCheck,
-            },
-            {
-              num: '04',
-              role: 'Ranker Agent',
-              desc: 'Scores and ranks clean survivors by distinctiveness and clarity.',
-              icon: Cpu,
-            }
-          ].map((agent, idx) => {
-            const isAgentActive = activeAgentIndex === idx;
-            const isAgentPassed = activeAgentIndex !== null && activeAgentIndex > idx;
-            return (
-              <div
-                key={agent.role}
-                className={`space-y-1.5 transition-all ${
-                  isAgentActive ? 'opacity-100' : isAgentPassed ? 'opacity-100' : 'opacity-40'
-                }`}
-              >
-                <div className="w-full h-1 rounded-full bg-[#EAE6DF] overflow-hidden mb-2">
-                  <div 
-                    className={`h-full transition-all duration-300 ${
-                      isAgentActive ? 'bg-amber-600 w-full motion-safe:animate-pulse' :
-                      isAgentPassed ? 'bg-[#1C1917] w-full' : 'w-0'
-                    }`}
+      {/* Chapter 03: Workspace & Generated Recommendations */}
+      <section className="py-12 sm:py-20">
+        <ScrollReveal direction="up" delayMs={100}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            {/* Left Column: Input Brief Parameters */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="space-y-1 pb-2">
+                <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                  03 / Editorial Brief
+                </div>
+                <h3 className="font-editorial text-2xl sm:text-3xl text-[#1C1917]">
+                  Target Parameters
+                </h3>
+              </div>
+
+              <div className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-[#57534E] font-semibold mb-1.5">Publication Theme / Domain</label>
+                  <input
+                    type="text"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    placeholder="e.g. Daily National Defense & Geopolitics"
+                    className="w-full bg-white border border-[#DDD5C9] rounded-xl px-4 py-3 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-mono text-[#78716C]">{agent.num}</span>
-                  {isAgentPassed && <CheckCircle2 className="w-3.5 h-3.5 text-[#137333]" />}
+                <div>
+                  <label className="block text-[#57534E] font-semibold mb-1.5">Root Keywords</label>
+                  <input
+                    type="text"
+                    value={keywords}
+                    onChange={(e) => setKeywords(e.target.value)}
+                    placeholder="e.g. Defence, Raksha, Rashtra"
+                    className="w-full bg-white border border-[#DDD5C9] rounded-xl px-4 py-3 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
+                  />
                 </div>
 
-                <div className="font-bold text-xs text-[#1C1917]">
-                  {agent.role}
-                </div>
-                <p className="text-xs text-[#57534E] leading-relaxed">
-                  {agent.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Collision & Self-Regeneration Notice */}
-        {retryInfo && (
-          <div className="p-4 bg-[#FAF9F6] rounded-xl border border-[#EDE8DF] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-start gap-3">
-              <Flame className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-              <div>
-                <div className="font-bold text-[#1C1917]">
-                  Automated Collision Pruning (Cycle {retryInfo.cycle})
-                </div>
-                <p className="text-[#57534E] mt-0.5">
-                  <strong>{retryInfo.collidedCount} of {retryInfo.totalGenerated}</strong> proposals collided during 4-D testing and were pruned before reaching you.
-                </p>
-                <p className="text-[11px] text-[#78716C] font-mono mt-0.5">
-                  Pruned sample: <em>"{retryInfo.collisionSample}"</em>
-                </p>
-              </div>
-            </div>
-
-            <div className="text-xs font-mono font-bold text-[#137333] shrink-0 self-end sm:self-center">
-              {retryInfo.survivingCount} Verified Clean Titles
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Main Workspace Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start pt-4">
-        {/* Left: Input Parameters */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="space-y-1 border-b border-[#EDE8DF] pb-3">
-            <h2 className="font-bold text-sm text-[#1C1917]">
-              Title Brief &amp; Context
-            </h2>
-            <p className="text-xs text-[#78716C]">
-              Configure intent for the autonomous agents.
-            </p>
-          </div>
-
-          <div className="space-y-4 text-xs">
-            <div>
-              <label className="block text-[#57534E] font-semibold mb-1">Publication Theme / Domain</label>
-              <input
-                type="text"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="e.g. Daily National Defense & Geopolitics"
-                className="w-full bg-white border border-[#DDD6CE] rounded-xl px-3.5 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[#57534E] font-semibold mb-1">Root Keywords</label>
-              <input
-                type="text"
-                value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
-                placeholder="e.g. Defence, Raksha, Rashtra"
-                className="w-full bg-white border border-[#DDD6CE] rounded-xl px-3.5 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[#57534E] font-semibold mb-1">Language</label>
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
-                >
-                  <option value="Hindi">Hindi</option>
-                  <option value="English">English</option>
-                  <option value="Marathi">Marathi</option>
-                  <option value="Bengali">Bengali</option>
-                  <option value="Tamil">Tamil</option>
-                  <option value="Telugu">Telugu</option>
-                  <option value="Gujarati">Gujarati</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[#57534E] font-semibold mb-1">Periodicity</label>
-                <select
-                  value={periodicity}
-                  onChange={(e) => setPeriodicity(e.target.value)}
-                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
-                >
-                  <option value="Daily">Daily</option>
-                  <option value="Weekly">Weekly</option>
-                  <option value="Fortnightly">Fortnightly</option>
-                  <option value="Monthly">Monthly</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[#57534E] font-semibold mb-1">State</label>
-                <select
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
-                >
-                  <option value="Uttar Pradesh">Uttar Pradesh</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Madhya Pradesh">Madhya Pradesh</option>
-                  <option value="Rajasthan">Rajasthan</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[#57534E] font-semibold mb-1">Tone</label>
-                <select
-                  value={tone}
-                  onChange={(e) => setTone(e.target.value)}
-                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
-                >
-                  <option value="Authoritative & Progressive">Authoritative</option>
-                  <option value="Modern & Analytical">Analytical</option>
-                  <option value="Grassroots & People-Centric">Grassroots</option>
-                </select>
-              </div>
-            </div>
-
-            <button
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              className="w-full mt-2 py-3 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              {isGenerating ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
-                  <span>Synthesizing Alternatives...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Generate Pre-Cleared Titles</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Right: Generated Titles Stream */}
-        <div className="lg:col-span-8 space-y-4">
-          <div className="space-y-1 border-b border-[#EDE8DF] pb-3">
-            <h2 className="font-bold text-sm text-[#1C1917]">
-              Pre-Verified Recommendations ({candidates.length})
-            </h2>
-            <p className="text-xs text-[#78716C]">
-              Every suggestion has cleared the 82k registry lookup &amp; PRGI statutory rules.
-            </p>
-          </div>
-
-          <div className="divide-y divide-[#EDE8DF]">
-            {candidates.map((candidate: GeneratedCandidate) => (
-              <div
-                key={candidate.id}
-                className="py-5 flex flex-col md:flex-row md:items-baseline justify-between gap-4"
-              >
-                <div className="space-y-1.5 max-w-xl">
-                  <div className="flex items-baseline gap-3 flex-wrap">
-                    <span className="font-bold text-lg text-[#1C1917]">
-                      {candidate.title}
-                    </span>
-                    <span className="text-xs font-mono text-[#137333] font-bold">
-                      Verified Clear
-                    </span>
-                    <span className="text-xs font-mono text-[#78716C]">
-                      Uniqueness: {candidate.uniquenessScore}%
-                    </span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[#57534E] font-semibold mb-1.5">Language</label>
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      className="w-full bg-white border border-[#DDD5C9] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none"
+                    >
+                      <option value="Hindi">Hindi</option>
+                      <option value="English">English</option>
+                      <option value="Marathi">Marathi</option>
+                      <option value="Bengali">Bengali</option>
+                      <option value="Tamil">Tamil</option>
+                      <option value="Telugu">Telugu</option>
+                      <option value="Gujarati">Gujarati</option>
+                    </select>
                   </div>
 
-                  <p className="text-xs text-[#57534E]">
-                    <strong className="text-[#1C1917]">Meaning:</strong> {candidate.meaning}
-                  </p>
-                  <p className="text-xs text-[#78716C]">
-                    {candidate.rationale}
-                  </p>
+                  <div>
+                    <label className="block text-[#57534E] font-semibold mb-1.5">Periodicity</label>
+                    <select
+                      value={periodicity}
+                      onChange={(e) => setPeriodicity(e.target.value)}
+                      className="w-full bg-white border border-[#DDD5C9] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none"
+                    >
+                      <option value="Daily">Daily</option>
+                      <option value="Weekly">Weekly</option>
+                      <option value="Fortnightly">Fortnightly</option>
+                      <option value="Monthly">Monthly</option>
+                    </select>
+                  </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-3 shrink-0">
-                  <button
-                    onClick={() => copyTitle(candidate.title, candidate.id)}
-                    className="hover:text-[#1C1917] text-xs font-semibold text-[#57534E] flex items-center gap-1 cursor-pointer"
-                    title="Copy title"
-                  >
-                    {copiedId === candidate.id ? <Check className="w-3.5 h-3.5 text-[#137333]" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedId === candidate.id ? 'Copied' : 'Copy'}</span>
-                  </button>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[#57534E] font-semibold mb-1.5">State</label>
+                    <select
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      className="w-full bg-white border border-[#DDD5C9] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none"
+                    >
+                      <option value="Uttar Pradesh">Uttar Pradesh</option>
+                      <option value="Maharashtra">Maharashtra</option>
+                      <option value="Delhi">Delhi</option>
+                      <option value="Madhya Pradesh">Madhya Pradesh</option>
+                      <option value="Rajasthan">Rajasthan</option>
+                    </select>
+                  </div>
 
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      onSelectTitleForVerification(candidate.title);
-                    }}
-                    className="px-3.5 py-1.5 rounded-lg bg-[#1C1917] hover:bg-[#382E22] text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-                  >
-                    <span>Inspect in Verifier</span>
-                    <ArrowRight className="w-3 h-3 text-amber-300" />
-                  </button>
+                  <div>
+                    <label className="block text-[#57534E] font-semibold mb-1.5">Tone</label>
+                    <select
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value)}
+                      className="w-full bg-white border border-[#DDD5C9] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none"
+                    >
+                      <option value="Authoritative & Progressive">Authoritative</option>
+                      <option value="Modern & Analytical">Analytical</option>
+                      <option value="Grassroots & People-Centric">Grassroots</option>
+                    </select>
+                  </div>
                 </div>
+
+                <button
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                  className="w-full mt-3 py-4 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {isGenerating ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
+                      <span>Synthesizing Alternatives...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 text-amber-300" />
+                      <span>Generate Pre-Cleared Titles</span>
+                    </>
+                  )}
+                </button>
               </div>
-            ))}
+            </div>
+
+            {/* Right Column: Generated Titles Stream */}
+            <div className="lg:col-span-8 space-y-6">
+              <div className="space-y-1 pb-2">
+                <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                  04 / Pre-Verified Candidates
+                </div>
+                <h3 className="font-editorial text-2xl sm:text-3xl text-[#1C1917]">
+                  Conflict-Free Recommendations ({candidates.length})
+                </h3>
+              </div>
+
+              <div className="divide-y divide-[#EDE8DF]">
+                {candidates.map((candidate: GeneratedCandidate) => (
+                  <div
+                    key={candidate.id}
+                    className="py-6 flex flex-col md:flex-row md:items-baseline justify-between gap-6"
+                  >
+                    <div className="space-y-2 max-w-xl">
+                      <div className="flex items-baseline gap-3 flex-wrap">
+                        <span className="font-bold text-xl text-[#1C1917]">
+                          {candidate.title}
+                        </span>
+                        <span className="text-xs font-mono text-[#137333] font-bold">
+                          Verified Clear
+                        </span>
+                        <span className="text-xs font-mono text-[#78716C]">
+                          Uniqueness: {candidate.uniquenessScore}%
+                        </span>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-[#57534E]">
+                        <strong className="text-[#1C1917]">Meaning:</strong> {candidate.meaning}
+                      </p>
+                      <p className="text-xs text-[#78716C] leading-relaxed">
+                        {candidate.rationale}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button
+                        onClick={() => copyTitle(candidate.title, candidate.id)}
+                        className="hover:text-[#1C1917] text-xs font-semibold text-[#57534E] flex items-center gap-1 cursor-pointer"
+                        title="Copy title"
+                      >
+                        {copiedId === candidate.id ? <Check className="w-3.5 h-3.5 text-[#137333]" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedId === candidate.id ? 'Copied' : 'Copy'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          sound.playClick();
+                          onSelectTitleForVerification(candidate.title);
+                        }}
+                        className="px-4 py-2 rounded-xl bg-[#1C1917] hover:bg-[#382E22] text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                      >
+                        <span>Inspect in Verifier</span>
+                        <ArrowRight className="w-3 h-3 text-amber-300" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </ScrollReveal>
+      </section>
     </div>
   );
 };

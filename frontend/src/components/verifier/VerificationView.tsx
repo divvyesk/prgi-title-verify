@@ -14,6 +14,7 @@ import confetti from 'canvas-confetti';
 import { Hero3DCanvas } from '../canvas/Hero3DCanvas';
 import { useVerification } from '../../hooks/useVerification';
 import { PipelineProgress } from './PipelineProgress';
+import { ScrollReveal } from '../common/ScrollReveal';
 import { detectScriptAndLanguage, transliterateToRoman } from '../../utils/transliteration';
 import type { VerificationResult } from '../../types';
 import { sound } from '../../utils/audio';
@@ -162,397 +163,440 @@ Explanation: ${result.explanation}`;
   };
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto px-6 sm:px-12 py-8">
-      {/* Hero Section with Distinctive Editorial Typography */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-        {/* Left Column */}
-        <div className="lg:col-span-6 space-y-6">
-          <div className="space-y-3">
-            <h1 className="font-editorial text-4xl sm:text-6xl text-[#1C1917] tracking-tight leading-[1.08]">
-              Automated press title clearance in <em className="italic font-normal">sub-2 seconds.</em>
-            </h1>
-            <p className="text-[#57534E] text-base sm:text-lg leading-relaxed max-w-lg">
-              Statutory 4-dimensional NLP verification across 82,713 registered publications before press registration with PRGI.
-            </p>
-          </div>
-
-          {/* Clean Functional Search Input (Primary Essential Container) */}
-          <div className="space-y-3 pt-2">
-            <div className="relative flex flex-col sm:flex-row gap-2">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={inputTitle}
-                  onChange={(e) => setInputTitle(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
-                  placeholder="Enter publication title..."
-                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-4 py-3.5 text-[#1C1917] placeholder-[#A8A29E] text-base font-semibold focus:outline-none shadow-2xs"
-                />
-                {inputTitle && (
-                  <button
-                    onClick={() => setInputTitle('')}
-                    className="absolute right-4 top-3.5 text-[#78716C] hover:text-[#1C1917] text-xs font-bold"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              <button
-                onClick={() => handleVerify()}
-                disabled={isRunning || !inputTitle.trim()}
-                className="px-8 py-3.5 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                {isRunning ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
-                    <span>Verifying...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Verify Title</span>
-                    <ArrowRight className="w-4 h-4 text-amber-300" />
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Language & State Selectors + Presets */}
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#57534E] pt-1">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5 text-[#78716C]" />
-                  <select
-                    value={selectedLanguage}
-                    onChange={(e) => setSelectedLanguage(e.target.value)}
-                    className="bg-transparent font-semibold text-[#1C1917] focus:outline-none cursor-pointer"
-                  >
-                    <option value="English">English</option>
-                    <option value="Hindi">Hindi</option>
-                    <option value="Marathi">Marathi</option>
-                    <option value="Bengali">Bengali</option>
-                    <option value="Tamil">Tamil</option>
-                    <option value="Telugu">Telugu</option>
-                    <option value="Gujarati">Gujarati</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#78716C]" />
-                  <select
-                    value={selectedState}
-                    onChange={(e) => setSelectedState(e.target.value)}
-                    className="bg-transparent font-semibold text-[#1C1917] focus:outline-none cursor-pointer"
-                  >
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Uttar Pradesh">Uttar Pradesh</option>
-                    <option value="West Bengal">West Bengal</option>
-                    <option value="Tamil Nadu">Tamil Nadu</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Preset Links */}
-              <div className="flex items-center gap-2">
-                <span className="text-[#78716C]">Try:</span>
-                {PRESET_TEST_CASES.slice(0, 3).map((preset) => (
-                  <button
-                    key={preset.value}
-                    onClick={() => {
-                      setInputTitle(preset.value);
-                      sound.playClick();
-                      handleVerify(preset.value);
-                    }}
-                    className="hover:text-[#1C1917] hover:underline font-medium cursor-pointer"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Transliteration Preview */}
-            {detected.isIndic && (
-              <div className="text-xs text-[#57534E] flex items-center gap-2 pt-1">
-                <span>{detected.language}:</span>
-                <code className="font-mono bg-[#EFEAE1] px-2 py-0.5 rounded text-xs text-[#1C1917]">
-                  {transliteratedPreview}
-                </code>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right 3D Spatial Canvas */}
-        <div className="lg:col-span-6 h-[320px] sm:h-[380px] relative overflow-hidden flex items-center justify-center">
-          <Hero3DCanvas title={inputTitle} verdict={result?.verdict} isScanning={isRunning} />
-        </div>
-      </div>
-
-      {/* Real 5-Stage Pipeline Telemetry Stream (No Boxy Card Wrappers) */}
-      <div className="pt-4 border-t border-[#EDE8DF]">
-        <PipelineProgress
-          stage={stage}
-          isRunning={isRunning}
-          stageTimings={result?.stageTimings}
-          totalTimeMs={result?.processingTimeMs}
-          engine={engine}
-        />
-      </div>
-
-      {/* Verification Results Display */}
-      {result && (
-        <div className="space-y-10 pt-4">
-          {/* Main Verdict Banner */}
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#DDD6CE] space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className={`text-xs font-bold uppercase px-3 py-1 rounded tracking-wide ${
-                    result.verdict === 'APPROVED' ? 'bg-[#E6F4EA] text-[#137333]' :
-                    result.verdict === 'REJECTED' ? 'bg-[#FCE8E6] text-[#C5221F]' :
-                    'bg-[#FEF7E0] text-[#B06000]'
-                  }`}>
-                    {result.verdict === 'APPROVED' && 'Approved · Clear for Registration'}
-                    {result.verdict === 'REJECTED' && 'Rejected · Conflict Detected'}
-                    {result.verdict === 'MANUAL_REVIEW' && 'Manual Review Required'}
-                  </span>
-
-                  {engine === 'LIVE' ? (
-                    <span className="text-xs font-mono text-[#137333] font-semibold">
-                      Live Engine (82,713 Registry)
-                    </span>
-                  ) : (
-                    <span className="text-xs font-mono text-[#78716C]">
-                      Offline Engine (2,500 Sample)
-                    </span>
-                  )}
-                </div>
-
-                <h2 className="font-editorial text-3xl sm:text-4xl text-[#1C1917]">
-                  "{result.inputTitle}"
-                </h2>
-                <p className="text-sm text-[#57534E] max-w-2xl leading-relaxed">
-                  {result.explanation}
-                </p>
-              </div>
-
-              {/* Conflict Risk Score */}
-              <div className="text-right shrink-0">
-                <div className="text-xs font-mono text-[#78716C] uppercase">
-                  Conflict Risk
-                </div>
-                <div className={`text-4xl sm:text-5xl font-extrabold font-mono ${
-                  result.verdict === 'APPROVED' ? 'text-[#137333]' :
-                  result.verdict === 'REJECTED' ? 'text-[#C5221F]' : 'text-[#B06000]'
-                }`}>
-                  {result.verdictScore}<span className="text-sm font-normal text-[#A8A29E]">/100</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions Ribbon */}
-            <div className="pt-4 border-t border-[#EDE8DF] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#57534E]">
-              <div>
-                <strong className="text-[#1C1917]">Guidance:</strong> {result.recommendedAction}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={copyVerificationReport}
-                  className="hover:text-[#1C1917] font-semibold flex items-center gap-1.5 cursor-pointer"
-                >
-                  {copiedReport ? <Check className="w-3.5 h-3.5 text-[#137333]" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedReport ? 'Report Copied' : 'Copy Report'}</span>
-                </button>
-
-                {result.verdict === 'REJECTED' && (
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      onNavigateToAgents(result.inputTitle);
-                    }}
-                    className="px-4 py-2 rounded-xl bg-[#1C1917] hover:bg-[#382E22] text-white font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Generate Alternatives</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* 4-Dimensional Similarity Analysis & Conflicts (Separated by Spacing, Not Nested Boxes) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            {/* Left: 4-D Similarity Meters */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="space-y-1">
-                <h3 className="font-bold text-base text-[#1C1917]">
-                  4-Dimensional Similarity Breakdown
-                </h3>
-                <p className="text-xs text-[#78716C]">
-                  Weighted scoring against top matching candidate.
-                </p>
-              </div>
-
+    <div className="max-w-7xl mx-auto px-6 sm:px-12 divide-y divide-[#EAE4DA]">
+      
+      {/* CHAPTER 01: Hero & Verification Entry Viewport */}
+      <section className="py-12 sm:py-20">
+        <ScrollReveal direction="up" delayMs={50}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Left Column: Editorial Headline & Search Interface */}
+            <div className="lg:col-span-6 space-y-8">
               <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">Lexical Permutation</span>
-                    <span className="font-mono font-bold text-[#1C1917]">{result.similarityBreakdown.lexicalScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#1C1917] h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.lexicalScore}%` }}
-                    />
-                  </div>
+                <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                  01 / Statutory Press Clearance
                 </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">Phonetic Soundex</span>
-                    <span className="font-mono font-bold text-[#1C1917]">{result.similarityBreakdown.phoneticScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#1C1917] h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.phoneticScore}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">Semantic Multilingual</span>
-                    <span className="font-mono font-bold text-[#137333]">{result.similarityBreakdown.semanticScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#137333] h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.semanticScore}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">Core Root Token</span>
-                    <span className="font-mono font-bold text-[#1C1917]">{result.similarityBreakdown.coreWordScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#1C1917] h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.coreWordScore}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Core Root Tokens */}
-              <div className="pt-2 text-xs flex items-center gap-2 flex-wrap">
-                <span className="text-[#78716C]">Root Tokens:</span>
-                {result.coreWords.map((word, idx) => (
-                  <span key={idx} className="font-mono font-bold px-2 py-0.5 bg-[#EAE6DF] text-[#1C1917] rounded text-xs">
-                    {word}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Right: Registry Conflicts List */}
-            <div className="lg:col-span-7 space-y-4">
-              <div className="space-y-1">
-                <h3 className="font-bold text-base text-[#1C1917]">
-                  Top Registry Conflicts ({result.clashingTitles.length})
-                </h3>
-                <p className="text-xs text-[#78716C]">
-                  Most similar titles retrieved from the 82k registry.
+                <h1 className="font-editorial text-5xl sm:text-7xl text-[#1C1917] tracking-tight leading-[1.04]">
+                  Automated title verification in <em className="italic font-normal">sub-2 seconds.</em>
+                </h1>
+                <p className="text-[#57534E] text-base sm:text-lg leading-relaxed max-w-lg font-normal">
+                  Statutory 4-dimensional NLP conflict detection across 82,713 registered titles before press registration with PRGI.
                 </p>
               </div>
 
-              {result.clashingTitles.length === 0 ? (
-                <div className="py-6 text-center text-[#78716C] text-sm">
-                  No conflicting titles found in the registry.
-                </div>
-              ) : (
-                <div className="divide-y divide-[#EDE8DF]">
-                  {result.clashingTitles.map((clash, idx) => (
-                    <div key={idx} className="py-3 flex items-start justify-between gap-4">
-                      <div className="space-y-0.5">
-                        <div className="flex items-baseline gap-2">
-                          <span className="font-bold text-sm text-[#1C1917]">
-                            {clash.title}
-                          </span>
-                          <span className="text-xs font-mono text-[#78716C]">
-                            {clash.regNo || clash.registration_number || 'REG-MASTER'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#57534E]">
-                          {clash.language} · {clash.state} — {clash.reason}
-                        </p>
-                      </div>
-
-                      <div className="text-right shrink-0">
-                        <span className="font-mono font-bold text-sm text-[#C5221F]">
-                          {clash.similarity}%
-                        </span>
-                        <div className="text-[10px] font-bold text-[#78716C] uppercase">
-                          {clash.matchType}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Statutory PRGI Rule Checks Section (Clean 2-Column Spacing) */}
-          <div className="space-y-4 pt-4 border-t border-[#EDE8DF]">
-            <div className="space-y-1">
-              <h3 className="font-bold text-base text-[#1C1917]">
-                Statutory PRGI Guidelines Compliance Checklist
-              </h3>
-              <p className="text-xs text-[#78716C]">
-                Deterministic admissibility checks evaluated against official guidelines.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {result.ruleViolations.map((rule) => (
-                <div
-                  key={rule.ruleId}
-                  className="py-2.5 flex items-start justify-between gap-3"
-                >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-[#1C1917]">
-                        {rule.ruleName}
-                      </span>
-                      <span className="text-[11px] font-mono text-[#78716C]">
-                        {rule.clause}
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#57534E] leading-relaxed">
-                      {rule.description}
-                    </p>
-                  </div>
-
-                  <div className="shrink-0 pt-0.5">
-                    {rule.passed ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#137333]" />
-                    ) : (
-                      <XCircle className="w-4 h-4 text-[#C5221F]" />
+              {/* Clean Functional Search Input */}
+              <div className="space-y-4 pt-2">
+                <div className="relative flex flex-col sm:flex-row gap-2.5">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={inputTitle}
+                      onChange={(e) => setInputTitle(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
+                      placeholder="Enter publication title..."
+                      className="w-full bg-white border border-[#DDD5C9] rounded-xl px-5 py-4 text-[#1C1917] placeholder-[#A8A29E] text-base font-semibold focus:outline-none shadow-2xs"
+                    />
+                    {inputTitle && (
+                      <button
+                        onClick={() => setInputTitle('')}
+                        className="absolute right-4 top-4 text-[#78716C] hover:text-[#1C1917] text-xs font-bold cursor-pointer"
+                      >
+                        Clear
+                      </button>
                     )}
                   </div>
+
+                  <button
+                    onClick={() => handleVerify()}
+                    disabled={isRunning || !inputTitle.trim()}
+                    className="px-8 py-4 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer"
+                  >
+                    {isRunning ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
+                        <span>Verifying...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Verify Title</span>
+                        <ArrowRight className="w-4 h-4 text-amber-300" />
+                      </>
+                    )}
+                  </button>
                 </div>
-              ))}
+
+                {/* Filter Controls & Presets */}
+                <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-[#57534E] pt-1">
+                  <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-[#78716C]" />
+                      <select
+                        value={selectedLanguage}
+                        onChange={(e) => setSelectedLanguage(e.target.value)}
+                        className="bg-transparent font-semibold text-[#1C1917] focus:outline-none cursor-pointer"
+                      >
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Marathi">Marathi</option>
+                        <option value="Bengali">Bengali</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Gujarati">Gujarati</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#78716C]" />
+                      <select
+                        value={selectedState}
+                        onChange={(e) => setSelectedState(e.target.value)}
+                        className="bg-transparent font-semibold text-[#1C1917] focus:outline-none cursor-pointer"
+                      >
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Sample Preset Links */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#78716C]">Try:</span>
+                    {PRESET_TEST_CASES.slice(0, 3).map((preset) => (
+                      <button
+                        key={preset.value}
+                        onClick={() => {
+                          setInputTitle(preset.value);
+                          sound.playClick();
+                          handleVerify(preset.value);
+                        }}
+                        className="hover:text-[#1C1917] hover:underline font-medium cursor-pointer"
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Transliteration Preview */}
+                {detected.isIndic && (
+                  <div className="text-xs text-[#57534E] flex items-center gap-2 pt-1">
+                    <span>{detected.language}:</span>
+                    <code className="font-mono bg-[#EFEAE1] px-2 py-0.5 rounded text-xs text-[#1C1917]">
+                      {transliteratedPreview}
+                    </code>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column: 3D Spatial Canvas */}
+            <div className="lg:col-span-6 h-[340px] sm:h-[420px] relative overflow-hidden flex items-center justify-center">
+              <Hero3DCanvas title={inputTitle} verdict={result?.verdict} isScanning={isRunning} />
             </div>
           </div>
-        </div>
+        </ScrollReveal>
+      </section>
+
+      {/* CHAPTER 02: Real 5-Stage Pipeline Telemetry Stream */}
+      <section className="py-12 sm:py-16">
+        <ScrollReveal direction="up" delayMs={100}>
+          <div className="space-y-2 mb-6">
+            <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+              02 / Live Processing Telemetry
+            </div>
+            <h2 className="font-editorial text-3xl sm:text-4xl text-[#1C1917]">
+              Multi-dimensional clearance pipeline
+            </h2>
+          </div>
+
+          <PipelineProgress
+            stage={stage}
+            isRunning={isRunning}
+            stageTimings={result?.stageTimings}
+            totalTimeMs={result?.processingTimeMs}
+            engine={engine}
+          />
+        </ScrollReveal>
+      </section>
+
+      {/* CHAPTER 03: Primary Verdict Banner & Statutory Evidence */}
+      {result && (
+        <section className="py-12 sm:py-20 space-y-16">
+          {/* Main Verdict Banner */}
+          <ScrollReveal direction="up" delayMs={50}>
+            <div className="space-y-3 mb-6">
+              <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                03 / Admissibility Outcome
+              </div>
+            </div>
+
+            <div className={`p-8 sm:p-10 rounded-2xl ${
+              result.verdict === 'APPROVED' ? 'beige-card-success' :
+              result.verdict === 'REJECTED' ? 'beige-card-danger' : 'beige-card-warning'
+            }`}>
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className={`text-xs font-bold uppercase px-3 py-1 rounded tracking-wide ${
+                      result.verdict === 'APPROVED' ? 'bg-[#E6F4EA] text-[#137333]' :
+                      result.verdict === 'REJECTED' ? 'bg-[#FCE8E6] text-[#C5221F]' :
+                      'bg-[#FEF7E0] text-[#B06000]'
+                    }`}>
+                      {result.verdict === 'APPROVED' && 'Approved · Clear for Registration'}
+                      {result.verdict === 'REJECTED' && 'Rejected · Conflict Detected'}
+                      {result.verdict === 'MANUAL_REVIEW' && 'Manual Review Required'}
+                    </span>
+
+                    {engine === 'LIVE' ? (
+                      <span className="text-xs font-mono text-[#137333] font-semibold">
+                        Live Engine (82,713 Registry)
+                      </span>
+                    ) : (
+                      <span className="text-xs font-mono text-[#78716C]">
+                        Offline Engine (2,500 Sample)
+                      </span>
+                    )}
+                  </div>
+
+                  <h2 className="font-editorial text-4xl sm:text-5xl text-[#1C1917] tracking-tight">
+                    "{result.inputTitle}"
+                  </h2>
+                  <p className="text-sm sm:text-base text-[#57534E] max-w-2xl leading-relaxed">
+                    {result.explanation}
+                  </p>
+                </div>
+
+                {/* Conflict Risk Score */}
+                <div className="text-right shrink-0">
+                  <div className="text-xs font-mono text-[#78716C] uppercase">
+                    Conflict Risk
+                  </div>
+                  <div className={`text-5xl sm:text-6xl font-extrabold font-mono ${
+                    result.verdict === 'APPROVED' ? 'text-[#137333]' :
+                    result.verdict === 'REJECTED' ? 'text-[#C5221F]' : 'text-[#B06000]'
+                  }`}>
+                    {result.verdictScore}<span className="text-sm font-normal text-[#A8A29E]">/100</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions Ribbon */}
+              <div className="mt-8 pt-4 border-t border-[#EDE8DF] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#57534E]">
+                <div>
+                  <strong className="text-[#1C1917]">Guidance:</strong> {result.recommendedAction}
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={copyVerificationReport}
+                    className="hover:text-[#1C1917] font-semibold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {copiedReport ? <Check className="w-3.5 h-3.5 text-[#137333]" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedReport ? 'Report Copied' : 'Copy Report'}</span>
+                  </button>
+
+                  {result.verdict === 'REJECTED' && (
+                    <button
+                      onClick={() => {
+                        sound.playClick();
+                        onNavigateToAgents(result.inputTitle);
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-[#1C1917] hover:bg-[#382E22] text-white font-bold flex items-center gap-2 cursor-pointer shadow-2xs transition-all"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Generate Alternatives</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* CHAPTER 04: 4-D Similarity Analysis & Conflicts */}
+          <ScrollReveal direction="up" delayMs={100}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+              {/* Left Column: 4-D Similarity Breakdown */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="space-y-1">
+                  <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                    04 / 4-Dimensional NLP Scoring
+                  </div>
+                  <h3 className="font-editorial text-2xl sm:text-3xl text-[#1C1917]">
+                    Similarity Dimensions
+                  </h3>
+                  <p className="text-xs text-[#78716C]">
+                    Weighted similarity against highest matching registered title.
+                  </p>
+                </div>
+
+                <div className="space-y-5 pt-2">
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-[#44403C] font-semibold">Lexical Permutation</span>
+                      <span className="font-mono font-bold text-[#1C1917]">{result.similarityBreakdown.lexicalScore}%</span>
+                    </div>
+                    <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#1C1917] h-full rounded-full transition-all duration-500"
+                        style={{ width: `${result.similarityBreakdown.lexicalScore}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-[#44403C] font-semibold">Phonetic Soundex</span>
+                      <span className="font-mono font-bold text-[#1C1917]">{result.similarityBreakdown.phoneticScore}%</span>
+                    </div>
+                    <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#1C1917] h-full rounded-full transition-all duration-500"
+                        style={{ width: `${result.similarityBreakdown.phoneticScore}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-[#44403C] font-semibold">Semantic Multilingual</span>
+                      <span className="font-mono font-bold text-[#137333]">{result.similarityBreakdown.semanticScore}%</span>
+                    </div>
+                    <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#137333] h-full rounded-full transition-all duration-500"
+                        style={{ width: `${result.similarityBreakdown.semanticScore}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-[#44403C] font-semibold">Core Root Token</span>
+                      <span className="font-mono font-bold text-[#1C1917]">{result.similarityBreakdown.coreWordScore}%</span>
+                    </div>
+                    <div className="w-full bg-[#EAE6DF] h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#1C1917] h-full rounded-full transition-all duration-500"
+                        style={{ width: `${result.similarityBreakdown.coreWordScore}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Extracted Core Root Tokens */}
+                <div className="pt-3 text-xs flex items-center gap-2 flex-wrap">
+                  <span className="text-[#78716C]">Root Tokens:</span>
+                  {result.coreWords.map((word, idx) => (
+                    <span key={idx} className="font-mono font-bold px-2 py-0.5 bg-[#EAE6DF] text-[#1C1917] rounded text-xs">
+                      {word}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Registry Conflict Records */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="space-y-1">
+                  <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                    05 / Registry Collision Analysis
+                  </div>
+                  <h3 className="font-editorial text-2xl sm:text-3xl text-[#1C1917]">
+                    Top Registry Conflicts ({result.clashingTitles.length})
+                  </h3>
+                  <p className="text-xs text-[#78716C]">
+                    Nearest conflicting publications retrieved from the 82,713 title index.
+                  </p>
+                </div>
+
+                {result.clashingTitles.length === 0 ? (
+                  <div className="py-8 text-center text-[#78716C] text-sm">
+                    No conflicting registered publications found in the database.
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#EDE8DF] pt-2">
+                    {result.clashingTitles.map((clash, idx) => (
+                      <div key={idx} className="py-4 flex items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-baseline gap-2.5">
+                            <span className="font-bold text-base text-[#1C1917]">
+                              {clash.title}
+                            </span>
+                            <span className="text-xs font-mono text-[#78716C]">
+                              {clash.regNo || clash.registration_number || 'REG-MASTER'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#57534E] leading-relaxed">
+                            {clash.language} · {clash.state} — {clash.reason}
+                          </p>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span className="font-mono font-bold text-base text-[#C5221F]">
+                            {clash.similarity}%
+                          </span>
+                          <div className="text-[10px] font-bold text-[#78716C] uppercase">
+                            {clash.matchType}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* CHAPTER 05: Statutory PRGI Guidelines Checklist */}
+          <ScrollReveal direction="up" delayMs={100}>
+            <div className="space-y-6 pt-6 border-t border-[#EDE8DF]">
+              <div className="space-y-1">
+                <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#78716C]">
+                  06 / Statutory Verification Rules
+                </div>
+                <h3 className="font-editorial text-2xl sm:text-3xl text-[#1C1917]">
+                  Statutory PRGI Guidelines Compliance Checklist
+                </h3>
+                <p className="text-xs text-[#78716C]">
+                  Deterministic admissibility checks evaluated against official guidelines.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                {result.ruleViolations.map((rule) => (
+                  <div
+                    key={rule.ruleId}
+                    className="py-3 flex items-start justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-[#1C1917]">
+                          {rule.ruleName}
+                        </span>
+                        <span className="text-[11px] font-mono text-[#78716C]">
+                          {rule.clause}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#57534E] leading-relaxed">
+                        {rule.description}
+                      </p>
+                    </div>
+
+                    <div className="shrink-0 pt-0.5">
+                      {rule.passed ? (
+                        <CheckCircle2 className="w-4 h-4 text-[#137333]" />
+                      ) : (
+                        <XCircle className="w-4 h-4 text-[#C5221F]" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
       )}
     </div>
   );

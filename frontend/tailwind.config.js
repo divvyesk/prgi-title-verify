@@ -41,9 +41,10 @@ export default {
       },
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-        serif: ['Newsreader', 'Playfair Display', 'Georgia', 'serif'],
-        display: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
-        editorial: ['Playfair Display', 'Newsreader', 'serif'],
+        serif: ['Cormorant Garamond', 'Newsreader', 'Georgia', 'serif'],
+        display: ['Syne', 'Outfit', 'Plus Jakarta Sans', 'sans-serif'],
+        editorial: ['Cormorant Garamond', 'Newsreader', 'serif'],
+        luxury: ['Syne', 'Outfit', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace']
       },
       animation: {

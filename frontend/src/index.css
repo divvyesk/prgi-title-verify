@@ -5,25 +5,23 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #F8F6F0;
+    background-color: #FBF9F4;
     color: #1C1917;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
   
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-    letter-spacing: -0.025em;
-    color: #1C1917;
-    font-weight: 700;
+  .font-editorial {
+    font-family: 'Cormorant Garamond', 'Newsreader', serif;
   }
 
-  .font-poppins {
-    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  .font-luxury {
+    font-family: 'Syne', 'Outfit', 'Plus Jakarta Sans', sans-serif;
   }
 
-  .font-display {
-    font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+  .font-sans {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   }
 
   code, pre, .font-mono {
@@ -31,75 +29,81 @@
   }
 }
 
-/* Impeccable Clean Surfaces & Cards (No AI Frosted Glass / Slop) */
-.beige-card {
-  background: #FFFFFF;
-  border: 1px solid #E7E5E4;
-  box-shadow: 0 1px 3px 0 rgba(28, 25, 23, 0.04), 0 1px 2px -1px rgba(28, 25, 23, 0.03);
+/* Luxury Editorial & Sculpted Layout Styles */
+.section-anchor {
+  position: relative;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
 }
 
-.beige-card-subtle {
-  background: #FAF9F6;
-  border: 1px solid #E7E5E4;
+@media (min-width: 640px) {
+  .section-anchor {
+    padding-top: 6.5rem;
+    padding-bottom: 6.5rem;
+  }
+}
+
+/* Subtle Section Divider Rails */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #E7E0D5 20%, #E7E0D5 80%, transparent 100%);
+}
+
+/* Subtle Minimal Cards for Essential Interaction Only */
+.beige-card {
+  background: #FFFFFF;
+  border: 1px solid #EAE4DA;
+  box-shadow: 0 1px 3px 0 rgba(28, 25, 23, 0.03);
 }
 
 .beige-card-elevated {
   background: #FFFFFF;
-  border: 1px solid #D6D3D1;
-  box-shadow: 0 4px 6px -1px rgba(28, 25, 23, 0.05), 0 2px 4px -2px rgba(28, 25, 23, 0.05);
+  border: 1px solid #DDD5C9;
+  box-shadow: 0 8px 24px -4px rgba(28, 25, 23, 0.05);
 }
 
-/* Solid, High-Contrast Verdict Surfaces (Grounded, No Slop Gradients) */
+/* Solid, High-Contrast Verdict Surfaces */
 .beige-card-success {
   background: #FFFFFF;
   border: 1.5px solid #059669;
-  box-shadow: 0 4px 12px -2px rgba(5, 150, 105, 0.08);
+  box-shadow: 0 4px 16px -2px rgba(5, 150, 105, 0.06);
 }
 
 .beige-card-warning {
   background: #FFFFFF;
   border: 1.5px solid #D97706;
-  box-shadow: 0 4px 12px -2px rgba(217, 119, 6, 0.08);
+  box-shadow: 0 4px 16px -2px rgba(217, 119, 6, 0.06);
 }
 
 .beige-card-danger {
   background: #FFFFFF;
   border: 1.5px solid #DC2626;
-  box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.08);
+  box-shadow: 0 4px 16px -2px rgba(220, 38, 38, 0.06);
 }
 
-/* Crisp Interactive Hover Elements */
-.interactive-card {
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.interactive-card:hover {
-  border-color: #A8A29E;
-  box-shadow: 0 4px 12px -2px rgba(28, 25, 23, 0.06);
-}
-
-/* Micro Focus & Selection Styles */
+/* Focus and input styling */
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: #1C1917 !important;
   box-shadow: 0 0 0 1px #1C1917;
 }
 
-/* Custom Scrollbar */
+/* Smooth Minimal Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F5F2EA;
+  background: #FBF9F4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D6D3D1;
+  background: #DDD5C9;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A8A29E;
+  background: #B5A997;
 }
