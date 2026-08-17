@@ -1,7 +1,10 @@
 """
-Smoke test for agents/clients.py. No LLM, no backend, no network — just
-proves the fixture client reads real fixture files and returns the
-verify_batch dict shape the Verifier node (Prompt 4) will consume.
+Smoke test for agents/clients.py. No LLM — proves the fixture client reads
+real fixture files and returns the verify_batch dict shape the Verifier
+node (Prompt 4) consumes, and (Prompt 6) that HttpVerifyClient correctly
+falls back to FixtureVerifyClient when the backend is genuinely
+unreachable — tested against a real, guaranteed-refused connection
+(127.0.0.1:1), not a mock.
 
 Run:
     backend/.venv/bin/python agents/test_clients.py
@@ -12,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from agents.clients import FixtureVerifyClient
+from agents.clients import FixtureVerifyClient, HttpVerifyClient
 
 
 def test_exact_match_titles_return_curated_verdicts():
@@ -43,11 +46,21 @@ def test_batch_of_18_produces_some_rejections():
     assert "APPROVED" in verdicts or "MANUAL_REVIEW" in verdicts
 
 
+def test_http_client_falls_back_to_fixtures_when_backend_unreachable():
+    # 127.0.0.1:1 — nothing listens there, so this is a REAL connection
+    # error (httpx.ConnectError), not a simulated one.
+    client = HttpVerifyClient(base_url="http://127.0.0.1:1", timeout_s=2.0)
+    results = client.verify_batch(["Times India", "Aditi National Strategy Review"])
+    assert len(results) == 2
+    assert results[1]["verdict"] == "APPROVED", "should have silently fallen back to FixtureVerifyClient's exact-match data"
+
+
 if __name__ == "__main__":
     checks = [
         ("exact-match titles return curated verdicts", test_exact_match_titles_return_curated_verdicts),
         ("deterministic across repeated calls", test_deterministic_across_repeated_calls),
         ("batch of 18 produces some rejections", test_batch_of_18_produces_some_rejections),
+        ("HttpVerifyClient falls back to fixtures when backend unreachable", test_http_client_falls_back_to_fixtures_when_backend_unreachable),
     ]
     passed, failed = 0, 0
     for name, fn in checks:
