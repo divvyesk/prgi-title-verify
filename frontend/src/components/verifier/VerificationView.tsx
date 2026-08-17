@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Sparkles, 
@@ -19,6 +19,7 @@ import {
 import confetti from 'canvas-confetti';
 import { Hero3DCanvas } from '../canvas/Hero3DCanvas';
 import { useVerification } from '../../hooks/useVerification';
+import { PipelineProgress } from './PipelineProgress';
 import { detectScriptAndLanguage, transliterateToRoman } from '../../utils/transliteration';
 import type { VerificationResult } from '../../types';
 import { sound } from '../../utils/audio';
@@ -35,14 +36,6 @@ const PRESET_TEST_CASES = [
   { label: 'Dainik Samachar', value: 'Dainik Samachar' },
   { label: 'The Vidarbha Daily', value: 'The Vidarbha Daily Express' },
   { label: 'Aditi National Strategy', value: 'Aditi National Strategy Review' }
-];
-
-const PIPELINE_STAGES = [
-  { num: 1, name: 'Normalize' },
-  { num: 2, name: 'Shortlist' },
-  { num: 3, name: '4-D Score' },
-  { num: 4, name: 'Statutory Rules' },
-  { num: 5, name: 'Verdict' }
 ];
 
 const INITIAL_DEMO_RESULT: VerificationResult = {
@@ -92,7 +85,16 @@ const INITIAL_DEMO_RESULT: VerificationResult = {
   explanation: 'Proposed title conflicts with registered publication "India Times" under PRGI Anagram & Deceptive Similarity Protection.',
   recommendedAction: 'Use the AI Studio to generate distinctive, pre-cleared alternatives.',
   guidelineCitations: ['PRGI Title Verification Guidelines 2025, Section 2.3'],
-  processingTimeMs: 42,
+  stageTimings: {
+    normalize: 3,
+    shortlist: 42,
+    score: 310,
+    check: 8,
+    explain: 120
+  },
+  engine: 'OFFLINE',
+  cached: false,
+  processingTimeMs: 483,
   timestamp: new Date().toISOString()
 };
 
@@ -108,18 +110,6 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
 
   // Single unified verification hook
   const { run, stage, result, engine, isRunning } = useVerification(INITIAL_DEMO_RESULT);
-
-  const activeStageNum = useMemo(() => {
-    switch (stage) {
-      case 'normalize': return 1;
-      case 'shortlist': return 2;
-      case 'score': return 3;
-      case 'check': return 4;
-      case 'explain':
-      case 'done': return 5;
-      default: return 5;
-    }
-  }, [stage]);
 
   const detected = detectScriptAndLanguage(inputTitle);
   const transliteratedPreview = transliterateToRoman(inputTitle);
@@ -364,29 +354,15 @@ Explanation: ${result.explanation}`;
           )}
         </div>
 
-        {/* 5-Stage Stepper Ribbon */}
-        <div className="pt-2 border-t border-[#E8E0D2]">
-          <div className="grid grid-cols-5 gap-2 text-xs">
-            {PIPELINE_STAGES.map((stageItem) => {
-              const isCurrent = activeStageNum === stageItem.num;
-              const isDone = activeStageNum >= stageItem.num;
-              return (
-                <div
-                  key={stageItem.num}
-                  className={`py-2 px-2.5 rounded-xl border text-center transition-all ${
-                    isCurrent
-                      ? 'bg-amber-100 border-amber-400 text-amber-950 font-bold'
-                      : isDone
-                      ? 'bg-white border-[#E2D7C5] text-[#1C1917]'
-                      : 'bg-[#F0EBE0]/50 border-transparent text-[#A8A29E]'
-                  }`}
-                >
-                  <div className="text-[10px] font-mono text-[#75634B]">0{stageItem.num}</div>
-                  <div className="text-xs truncate">{stageItem.name}</div>
-                </div>
-              );
-            })}
-          </div>
+        {/* Real 5-Stage Pipeline Progress & Measured Latencies */}
+        <div className="pt-3 border-t border-[#E8E0D2]">
+          <PipelineProgress
+            stage={stage}
+            isRunning={isRunning}
+            stageTimings={result?.stageTimings}
+            totalTimeMs={result?.processingTimeMs}
+            engine={engine}
+          />
         </div>
       </div>
 

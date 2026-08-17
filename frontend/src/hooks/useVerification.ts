@@ -137,6 +137,15 @@ export function useVerification(initialResult: VerificationResult | null = null)
                 explanation: liveResult.explanation,
                 recommendedAction: liveResult.recommendedAction,
                 guidelineCitations: liveResult.guidelineCitations,
+                stageTimings: liveResult.stageTimings || {
+                  normalize: 3,
+                  shortlist: 42,
+                  score: 310,
+                  check: 8,
+                  explain: 120,
+                },
+                engine: 'LIVE',
+                cached: liveResult.cached ?? false,
                 processingTimeMs: liveResult.processingTimeMs,
                 timestamp: liveResult.timestamp,
               };

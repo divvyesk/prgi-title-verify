@@ -85,6 +85,9 @@ export interface VerificationResult {
   explanation: string;
   recommendedAction: string;
   guidelineCitations: string[];
+  stageTimings?: Record<string, number>;
+  engine?: 'LIVE' | 'OFFLINE';
+  cached?: boolean;
   processingTimeMs: number;
   timestamp: string;
 }
