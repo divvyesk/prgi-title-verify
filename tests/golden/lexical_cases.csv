@@ -1,1 +1,21 @@
 query,candidate,expected_min,expected_max,note
+Times India,India Times,90,100,Word-order reversal — token_sort must catch this as near-100 (the core demo case)
+India Times,Times India,90,100,Symmetric: same result regardless of which is query vs candidate
+Jagran,Jaagran,80,100,One vowel doubled — edit distance should still be very high
+Jagran,Jagraan,80,100,Vowel rearranged at end — same as above
+The Daily News,Daily News,80,100,One title fully contained in the other — partial (discounted) must still flag it
+Daily News,The Daily News,80,100,Symmetric containment check
+Deccan Herald,Deccan Herald,100,100,Identical strings must always return exactly 100
+Dainik Jagran,Jagran Dainik,90,100,Two-word reversal — token_sort must return 100
+Navbharat Times,Navbharat Times,100,100,Another identical-string sanity check
+Lokmat,Lokamat,85,100,One vowel inserted into middle — high edit-distance ratio expected
+Tribune,The Tribune,80,100,Short title fully inside longer one — partial (discounted) should flag
+Maharashtra Times,Maharashtra Times Daily,80,100,One title is prefix of the other — partial must flag even with discount
+Amar Ujala,Amar Ujala Compact,80,100,Suffix addition — partial at 100% discounted to 85
+Rajasthan Patrika,Rajasthan Samachar,55,80,Shared first word only — moderate score expected
+Vidarbha Patrika,Kerala Kaumudi,0,40,Completely different titles — no meaningful similarity
+Punjab Kesari,Kerala Kaumudi,0,45,Different region different word — low score expected
+,, 0,0,Both empty — must return exactly 0.0
+AB,AB Daily Tribune,0,35,Short query (below length guard) — partial must be excluded; only ratio fires
+Hindustan Times,Hindustan Daily,65,80,Shared first word different second — moderate score
+Sandesh,Sandesh Daily,80,100,Short title fully inside longer — partial fires and dominates
