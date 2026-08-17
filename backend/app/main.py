@@ -34,6 +34,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import db
 from app.config import settings
+from app.services import pipeline
 from ml.similarity import semantic
 from app.routers import (
     alternatives,
@@ -64,6 +65,15 @@ async def lifespan(app: FastAPI):
     if not settings.stub_mode:
         load_s = semantic.preload()
         logger.info("BGE-M3 loaded in %.1fs", load_s)
+
+        # Runs a full verification for each of the six demo titles: warms
+        # every code path (model, pool, retrievers, scorers) before the
+        # first real request, and leaves those exact titles in-cache so
+        # they answer in single-digit ms in front of judges. Same STUB_MODE
+        # gate as above — nothing to warm up while everything is stubbed.
+        warm_start = time.perf_counter()
+        await pipeline.warm_up()
+        logger.info("warm-up complete in %.1fs", time.perf_counter() - warm_start)
 
     logger.info("startup complete in %.1f ms (stub_mode=%s)", (time.perf_counter() - start) * 1000, settings.stub_mode)
     yield

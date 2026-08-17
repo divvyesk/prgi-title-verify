@@ -35,8 +35,11 @@ and delegate to it instead of computing weights inline.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import re
+import uuid
+from collections import OrderedDict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -51,6 +54,8 @@ from contracts.contracts import (
     VerificationResult,
 )
 
+import importlib
+
 from app.config import settings
 from app.db import get_pool
 from app.services import stub
@@ -59,6 +64,33 @@ from ml.registry import RETRIEVERS, SCORERS
 
 logger = logging.getLogger("app.services.pipeline")
 
+
+def _try_import(module_path: str, attr: str):
+    """Same resilience pattern as ml/registry.py, applied to the four
+    integration points below instead of scorers/retrievers: try to pick up
+    a teammate's real module, log a warning and stay on stub if it isn't
+    there (or isn't finished) yet. Returns None on any failure — an empty
+    placeholder file (valid, no such attribute) and a module that doesn't
+    exist at all both fail exactly the same safe way."""
+    try:
+        module = importlib.import_module(module_path)
+        return getattr(module, attr)
+    except Exception as exc:
+        logger.warning("%s.%s not available (%s) — staying on stub for this stage", module_path, attr, exc)
+        return None
+
+
+# Expected interfaces (informal — none of these are frozen contracts/ shapes,
+# since they're internal wiring points, not request/response boundaries):
+#   ml.rules.engine.check(title: str) -> list[RuleViolation]              (Pruthviraj)
+#   ml.rag.explain.explain(title, verdict, clashing_titles, rule_violations)
+#       -> tuple[explanation: str, recommended_action: str, citations: list[str]]  (Suhani)
+#       — matches stub.template_explanation()'s signature exactly, so it's a drop-in swap.
+#   ml.scoring.score_candidates(title: str, candidates: list[str]) -> list[CandidateScore]  (Jai)
+_real_rules_check = _try_import("ml.rules.engine", "check")
+_real_explain = _try_import("ml.rag.explain", "explain")
+_real_composite_scorer = _try_import("ml.scoring", "score_candidates")
+
 # shortlist/score default to STUB_MODE's value, not a hardcoded False: with
 # STUB_MODE=1 (the default — see backend/app/config.py), the whole point is
 # that this process never touches the DB or loads the model, and these two
@@ -66,12 +98,16 @@ logger = logging.getLogger("app.services.pipeline")
 # actually turns them real; from there, each can still be flipped back
 # independently as the demo-day insurance policy the module docstring
 # describes, without touching STUB_MODE itself.
+#
+# rules/explain are the inverse: independent of STUB_MODE entirely (a
+# lightweight process still benefits from a real, already-loaded rule
+# engine or explainer if one happens to be importable), gated only on
+# whether the real module above actually imported.
 STUB = {
-    "shortlist": settings.stub_mode,  # real when STUB_MODE=0 — Prompt 6: ml.registry.RETRIEVERS + RRF fusion
-    "score": settings.stub_mode,      # real when STUB_MODE=0 — Prompt 6: ml.registry.SCORERS
-    "rules": True,       # Pruthviraj's real rule engine not wired yet, regardless of STUB_MODE
-    "explain": True,     # Suhani's RAG explainer not wired yet — prose only,
-                          # NOT the verdict (see module docstring)
+    "shortlist": settings.stub_mode,       # real when STUB_MODE=0 — Prompt 6: ml.registry.RETRIEVERS + RRF fusion
+    "score": settings.stub_mode,           # real when STUB_MODE=0 — Prompt 6: ml.registry.SCORERS
+    "rules": _real_rules_check is None,    # real once ml/rules/engine.py lands (Pruthviraj)
+    "explain": _real_explain is None,      # real once ml/rag/explain.py lands (Suhani) — prose only, NOT the verdict
 }
 
 _STOPWORDS_PATH = Path(__file__).resolve().parents[3] / "ml" / "config" / "stopwords.txt"
@@ -83,6 +119,42 @@ _DIMENSION_TO_MATCH_TYPE = {
     "semantic": "SEMANTIC",
     "core_word": "CORE_WORD",
 }
+
+# The six titles we demo. Pre-warmed into the cache at startup (see
+# warm_up() below) so they answer in single-digit milliseconds in front of
+# judges on hotel wifi, regardless of what the rest of the pipeline costs.
+DEMO_TITLES = [
+    "Times India",
+    "Jaagran",
+    "Dainik Samachar",
+    "The Vidarbha Daily Express",
+    "Royal Matrimonial Classifieds",
+    "Aditi National Strategy Review",
+]
+
+_CACHE_MAX_SIZE = 256
+_verification_cache: "OrderedDict[str, VerificationResult]" = OrderedDict()
+
+
+def _cache_get(key: str) -> VerificationResult | None:
+    if key not in _verification_cache:
+        return None
+    _verification_cache.move_to_end(key)
+    return _verification_cache[key]
+
+
+def _cache_put(key: str, value: VerificationResult) -> None:
+    _verification_cache[key] = value
+    _verification_cache.move_to_end(key)
+    if len(_verification_cache) > _CACHE_MAX_SIZE:
+        _verification_cache.popitem(last=False)  # evict least-recently-used
+
+
+def _title_fingerprint(title: str) -> str:
+    """For logging only — never the raw title (privacy requirement, see
+    run_verification). Short enough to eyeball-correlate log lines for the
+    same title across a request without being reversible in practice."""
+    return hashlib.sha256(title.encode("utf-8")).hexdigest()[:12]
 
 
 def _stopwords() -> set[str]:
@@ -245,6 +317,11 @@ def _real_score(title: str, candidates: list[str]) -> list[CandidateScore]:
 def run_score(title: str, candidates: list[str]) -> list[CandidateScore]:
     if STUB["score"]:
         return stub.score_candidates(title, candidates)
+    if _real_composite_scorer is not None:
+        try:
+            return _real_composite_scorer(title, candidates)
+        except Exception:
+            logger.exception("ml.scoring.score_candidates() raised — falling back to the bridge blending logic for this request")
     return _real_score(title, candidates)
 
 
@@ -255,10 +332,11 @@ def run_score(title: str, candidates: list[str]) -> list[CandidateScore]:
 def run_rules(title: str) -> list[RuleViolation]:
     if STUB["rules"]:
         return stub.check_rules(title)
-    raise NotImplementedError(
-        "real deterministic rule engine (ml/rules/) lands Day 2-3 — flip "
-        "STUB['rules'] back to True until then"
-    )
+    try:
+        return _real_rules_check(title)
+    except Exception:
+        logger.exception("ml.rules.engine.check() raised — falling back to stub rule check for this request")
+        return stub.check_rules(title)
 
 
 # ---------------------------------------------------------------------------
@@ -318,25 +396,45 @@ def _build_verdict(
     return verdict, round(blended, 2), top.scores, clashing_titles
 
 
-async def run_verification(title: str, language: str | None = None, state: str | None = None) -> VerificationResult:
+async def run_verification(
+    title: str, language: str | None = None, state: str | None = None, request_id: str | None = None
+) -> VerificationResult:
+    request_id = request_id or str(uuid.uuid4())
+    fp = _title_fingerprint(title)  # never log `title` itself below — length + hash only, privacy requirement
     t_start = stub.now_ms()
     timings: dict[str, float] = {}
+
+    logger.info("[%s] verify start len=%d fp=%s", request_id, len(title), fp)
 
     t0 = stub.now_ms()
     normalized, detected_language, detected_script, transliterated, core_words = _normalize(title, language)
     timings["normalize"] = round(stub.now_ms() - t0, 2)
+    logger.info("[%s] stage=normalize done %.2fms", request_id, timings["normalize"])
+
+    cached_result = _cache_get(normalized)
+    if cached_result is not None:
+        logger.info("[%s] cache hit fp=%s", request_id, fp)
+        data = cached_result.model_dump(by_alias=True, mode="json")
+        data["inputTitle"] = title
+        data["cached"] = True
+        data["processingTimeMs"] = int(round(stub.now_ms() - t_start))
+        data["timestamp"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        return VerificationResult(**data)
 
     t1 = stub.now_ms()
     candidates = await run_shortlist(title)
     timings["shortlist"] = round(stub.now_ms() - t1, 2)
+    logger.info("[%s] stage=shortlist done %.2fms candidates=%d", request_id, timings["shortlist"], len(candidates))
 
     t2 = stub.now_ms()
     candidate_scores = run_score(title, [c.title for c in candidates])
     timings["score"] = round(stub.now_ms() - t2, 2)
+    logger.info("[%s] stage=score done %.2fms", request_id, timings["score"])
 
     t3 = stub.now_ms()
     rule_violations = run_rules(title)
     timings["check"] = round(stub.now_ms() - t3, 2)
+    logger.info("[%s] stage=check done %.2fms violations=%d", request_id, timings["check"], len(rule_violations))
 
     t4 = stub.now_ms()
     if STUB["shortlist"] and STUB["score"]:
@@ -371,14 +469,20 @@ async def run_verification(title: str, language: str | None = None, state: str |
                 title, verdict, clashing_titles, rule_violations
             )
         else:
-            raise NotImplementedError(
-                "real RAG-retrieved explanation prose (ml/rag/) lands later "
-                "— flip STUB['explain'] back to True until then"
-            )
+            try:
+                explanation, recommended_action, guideline_citations = _real_explain(
+                    title, verdict, clashing_titles, rule_violations
+                )
+            except Exception:
+                logger.exception("ml.rag.explain.explain() raised — falling back to templated prose for this request")
+                explanation, recommended_action, guideline_citations = stub.template_explanation(
+                    title, verdict, clashing_titles, rule_violations
+                )
         engine = "LIVE"
     timings["explain"] = round(stub.now_ms() - t4, 2)
+    logger.info("[%s] stage=explain done %.2fms verdict=%s", request_id, timings["explain"], verdict)
 
-    return VerificationResult(
+    result = VerificationResult(
         inputTitle=title,
         normalizedTitle=normalized,
         detectedLanguage=detected_language,
@@ -398,3 +502,27 @@ async def run_verification(title: str, language: str | None = None, state: str |
         processingTimeMs=int(round(stub.now_ms() - t_start)),
         timestamp=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
     )
+    _cache_put(normalized, result)
+    logger.info("[%s] verify done %dms fp=%s", request_id, result.processing_time_ms, fp)
+    return result
+
+
+async def warm_up() -> None:
+    """Called once from the lifespan handler, after the model loads: runs a
+    complete verification for each of the six demo titles so (a) the model,
+    connection pool and every code path are hot before the first real
+    request, and (b) those exact six titles answer from cache in
+    single-digit milliseconds in front of judges, regardless of what the
+    rest of the pipeline costs. One function satisfies both asks in Prompt 7
+    rather than a throwaway dummy call plus a separate pre-warm loop."""
+    for demo_title in DEMO_TITLES:
+        t0 = stub.now_ms()
+        try:
+            await run_verification(demo_title)
+            # Same "never log the raw title" rule as everywhere else, even
+            # though these particular six are Divvye's own hardcoded demo
+            # constants, not user input — keeping one rule with no
+            # exceptions is easier to trust than a rule with a footnote.
+            logger.info("warm-up: len=%d fp=%s ready in %.0fms", len(demo_title), _title_fingerprint(demo_title), stub.now_ms() - t0)
+        except Exception:
+            logger.exception("warm-up failed for %r — that title will compute on first real request instead", demo_title)
