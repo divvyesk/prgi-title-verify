@@ -24,12 +24,14 @@ yarn-error.log*
 DEVELOPER.md
 
 .env
-.env**
-.env.**
 .env.local
+.env.*.local
+!.env.example
+!**/.env.example
 
 # Python
 venv/
+.venv/
 __pycache__/
 *.pyc
 
