@@ -39,7 +39,8 @@ export const RegistryExplorer: React.FC = () => {
       const matchesSearch =
         !searchTerm ||
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.regNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.regNo && item.regNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.registration_number && item.registration_number.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (item.publisher && item.publisher.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesLang =
@@ -176,44 +177,51 @@ export const RegistryExplorer: React.FC = () => {
 
       {/* Results Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paginated.map((item) => (
-          <div
-            key={item.id}
-            className="p-4 rounded-xl bg-white border border-[#DDD1BF] hover:border-[#CFC0A8] transition-all flex flex-col justify-between space-y-3 shadow-sm"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#F8F6F0] text-amber-900 border border-amber-200">
-                  {item.regNo || 'REG-PENDING'}
-                </span>
-                <span className="text-[10px] text-[#75634B] font-mono">
-                  {item.regDate || 'Registered'}
-                </span>
-              </div>
+        {paginated.map((item, idx) => {
+          const regNumber = item.regNo || item.registration_number || 'REG-PENDING';
+          const regDate = item.regDate || item.registration_date || 'Registered';
+          const stateName = item.state || item.publication_state || 'National';
+          const districtName = item.district || item.publication_district;
 
-              <h2 className="text-sm font-bold text-[#1C1917] leading-snug font-display">
-                {item.title}
-              </h2>
-            </div>
-
-            <div className="space-y-1.5 pt-2 border-t border-[#E8E0D2] text-[11px] text-[#75634B]">
-              <div className="flex items-center gap-1.5">
-                <Globe className="w-3 h-3 text-amber-700" />
-                <span>Language: {item.language || 'English'}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-3 h-3 text-emerald-700" />
-                <span>State: {item.state || 'National'}</span>
-              </div>
-              {item.periodicity && (
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3 h-3 text-purple-700" />
-                  <span>Periodicity: {item.periodicity}</span>
+          return (
+            <div
+              key={item.id || item.title_id || `rec-${idx}`}
+              className="p-4 rounded-xl bg-white border border-[#DDD1BF] hover:border-[#CFC0A8] transition-all flex flex-col justify-between space-y-3 shadow-sm"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#F8F6F0] text-amber-900 border border-amber-200">
+                    {regNumber}
+                  </span>
+                  <span className="text-[10px] text-[#75634B] font-mono">
+                    {regDate}
+                  </span>
                 </div>
-              )}
+
+                <h2 className="text-sm font-bold text-[#1C1917] leading-snug font-display">
+                  {item.title}
+                </h2>
+              </div>
+
+              <div className="space-y-1.5 pt-2 border-t border-[#E8E0D2] text-[11px] text-[#75634B]">
+                <div className="flex items-center gap-1.5">
+                  <Globe className="w-3 h-3 text-amber-700" />
+                  <span>Language: {item.language || item.language_normalized || 'English'}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-emerald-700" />
+                  <span>State: {stateName} {districtName ? `(${districtName})` : ''}</span>
+                </div>
+                {item.periodicity && (
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3 text-purple-700" />
+                    <span>Periodicity: {item.periodicity}</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Pagination Controls */}

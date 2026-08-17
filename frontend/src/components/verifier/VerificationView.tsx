@@ -636,13 +636,13 @@ Timestamp: ${result.timestamp}`;
                             {clash.title}
                           </span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F0EBE0] text-[#564735] font-mono font-semibold">
-                            {clash.regNo}
+                            {clash.regNo || clash.registration_number || 'REG-MASTER'}
                           </span>
                         </div>
                         <div className="text-[11px] text-[#75634B] flex items-center gap-2">
-                          <span>{clash.language}</span>
+                          <span>{clash.language || 'English'}</span>
                           <span>•</span>
-                          <span>{clash.state}</span>
+                          <span>{clash.state || clash.publication_state || 'National'}</span>
                           <span>•</span>
                           <span className="text-[#382E22] font-medium">{clash.reason}</span>
                         </div>
