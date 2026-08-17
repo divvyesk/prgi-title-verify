@@ -205,11 +205,11 @@ export const RegistryExplorer: React.FC = () => {
             return (
               <div
                 key={item.id || item.title_id || `rec-${idx}`}
-                className="py-5 px-4 -mx-4 rounded-2xl hover:bg-[#F8F6F0] transition-all flex flex-col justify-between space-y-4"
+                className="p-5 rounded-2xl bg-white/60 border border-[#E8E0D2] hover:bg-amber-50/80 hover:border-amber-300/80 hover:shadow-sm transition-all duration-200 flex flex-col justify-between space-y-4 cursor-pointer"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="text-[10px] font-mono font-bold text-[#B45309] uppercase tracking-wider">
+                    <span className="text-[10px] font-mono font-bold text-[#B45309] uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100/60 border border-amber-200/80">
                       {regNumber}
                     </span>
                     <span className="text-[10px] text-[#A8A29E] font-mono">
