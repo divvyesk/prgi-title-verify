@@ -8,5 +8,5 @@ router = APIRouter(tags=["verify"])
 
 
 @router.post("/v1/verify", response_model=VerificationResult)
-def verify(body: VerifyRequest) -> VerificationResult:
-    return pipeline.run_verification(body.title, body.language, body.state)
+async def verify(body: VerifyRequest) -> VerificationResult:
+    return await pipeline.run_verification(body.title, body.language, body.state)
