@@ -51,9 +51,19 @@ from ml.rules.types import RuleContext, RuleOutcome
 
 # Import every checks module so their @rule decorators register the functions.
 # ORDER IS ALPHABETICAL — keep it that way to avoid accidental coupling.
+import ml.rules.checks.commercial   # noqa: F401  registers R-COM-01/02/03
+import ml.rules.checks.decency      # noqa: F401  registers R-DEC-01/02/03/04
 import ml.rules.checks.duplicates   # noqa: F401  registers R-DUP-07
-import ml.rules.checks.length       # noqa: F401  registers R-LEN-01, R-LEN-02, R-LEN-03, R-NUM-01
-import ml.rules.checks.symbols      # noqa: F401  registers R-SYM-01, R-SYM-02
+import ml.rules.checks.emblems      # noqa: F401  registers R-EMB-01/02/03
+import ml.rules.checks.generic      # noqa: F401  registers R-GEN-01/02/03/04/05
+import ml.rules.checks.government   # noqa: F401  registers R-GOV-02..09
+import ml.rules.checks.length       # noqa: F401  registers R-LEN-01/02/03, R-NUM-01
+import ml.rules.checks.location     # noqa: F401  registers R-LOC-01
+import ml.rules.checks.personal     # noqa: F401  registers R-PER-01
+import ml.rules.checks.religious    # noqa: F401  registers R-REL-01
+import ml.rules.checks.semantic     # noqa: F401  registers R-SEM-01 (stub)
+import ml.rules.checks.symbols      # noqa: F401  registers R-SYM-01/02
+import ml.rules.checks.url          # noqa: F401  registers R-URL-01/02
 
 logger = logging.getLogger(__name__)
 

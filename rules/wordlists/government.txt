@@ -1,0 +1,35 @@
+# rules/wordlists/government.txt
+# Words indicating misleading government/institutional association.
+# Source: PRGI Guideline 11 and 12 (verbatim examples) + frontend/src/utils/rulesEngine.ts
+# One entry per line. Lowercase. Phrases matched as substrings.
+# IMPORTANT: Single common words like "police" must be used with a second signal
+# (see government.py for the two-signal guard to prevent over-firing).
+government
+sarkari
+sarkar
+rashtrapati
+parliament
+sansad
+supreme court
+high court
+cbi
+cid
+vigilance
+investigation department
+defence establishment
+commission
+bureau
+rajpatra
+prashasan
+mantralaya
+united nations
+unicef
+unesco
+ilo
+who
+official gazette
+sarkar
+ministry
+pm kisan
+pradhan mantri
+mukhyamantri

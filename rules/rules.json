@@ -777,5 +777,22 @@
       "Community Harmony Review"
     ],
     "retrieval_chunk": "N/A"
+  },
+  {
+    "rule_id": "R-SEM-01",
+    "section": "Unverified/Missing",
+    "name": "Semantic cross-language meaning",
+    "description": "Titles that have a banned meaning in another language or script must be flagged for human review.",
+    "severity": "INFO",
+    "source_clause": "Missing from source document \u2014 semantic cross-language check is an operational extension not explicitly in the PRGI Guidelines document in the repository.",
+    "source_clause_verified": false,
+    "detection_hint": "LLM-based translation and meaning check (stub \u2014 awaiting Suhani integration)",
+    "examples_fail": [
+      "Vivah Suchi News"
+    ],
+    "examples_pass": [
+      "Heritage Quarterly"
+    ],
+    "retrieval_chunk": "N/A"
   }
 ]

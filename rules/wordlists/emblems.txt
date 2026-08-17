@@ -1,0 +1,18 @@
+# rules/wordlists/emblems.txt
+# National symbols and emblems covered by The Emblems and Names (Prevention of
+# Improper Use) Act, 1950, and PRGI Guideline 11.
+# One entry per line. Lowercase. Phrases matched as substrings.
+ashoka
+ashoka chakra
+satyameva jayate
+tiranga
+tricolour
+national flag
+bharat mata
+jana gana mana
+vande mataram
+rashtrapati bhavan
+sansad bhavan
+india gate
+red fort
+lal qila
