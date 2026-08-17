@@ -118,7 +118,7 @@ export const RegistryExplorer: React.FC = () => {
             <div className="space-y-0.5 text-right hidden sm:block">
               <div className="text-[10px] font-mono uppercase tracking-wider text-[#78716C]">Total Titles</div>
               <div className="font-editorial text-2xl font-bold text-[#1C1917]">
-                {mode === 'LIVE' ? '82,713' : '2,500'}
+                {mode === 'LIVE' ? total.toLocaleString() : total.toLocaleString()}
               </div>
             </div>
           </div>
@@ -300,65 +300,77 @@ export const RegistryExplorer: React.FC = () => {
             </div>
           ) : (
             <div className="divide-y divide-[#EFEAE1]/90">
-              {records.map((r, idx) => (
-                <div
-                  key={r.title_id || r.registration_number || idx}
-                  className="py-4 sm:py-5 px-3 sm:px-4 rounded-2xl transition-all hover:bg-amber-50/90 border border-transparent hover:border-amber-200 group flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  {/* Title & Metadata */}
-                  <div className="space-y-1 flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="font-mono text-[11px] font-bold text-[#B45309] bg-amber-100/70 px-2 py-0.5 rounded-md">
-                        {r.registration_number || `ID-${r.title_id}`}
-                      </span>
-                      {r.periodicity && (
-                        <span className="font-mono text-[11px] text-[#78716C] bg-[#EFEAE1]/70 px-2 py-0.5 rounded-md">
-                          {r.periodicity}
-                        </span>
-                      )}
-                      {r.registration_date && (
-                        <span className="font-mono text-[11px] text-[#A8A29E]">
-                          Registered: {r.registration_date}
-                        </span>
-                      )}
-                    </div>
+              {records.map((item: any, idx) => {
+                const titleText = item.title || 'Untitled Publication';
+                const regNumber = item.registration_number || item.regNo || item.id || (item.title_id ? `ID-${item.title_id}` : `REG-${idx + 1}`);
+                const periodicityText = item.periodicity || '';
+                const regDateText = item.registration_date || item.regDate || '';
+                const ownerName = item.owner || item.publisher || '';
+                const stateText = item.publication_state || item.state || 'All India';
+                const districtText = item.publication_district || item.district || '';
+                const langText = item.language || 'English';
+                const coreStem = item.title_core || item.titleCore || '';
 
-                    <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#1C1917] group-hover:text-amber-950 transition-colors truncate">
-                      {r.title}
-                    </h3>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#57534E] pt-0.5">
-                      {r.owner && (
-                        <span className="flex items-center gap-1">
-                          <Building2 className="w-3.5 h-3.5 text-[#A8A29E]" />
-                          <span>{r.owner}</span>
+                return (
+                  <div
+                    key={regNumber || idx}
+                    className="py-4 sm:py-5 px-3 sm:px-4 rounded-2xl transition-all hover:bg-amber-50/90 border border-transparent hover:border-amber-200 group flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  >
+                    {/* Title & Metadata */}
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="font-mono text-[11px] font-bold text-[#B45309] bg-amber-100/70 px-2 py-0.5 rounded-md">
+                          {regNumber}
                         </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-[#A8A29E]" />
-                        <span>{r.publication_state || 'All India'}{r.publication_district ? `, ${r.publication_district}` : ''}</span>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Globe className="w-3.5 h-3.5 text-[#A8A29E]" />
-                        <span>{r.language}</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Core Stem & Token Badge */}
-                  <div className="shrink-0 flex md:flex-col items-end justify-between gap-2 text-right">
-                    {r.title_core && (
-                      <div className="text-[11px] font-mono text-[#78716C]">
-                        Core Root: <strong className="text-[#1C1917]">{r.title_core}</strong>
+                        {periodicityText && (
+                          <span className="font-mono text-[11px] text-[#78716C] bg-[#EFEAE1]/70 px-2 py-0.5 rounded-md">
+                            {periodicityText}
+                          </span>
+                        )}
+                        {regDateText && (
+                          <span className="font-mono text-[11px] text-[#A8A29E]">
+                            Registered: {regDateText}
+                          </span>
+                        )}
                       </div>
-                    )}
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                      <FileCheck className="w-3 h-3" />
-                      <span>PRGI Verified</span>
-                    </span>
+
+                      <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#1C1917] group-hover:text-amber-950 transition-colors truncate">
+                        {titleText}
+                      </h3>
+
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#57534E] pt-0.5">
+                        {ownerName && (
+                          <span className="flex items-center gap-1">
+                            <Building2 className="w-3.5 h-3.5 text-[#A8A29E]" />
+                            <span>{ownerName}</span>
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-[#A8A29E]" />
+                          <span>{stateText}{districtText ? `, ${districtText}` : ''}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Globe className="w-3.5 h-3.5 text-[#A8A29E]" />
+                          <span>{langText}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Core Stem & Token Badge */}
+                    <div className="shrink-0 flex md:flex-col items-end justify-between gap-2 text-right">
+                      {coreStem && (
+                        <div className="text-[11px] font-mono text-[#78716C]">
+                          Core Root: <strong className="text-[#1C1917]">{coreStem}</strong>
+                        </div>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        <FileCheck className="w-3 h-3" />
+                        <span>PRGI Verified</span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

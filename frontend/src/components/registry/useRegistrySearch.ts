@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { TitleRecord } from '../../types';
 import sampleTitlesRaw from '../../data/titleMasterSample.json';
 
-const sampleTitles = sampleTitlesRaw as TitleRecord[];
+const sampleTitles = sampleTitlesRaw as unknown as TitleRecord[];
 
 export interface RegistrySearchParams {
   query: string;
@@ -40,19 +40,19 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
 
   // Extract unique filter choices from base sample
   const languages = useRef<string[]>(
-    Array.from(new Set(sampleTitles.map((t) => (t.language ? t.language.split(',')[0].trim() : ''))))
+    Array.from(new Set(sampleTitles.map((t: any) => (t.language ? t.language.split(',')[0].trim() : ''))))
       .filter(Boolean)
       .sort()
   ).current;
 
   const states = useRef<string[]>(
-    Array.from(new Set(sampleTitles.map((t) => (t.state ? t.state.trim() : ''))))
+    Array.from(new Set(sampleTitles.map((t: any) => (t.state || t.publication_state ? (t.state || t.publication_state).trim() : ''))))
       .filter(Boolean)
       .sort()
   ).current;
 
   const periodicities = useRef<string[]>(
-    Array.from(new Set(sampleTitles.map((t) => (t.periodicity ? t.periodicity.trim() : ''))))
+    Array.from(new Set(sampleTitles.map((t: any) => (t.periodicity ? t.periodicity.trim() : ''))))
       .filter(Boolean)
       .sort()
   ).current;
@@ -60,21 +60,28 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
   // Offline client-side search fallback
   const performOfflineSearch = useCallback(() => {
     const q = query.toLowerCase().trim();
-    const filtered = sampleTitles.filter((item) => {
+    const filtered = sampleTitles.filter((item: any) => {
+      const title = item.title || '';
+      const reg = item.regNo || item.registration_number || item.id || '';
+      const pub = item.publisher || item.owner || '';
+      const lang = item.language || '';
+      const st = item.state || item.publication_state || '';
+      const per = item.periodicity || '';
+
       const matchesSearch =
         !q ||
-        (item.title && item.title.toLowerCase().includes(q)) ||
-        (item.regNo && item.regNo.toLowerCase().includes(q)) ||
-        (item.publisher && item.publisher.toLowerCase().includes(q));
+        title.toLowerCase().includes(q) ||
+        reg.toLowerCase().includes(q) ||
+        pub.toLowerCase().includes(q);
 
       const matchesLang =
-        language === 'ALL' || (item.language && item.language.includes(language));
+        language === 'ALL' || lang.includes(language);
 
       const matchesState =
-        state === 'ALL' || item.state === state;
+        state === 'ALL' || st === state;
 
       const matchesPeriodicity =
-        periodicity === 'ALL' || item.periodicity === periodicity;
+        periodicity === 'ALL' || per === periodicity;
 
       return matchesSearch && matchesLang && matchesState && matchesPeriodicity;
     });
@@ -109,7 +116,9 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
       urlParams.set('page', String(page));
       urlParams.set('size', String(size));
 
-      const response = await fetch(`/v1/registry/search?${urlParams.toString()}`, {
+      // Try live API endpoint with Vite /api proxy or direct port 8000
+      const apiUrl = `/api/v1/registry/search?${urlParams.toString()}`;
+      const response = await fetch(apiUrl, {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json'
