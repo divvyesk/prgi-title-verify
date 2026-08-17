@@ -142,7 +142,7 @@ function PureNeonButterfly({
   );
 }
 
-// 3D Pure Warm Ochre & Caramel Neon Title Text (Mellow Organic Warmth)
+// 3D Pure Neon Title Text (Harmonized Uniform Palette on Verdict)
 function PureNeonTitle({
   title,
   verdict,
@@ -154,30 +154,42 @@ function PureNeonTitle({
 }) {
   const signRef = useRef<THREE.Group>(null);
 
-  // Warmer Shades: Roasted Caramel, Warm Ochre, Terracotta Amber, Deep Honey
+  // When a verdict arrives (REJECTED / APPROVED / MANUAL_REVIEW), ENTIRE text becomes a single solid unified hue.
+  // Before verdict (null / typing), multi-tone warm caramel and ochre are used.
   const { primaryColor, glowColor, secondaryColor, secondaryGlow } = useMemo(() => {
     if (verdict === 'APPROVED') {
+      // Entire text goes solid vibrant Emerald Green
       return { 
-        primaryColor: '#4D7C0F', // Warm Olive / Sage Gold
-        glowColor: '#65A30D', 
-        secondaryColor: '#B45309', 
-        secondaryGlow: '#D97706' 
+        primaryColor: '#16A34A', 
+        glowColor: '#22C55E', 
+        secondaryColor: '#16A34A', 
+        secondaryGlow: '#22C55E' 
       };
     }
     if (verdict === 'REJECTED') {
+      // Entire text goes solid vivid Neon Red
       return { 
-        primaryColor: '#9F1239', // Deep Terracotta Wine
-        glowColor: '#BE123C', 
-        secondaryColor: '#B45309', 
-        secondaryGlow: '#D97706' 
+        primaryColor: '#DC2626', 
+        glowColor: '#EF4444', 
+        secondaryColor: '#DC2626', 
+        secondaryGlow: '#EF4444' 
       };
     }
-    // Default & Manual Review: Warm Roasted Caramel & Terracotta Honey
+    if (verdict === 'MANUAL_REVIEW') {
+      // Entire text goes solid warm Amber Yellow
+      return { 
+        primaryColor: '#D97706', 
+        glowColor: '#F59E0B', 
+        secondaryColor: '#D97706', 
+        secondaryGlow: '#F59E0B' 
+      };
+    }
+    // Default & Before Verdict: Harmonious dual-tone warm caramel & deep ochre
     return { 
-      primaryColor: '#B45309', // Warm Deep Amber Ochre
+      primaryColor: '#B45309', // Warm Deep Amber Ochre (Line 1)
       glowColor: '#D97706',    // Warm Honey Amber
-      secondaryColor: '#92400E', // Roasted Cinnamon Gold
-      secondaryGlow: '#B45309'  // Mellow Warm Glow
+      secondaryColor: '#C27830', // Warm Roasted Caramel (Line 2)
+      secondaryGlow: '#F59E0B'  // Mellow Warm Glow
     };
   }, [verdict]);
 
@@ -213,7 +225,7 @@ function PureNeonTitle({
           <meshBasicMaterial color="#1C1917" transparent opacity={0.25} />
         </Text>
 
-        {/* Layer 1: Saturated Radiant Warm Caramel/Ochre Tube (Soft Mellow Emissive) */}
+        {/* Layer 1: Saturated Radiant Tube (Mellow Emissive) */}
         <Text
           position={[0, 0, 0]}
           fontSize={fontSize}
@@ -252,7 +264,7 @@ function PureNeonTitle({
         </Text>
       </group>
 
-      {/* Line 2: Secondary Warm Cinnamon/Amber Glowing 3D Neon Text */}
+      {/* Line 2: Secondary / Unified Verdict Glowing 3D Neon Text */}
       {line2 && (
         <group position={[0, -0.28, 0]}>
           {/* Layer 0: Dark Contrast Shadow Base */}
@@ -271,7 +283,7 @@ function PureNeonTitle({
             <meshBasicMaterial color="#1C1917" transparent opacity={0.25} />
           </Text>
 
-          {/* Layer 1: Saturated Radiant Warm Ochre Tube */}
+          {/* Layer 1: Saturated Radiant Tube (Matches Line 1 on Verdict) */}
           <Text
             position={[0, 0, 0]}
             fontSize={fontSize * 0.94}
@@ -340,9 +352,9 @@ function PureNeonTitle({
         <group position={[0, 0, 0.14]}>
           <mesh>
             <planeGeometry args={[3.4, 0.035]} />
-            <meshBasicMaterial color="#D97706" transparent opacity={0.9} toneMapped={false} />
+            <meshBasicMaterial color={glowColor} transparent opacity={0.9} toneMapped={false} />
           </mesh>
-          <pointLight color="#D97706" intensity={2.5} distance={2.5} />
+          <pointLight color={glowColor} intensity={2.5} distance={2.5} />
         </group>
       )}
     </group>
@@ -360,6 +372,45 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
     mql.addEventListener('change', handler);
     return () => mql.removeEventListener('change', handler);
   }, []);
+
+  // Synchronized butterfly colors based on verdict
+  const butterflyColors = useMemo(() => {
+    if (verdict === 'APPROVED') {
+      return {
+        b1: { color: '#16A34A', glow: '#22C55E' },
+        b2: { color: '#15803D', glow: '#16A34A' },
+        b3: { color: '#4D7C0F', glow: '#65A30D' },
+        b4: { color: '#16A34A', glow: '#22C55E' },
+        b5: { color: '#15803D', glow: '#16A34A' },
+      };
+    }
+    if (verdict === 'REJECTED') {
+      return {
+        b1: { color: '#DC2626', glow: '#EF4444' },
+        b2: { color: '#B91C1C', glow: '#DC2626' },
+        b3: { color: '#991B1B', glow: '#EF4444' },
+        b4: { color: '#DC2626', glow: '#EF4444' },
+        b5: { color: '#B91C1C', glow: '#DC2626' },
+      };
+    }
+    if (verdict === 'MANUAL_REVIEW') {
+      return {
+        b1: { color: '#D97706', glow: '#F59E0B' },
+        b2: { color: '#B45309', glow: '#D97706' },
+        b3: { color: '#CA8A04', glow: '#EAB308' },
+        b4: { color: '#D97706', glow: '#F59E0B' },
+        b5: { color: '#B45309', glow: '#D97706' },
+      };
+    }
+    // Default & Before Verdict: Warm multi-tone caramel, honey, amber, and bronze
+    return {
+      b1: { color: '#C27830', glow: '#D97706' },
+      b2: { color: '#B45309', glow: '#D97706' },
+      b3: { color: '#A16207', glow: '#CA8A04' },
+      b4: { color: '#C27830', glow: '#D97706' },
+      b5: { color: '#B45309', glow: '#D97706' },
+    };
+  }, [verdict]);
 
   if (reducedMotion) {
     return (
@@ -404,65 +455,65 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
 
         <Suspense fallback={null}>
           <group position={[0, 0.05, 0]}>
-            {/* Center Pure 3D Warm Ochre & Caramel Neon Title */}
+            {/* Center Pure 3D Warm Neon Title */}
             <PureNeonTitle
               title={title || 'Times India'}
               verdict={verdict}
               isScanning={isScanning}
             />
 
-            {/* Surrounding Warm Caramel, Amber & Bronze Butterflies (Safely Fitted Inside Viewport Bounds) */}
-            {/* 1. Top-Right Warm Caramel Butterfly */}
+            {/* Surrounding Butterflies Synchronized with Verdict State */}
+            {/* 1. Top-Right Butterfly */}
             <PureNeonButterfly
               position={[1.25, 0.58, 0.2]}
               rotation={[0.10, -0.22, 0.18]}
               scale={0.52}
-              color="#C27830"
-              glowColor="#D97706"
+              color={butterflyColors.b1.color}
+              glowColor={butterflyColors.b1.glow}
               wingAngleOffset={0}
               flutterSpeed={2.2}
             />
 
-            {/* 2. Top-Left Warm Ochre Honey Butterfly */}
+            {/* 2. Top-Left Butterfly */}
             <PureNeonButterfly
               position={[-1.25, 0.54, 0.2]}
               rotation={[0.12, 0.25, -0.20]}
               scale={0.48}
-              color="#B45309"
-              glowColor="#D97706"
+              color={butterflyColors.b2.color}
+              glowColor={butterflyColors.b2.glow}
               wingAngleOffset={1.2}
               flutterSpeed={2.6}
             />
 
-            {/* 3. Bottom-Left Warm Bronze Gold Butterfly */}
+            {/* 3. Bottom-Left Butterfly */}
             <PureNeonButterfly
               position={[-1.20, -0.52, 0.22]}
               rotation={[-0.08, 0.18, 0.14]}
               scale={0.46}
-              color="#A16207"
-              glowColor="#CA8A04"
+              color={butterflyColors.b3.color}
+              glowColor={butterflyColors.b3.glow}
               wingAngleOffset={2.4}
               flutterSpeed={2.0}
             />
 
-            {/* 4. Bottom-Right Warm Amber Sand Butterfly */}
+            {/* 4. Bottom-Right Butterfly */}
             <PureNeonButterfly
               position={[1.22, -0.48, 0.2]}
               rotation={[-0.10, -0.20, -0.15]}
               scale={0.45}
-              color="#C27830"
-              glowColor="#D97706"
+              color={butterflyColors.b4.color}
+              glowColor={butterflyColors.b4.glow}
               wingAngleOffset={3.6}
               flutterSpeed={2.4}
             />
 
-            {/* 5. Center-Top Floating Mini Cinnamon Butterfly */}
+            {/* 5. Center-Top Floating Mini Butterfly */}
             <PureNeonButterfly
               position={[0.0, 0.76, 0.15]}
               rotation={[0.04, 0.08, -0.06]}
               scale={0.38}
-              color="#B45309"
-              glowColor="#D97706"
+              color={butterflyColors.b5.color}
+              glowColor={butterflyColors.b5.glow}
               wingAngleOffset={4.8}
               flutterSpeed={2.8}
             />
