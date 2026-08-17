@@ -4,7 +4,7 @@ from psycopg import sql
 from sentence_transformers import SentenceTransformer
 
 def embed_and_store_guidelines(
-    json_path: str = 'rules/guideline_chunks.json', 
+    json_path: str = 'data/rules/guideline_chunks.json', 
     model_name: str = 'BAAI/bge-m3',
     db_conn_str: str = 'dbname=postgres'
 ):

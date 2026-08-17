@@ -75,7 +75,7 @@ if __name__ == "__main__":
         print(chunk)
     
     # Save realistic dummy data
-    with open('rules/guideline_chunks.json', 'w') as f:
+    with open('data/rules/guideline_chunks.json', 'w') as f:
         json.dump([{"chunk_id": i, "text": c} for i, c in enumerate(chunks)], f, indent=2)
     
-    print("\nSaved semantic chunks to rules/guideline_chunks.json")
+    print("\nSaved semantic chunks to data/rules/guideline_chunks.json")
