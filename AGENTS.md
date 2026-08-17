@@ -1,8 +1,8 @@
 # AGENTS.md — PRGI TitleGuard project memory
 
 This file is the persistent brief for anyone (human or agent) picking up work in
-this repository. It is the full onboarding brief as given to Divvye (integration
-lead), preserved in full so future sessions do not need to be re-briefed.
+this repository. It is the full onboarding brief as given to Darsh (Officer UI,
+Export & Testing lead), preserved in full so future sessions do not need to be re-briefed.
 
 ---
 
@@ -19,11 +19,14 @@ lead), preserved in full so future sessions do not need to be re-briefed.
       mark it `unverified` and say so explicitly.
 - [ ] Never run `git add .`. Always name the specific files being added — this
       repo already carries 30 MB of CSVs and a 20 MB PDF.
+- [ ] Never push to `main` or `dev`. Work on a feature branch (`officer-ui`) and open a pull request.
 - [ ] Prefer extending an existing working file over writing a new one from scratch.
 - [ ] Do not restructure the repository: no deleting, renaming, or moving existing
       files/folders (including `contracts/contracts.js`, which stays `.js`).
 - [ ] Do not reorganise `data/`, `ml/`, `search/`, `backend/`, or `frontend/`.
-- [ ] Stay inside your own file ownership; shared files need the owner's permission.
+- [ ] Stay inside your own file ownership (`frontend/src/components/officer/`,
+      `frontend/src/components/registry/`, `frontend/src/export/`, `frontend/tests/`);
+      shared files need the owner's permission.
 - [ ] One topic branch per person, kept for all three days. No branch-per-task,
       no `dev` branch, never commit directly to `main`.
 
@@ -31,10 +34,10 @@ lead), preserved in full so future sessions do not need to be re-briefed.
 
 ## THE PROJECT
 
-Name: PRGI TitleGuard — Automated Press Title Verification System
-Event: Smart India Hackathon 2026, problem statement PSS06
-Repo: https://github.com/divvyesk/prgi-title-verify
-Deadline: 3 days. Feature freeze 19 Aug 2026, 15:00.
+Name: PRGI TitleGuard — Automated Press Title Verification System  
+Event: Smart India Hackathon 2026, problem statement PSS06  
+Repo: https://github.com/divvyesk/prgi-title-verify  
+Deadline: 3 days. Feature freeze 19 Aug 2026, 15:00.  
 
 ## WHAT THE SYSTEM DOES
 
@@ -60,7 +63,7 @@ A proposed title goes through a fixed 5-stage pipeline:
 There is also an "Agentic Title Studio" that invents alternative titles when one is
 rejected, and an "Officer Review Docket" for PRGI officers.
 
-## ALREADY BUILT AND WORKING — REUSE THIS, DO NOT REBUILD OR REPLACE IT
+## WHAT IS ALREADY BUILT AND WORKING — DO NOT REBUILD ANY OF THIS
 
 - `frontend/` : a complete, working React 19 + TypeScript + Vite + Tailwind 3
   single-page app. Components: LoadingIntro, VerificationView (the main screen,
@@ -86,52 +89,25 @@ rejected, and an "Officer Review Docket" for PRGI officers.
   hybrid_search.py (a working trigram + vector merge).
   Never re-embed the dataset. It is done. Query the existing index.
 
-## EMPTY FILES THAT ALREADY EXIST — FILL THESE, DO NOT CREATE ALTERNATIVES BESIDE THEM
+## WHAT IS NOT BUILT YET
 
-The repository already has the right file layout; many files are simply 0 bytes.
-When a task needs one of these, open THAT file and write into it. Do not create
-a differently-named file next to it and leave the empty one behind.
-
-```
-backend/app/main.py              the FastAPI app
-backend/requirements.txt         Python dependencies
-backend/Dockerfile               backend container image
-contracts/contracts.py           Pydantic request/response models
-contracts/contracts.js           the same shapes as Zod schemas
-contracts/algo.py                the interface every algorithm implements
-contracts/CHANGELOG.md           contract version history
-ml/similarity/lexical.py         lexical scorer
-ml/similarity/phonetic.py        phonetic scorer
-ml/similarity/core_word.py       core-word scorer
-ml/similarity/semantic.py        semantic scorer
-ml/scoring.py                    the composite blend
-ml/embeddings/generate.py        embedding job for the guideline corpus
-search/database/schema.sql       extra search columns
-search/database/indexes.sql      extra search indexes
-data/datasets/dataset1/database/03_search.sql   the working search queries
-docs/API_SPEC.md  docs/ARCHITECTURE.md  docs/DATABASE_SCHEMA.md
-docs/GIT_WORKFLOW.md  docs/PRD.md
-infra/docker-compose.yml  infra/docker-compose.prod.yml
-```
-
-## DO NOT RESTRUCTURE THE REPOSITORY
-
-The folder layout stays exactly as it is. Specifically:
-
-- Do NOT delete any file or folder, even one that looks duplicated or unused.
-  `title_master.csv` at the repository root, the PDFs, the .docx files, and
-  `search/database/` all stay where they are.
-- Do NOT rename or move existing files, including `contracts/contracts.js`
-  (it stays .js — the typed frontend mirror lives in frontend/src/api/schemas.ts).
-- Do NOT reorganise `data/`, `ml/`, `search/`, `backend/` or `frontend/`.
-- New folders are only created inside the existing tree where there is genuinely no
-  home for new code, and are listed in each person's own task.
+These files exist in the repo but are COMPLETELY EMPTY (0 bytes). Treat them as
+not written:
+  `backend/app/main.py`, `backend/requirements.txt`, `backend/Dockerfile`
+  `ml/scoring.py`, `ml/embeddings/generate.py`
+  `ml/similarity/lexical.py`, `phonetic.py`, `semantic.py`, `core_word.py`
+  `contracts/contracts.py`, `contracts.js`, `algo.py`, `CHANGELOG.md`
+  `docs/API_SPEC.md`, `ARCHITECTURE.md`, `DATABASE_SCHEMA.md`, `GIT_WORKFLOW.md`
+  `infra/docker-compose.yml`, `docker-compose.prod.yml`
+  `search/database/schema.sql`, `indexes.sql`
+There is no backend at all. There is no rule engine, no RAG, no agent workflow,
+no BM25 index, no phonetic index, and no tests.
 
 ## KNOWN PROBLEMS IN THE EXISTING CODE
 
 1. `frontend/src/utils/rulesEngine.ts` cites legal clauses such as
    "PRGI Digital Alignment Guidelines 2025, Rule 3(2)(b)" that do not appear to
-   exist in the real guideline document. Fabricated citations are the worst
+   exist in the real guideline document. Fabricated citations are the single worst
    possible defect in this product. Never invent a clause number, anywhere.
 2. The committed SQL does not match the live database. generate_embeddings.py
    reads and writes an `embedding` column, but
@@ -142,8 +118,7 @@ The folder layout stays exactly as it is. Specifically:
 3. The PRD text says the frontend is Next.js. It is actually Vite + React.
    Do NOT migrate it. Keep Vite.
 4. The dataset is 100% Latin script. The `title_transliterated` column currently
-   just lowercases already-Latin text; it is not real cross-script
-   transliteration.
+   just lowercases already-Latin text; it is not real cross-script transliteration.
 
 ## TEAM AND FILE OWNERSHIP
 
@@ -153,13 +128,13 @@ Six people work in this repo at the same time. Each owns folders nobody else edi
 |---|---|
 | Divvye | contracts/, backend/, ml/fusion/, ml/similarity/semantic.py, ml/registry.py, contracts/fixtures/, ml/config/, docs/ |
 | Jai | ml/similarity/lexical.py, phonetic.py, core_word.py, ml/scoring.py, search/ |
-| Pruthviraj | data/rules/, ml/rules/, ml/embeddings/, data/eval/, data/datasets/ (all of it, including dataset1) |
+| Pruthviraj | rules/, ml/rules/, data/datasets/dataset2/, data/eval/ |
 | Suhani | agents/, ml/rag/, presentation/ |
 | Gurpreet | frontend/src/api/, frontend/src/hooks/, frontend/src/utils/, frontend/src/App.tsx, frontend/src/components/verifier/, frontend/src/components/agents/, infra/ |
-| Darsh | frontend/src/components/officer/, components/registry/, frontend/src/export/, frontend/tests/ |
+| Darsh | frontend/src/components/officer/, frontend/src/components/registry/, frontend/src/export/, frontend/tests/ |
 
 Shared files needing the owner's permission before editing:
-`contracts/*`, `ml/config/weights.yaml`, `ml/config/stopwords.txt`,
+`contracts/*`, `config/weights.yaml`, `config/stopwords.txt`,
 `frontend/src/types/index.ts`, `infra/docker-compose.yml`, `README.md`
 
 ## GIT — THE BRANCH STRUCTURE DOES NOT CHANGE
@@ -195,57 +170,18 @@ that was merged into `main` (PR #2, from the `data` branch).
   This repo already contains 30 MB of CSVs and a 20 MB PDF.
 - Prefer extending an existing working file over writing a new one from scratch.
 
-## MY ROLE (Divvye — integration lead)
+## MY ROLE (Darsh — Officer Review Docket, Registry Explorer, Export & Tests)
 
-I am Divvye. I am the integration lead. I own:
+I am Darsh. I build the officer-facing half of the product, the exportable official
+memorandum, and the automated tests. I own:
+  - `frontend/src/components/officer/`   the Officer Review Docket
+  - `frontend/src/components/registry/`  the Title Master Registry Explorer
+  - `frontend/src/export/`               the exportable official memorandum
+  - `frontend/tests/`                    Playwright end-to-end tests
 
-- `contracts/` : the frozen request/response schemas all six people code
-  against, in Python (contracts.py, Pydantic) and JavaScript (contracts.js,
-  Zod), plus the Protocol interface every similarity algorithm implements
-  (algo.py). All four of these files already exist and are empty — I fill them.
-- `contracts/fixtures/` : hand-written example JSON matching those contracts,
-  so the other five people can build against realistic data before any real
-  code exists.
-- `backend/` : the FastAPI service that orchestrates the 5-stage pipeline and
-  exposes it as a versioned /v1 API. backend/app/main.py already exists, empty.
-- `ml/similarity/semantic.py` (exists, empty) and `ml/fusion/` : the semantic
-  scorer, which QUERIES the BGE-M3 embeddings that are already generated and
-  indexed, and the code that merges several ranked candidate lists into one
-  shortlist.
-- `docs/` : five empty markdown files I fill.
-
-I also review every pull request and own `main`.
-
-My first three hours are the most important hours on the team, because until
-contracts and fixtures exist, five other people are guessing.
-
-## MY ROLE (Suhani — Agentic Studio, RAG, presentation)
-
-I am Suhani. I build the AI-agent side of the product and the presentation. I own:
-
-- `agents/` : a LangGraph workflow with four agents that invent alternative
-  titles when a proposed title is rejected: Interviewer -> writes a creative
-  brief from the publication's details; Generator -> proposes 15-20 candidate
-  titles; Verifier -> runs every candidate through the REAL verification
-  pipeline; Ranker -> returns only the survivors, ranked. One bounded retry
-  loop: if fewer than 5 candidates survive, go back to the Generator with the
-  rejection reasons, up to 3 attempts total.
-- `ml/rag/` : the explanation generator. It must RETRIEVE the real guideline
-  text first and only then ask a language model to phrase it. The model must
-  never answer from memory — that is how fabricated citations happen (Known
-  Problem #1 above).
-- `presentation/` : the Smart India Hackathon idea-submission deck.
-
-I do not touch the frontend, the backend orchestrator, or the algorithms.
-Contracts (`contracts/contracts.py`, `contracts/algo.py`) are already frozen
-and merged — I build against those, I don't redefine them.
-
-As of this section being written, `backend/app/services/pipeline.py` already
-has two dynamic-import wiring points waiting for my work: `ml.rules.engine`
-(not mine — Pruthviraj's) is one, but `ml.rag.explain.explain(title, verdict,
-clashing_titles, rule_violations) -> tuple[str, str, list[str]]` is exactly
-my RAG explainer's expected interface, and `/v1/alternatives`
-(`backend/app/routers/alternatives.py`) already tries `agents.studio.run_studio(
-genre, state, language, tone, audience) -> list[GeneratedCandidate]` and falls
-back to fixture data if it isn't there. Both fall back gracefully today —
-landing either module flips that endpoint real with no other code change.
+IMPORTANT: the frontend is already built and looks good. I must not restyle it,
+not change the theme, and not touch files outside my folders.
+Gurpreet owns `App.tsx`, `VerificationView` and the API layer. If I need a change
+there, I ask him.
+All of my work reads from fixture JSON files first, so I never have to wait for the
+backend to exist. On day 3 I swap the data source and the UI does not change.

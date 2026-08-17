@@ -2,18 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Sparkles, 
-  AlertTriangle, 
   CheckCircle2, 
-  XCircle, 
   ArrowRight, 
-  FileText, 
-  ShieldAlert, 
   Copy, 
   Check, 
   Zap, 
   Globe, 
   RefreshCw, 
-  TrendingUp, 
   Cpu,
   MapPin
 } from 'lucide-react';
@@ -23,6 +18,12 @@ import { runTitleVerification } from '../../utils/verificationEngine';
 import { detectScriptAndLanguage, transliterateToRoman } from '../../utils/transliteration';
 import type { VerificationResult } from '../../types';
 import { sound } from '../../utils/audio';
+import { 
+  SimilarityMatrix, 
+  ClashingTitlesList, 
+  RuleViolationsGrid, 
+  VerdictBanner 
+} from '../shared';
 
 interface VerificationViewProps {
   onNavigateToAgents: (seedTitle?: string) => void;
@@ -422,300 +423,54 @@ Timestamp: ${result.timestamp}`;
       {result && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Main Verdict Card */}
-          <div className={`p-6 sm:p-8 rounded-2xl border ${
-            result.verdict === 'APPROVED' ? 'beige-card-success' :
-            result.verdict === 'REJECTED' ? 'beige-card-danger' : 'beige-card-warning'
-          }`}>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              {/* Status Badge & Title Details */}
-              <div className="flex items-start gap-4">
-                <div className={`p-4 rounded-2xl text-white shadow-md ${
-                  result.verdict === 'APPROVED' ? 'bg-emerald-700' :
-                  result.verdict === 'REJECTED' ? 'bg-rose-700' : 'bg-amber-600'
-                }`}>
-                  {result.verdict === 'APPROVED' && <CheckCircle2 className="w-8 h-8" />}
-                  {result.verdict === 'REJECTED' && <XCircle className="w-8 h-8" />}
-                  {result.verdict === 'MANUAL_REVIEW' && <AlertTriangle className="w-8 h-8" />}
-                </div>
+          <VerdictBanner
+            verdict={result.verdict}
+            verdictScore={result.verdictScore}
+            explanation={result.explanation}
+            recommendedAction={result.recommendedAction}
+            inputTitle={result.inputTitle}
+            processingTimeMs={result.processingTimeMs}
+          >
+            <button
+              onClick={copyVerificationReport}
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] flex items-center gap-1.5 transition-colors cursor-pointer font-semibold shadow-sm"
+            >
+              {copiedReport ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedReport ? 'Copied' : 'Copy Report'}</span>
+            </button>
 
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-xs font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider ${
-                      result.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-                      result.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
-                      'bg-amber-100 text-amber-900 border border-amber-300'
-                    }`}>
-                      {result.verdict === 'APPROVED' && 'APPROVED • CLEAR FOR REGISTRATION'}
-                      {result.verdict === 'REJECTED' && 'REJECTED • HIGH CONFLICT / STATUTORY VIOLATION'}
-                      {result.verdict === 'MANUAL_REVIEW' && 'MANUAL REVIEW REQUIRED • BORDERLINE RISK'}
-                    </span>
-                    <span className="text-xs text-[#75634B] font-mono">
-                      Latency: {result.processingTimeMs}ms
-                    </span>
-                  </div>
-
-                  <h3 className="text-2xl sm:text-3xl font-editorial font-bold text-[#1C1917] mt-2">
-                    "{result.inputTitle}"
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#44403C] mt-1 max-w-2xl leading-relaxed">
-                    {result.explanation}
-                  </p>
-                </div>
-              </div>
-
-              {/* Conflict Risk Score Gauge */}
-              <div className="flex flex-col items-center justify-center bg-white px-6 py-4 rounded-xl border border-[#DDD1BF] min-w-[170px] shadow-sm">
-                <div className="text-[11px] font-bold text-[#75634B] uppercase tracking-wider mb-1 font-mono">
-                  Conflict Risk Score
-                </div>
-                <div className={`text-3xl sm:text-4xl font-extrabold font-mono ${
-                  result.verdict === 'APPROVED' ? 'text-emerald-700' :
-                  result.verdict === 'REJECTED' ? 'text-rose-700' : 'text-amber-700'
-                }`}>
-                  {result.verdictScore}<span className="text-base text-[#A8A29E]">/100</span>
-                </div>
-                <div className="text-[11px] text-[#75634B] mt-1 font-medium">
-                  {result.verdict === 'APPROVED' ? 'Safe Clearance' :
-                   result.verdict === 'REJECTED' ? 'Critical Clash' : 'Moderate Ambiguity'}
-                </div>
-              </div>
-            </div>
-
-            {/* Recommended Action Ribbon */}
-            <div className="mt-6 pt-4 border-t border-[#E5DDD0] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2 text-[#44403C]">
-                <strong className="text-[#1C1917]">Guidance:</strong>
-                <span>{result.recommendedAction}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={copyVerificationReport}
-                  className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] flex items-center gap-1.5 transition-colors cursor-pointer font-semibold shadow-sm"
-                >
-                  {copiedReport ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedReport ? 'Copied' : 'Copy Report'}</span>
-                </button>
-
-                {result.verdict === 'REJECTED' && (
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      onNavigateToAgents(result.inputTitle);
-                    }}
-                    className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 text-white font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Generate Safe Alternatives</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+            {result.verdict === 'REJECTED' && (
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  onNavigateToAgents(result.inputTitle);
+                }}
+                className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 text-white font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Generate Safe Alternatives</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </VerdictBanner>
 
           {/* 4-Dimensional Similarity Matrix & Clashing Records */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* 4-D Similarity Breakdown */}
-            <div className="lg:col-span-5 beige-card rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
-                <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
-                  <TrendingUp className="w-4 h-4 text-amber-700" />
-                  <span>4-Dimensional Similarity Matrix</span>
-                </div>
-                <span className="text-[11px] text-[#75634B] font-mono">NLP Engine</span>
-              </div>
+            <SimilarityMatrix
+              className="lg:col-span-5"
+              similarityBreakdown={result.similarityBreakdown}
+              coreWords={result.coreWords}
+            />
 
-              <div className="space-y-4">
-                {/* 1. Lexical Similarity */}
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">1. Lexical &amp; Word Order Anagram</span>
-                    <span className="font-mono font-bold text-amber-800">{result.similarityBreakdown.lexicalScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
-                    <div
-                      className="bg-amber-700 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.lexicalScore}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Detects character shifts and word order inversions (e.g., Times India vs India Times).
-                  </p>
-                </div>
-
-                {/* 2. Phonetic Similarity */}
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">2. Phonetic Soundex Match</span>
-                    <span className="font-mono font-bold text-purple-800">{result.similarityBreakdown.phoneticScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
-                    <div
-                      className="bg-purple-700 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.phoneticScore}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Detects identical pronunciation with altered spelling (e.g., Jagran vs Jaagran).
-                  </p>
-                </div>
-
-                {/* 3. Semantic / Multilingual Cross-Lingual */}
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">3. Semantic Cross-Lingual Translation</span>
-                    <span className="font-mono font-bold text-emerald-800">{result.similarityBreakdown.semanticScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
-                    <div
-                      className="bg-emerald-700 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.semanticScore}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Detects identical meanings translated across languages (e.g., Daily News vs Dainik Samachar).
-                  </p>
-                </div>
-
-                {/* 4. Core-Word Match */}
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">4. Core-Word Distinctive Root</span>
-                    <span className="font-mono font-bold text-stone-900">{result.similarityBreakdown.coreWordScore}%</span>
-                  </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
-                    <div
-                      className="bg-stone-800 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${result.similarityBreakdown.coreWordScore}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Strips media filler words ("The", "Daily", "Patrika") to uncover root collisions.
-                  </p>
-                </div>
-              </div>
-
-              {/* Extracted Core Root Tokens */}
-              <div className="p-3 bg-white rounded-xl border border-[#DDD1BF] text-xs">
-                <span className="text-[#75634B] font-semibold mr-2">Extracted Root Tokens:</span>
-                {result.coreWords.map((word, idx) => (
-                  <span key={idx} className="inline-block font-mono font-bold px-2 py-0.5 mr-1.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
-                    {word}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Clashing Titles Table */}
-            <div className="lg:col-span-7 beige-card rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
-                <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
-                  <ShieldAlert className="w-4 h-4 text-rose-700" />
-                  <span>Top Clashing Registered Titles ({result.clashingTitles.length} Suspects)</span>
-                </div>
-                <span className="text-[11px] text-[#75634B] font-mono">160k Registry</span>
-              </div>
-
-              {result.clashingTitles.length === 0 ? (
-                <div className="p-8 text-center text-[#75634B] space-y-2">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-700 mx-auto" />
-                  <p className="font-bold text-[#1C1917]">No Clashing Registered Titles</p>
-                  <p className="text-xs text-[#75634B]">Proposed title appears distinct and conflict-free in this jurisdiction.</p>
-                </div>
-              ) : (
-                <div className="space-y-2.5">
-                  {result.clashingTitles.map((clash, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3.5 rounded-xl bg-white border border-[#DDD1BF] hover:border-[#CFC0A8] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#1C1917] text-sm font-display">
-                            {clash.title}
-                          </span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F0EBE0] text-[#564735] font-mono font-semibold">
-                            {clash.regNo}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-[#75634B] flex items-center gap-2">
-                          <span>{clash.language}</span>
-                          <span>•</span>
-                          <span>{clash.state}</span>
-                          <span>•</span>
-                          <span className="text-[#382E22] font-medium">{clash.reason}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <div className={`text-base font-extrabold font-mono ${
-                            clash.similarity >= 80 ? 'text-rose-700' :
-                            clash.similarity >= 50 ? 'text-amber-700' : 'text-stone-700'
-                          }`}>
-                            {clash.similarity}%
-                          </div>
-                          <span className="text-[10px] uppercase tracking-wider text-[#A8A29E] font-bold font-mono">
-                            {clash.matchType}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ClashingTitlesList
+              className="lg:col-span-7"
+              clashingTitles={result.clashingTitles}
+              maxItems={5}
+            />
           </div>
 
           {/* Deterministic PRGI Government Rules Matrix */}
-          <div className="beige-card rounded-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
-              <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
-                <FileText className="w-4 h-4 text-amber-700" />
-                <span>Deterministic PRGI Statutory Rulebook (Member 4 Rules Engine)</span>
-              </div>
-              <span className="text-[11px] text-[#75634B] font-mono">PRGI 2025 Act</span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {result.ruleViolations.map((rule) => (
-                <div
-                  key={rule.ruleId}
-                  className={`p-3.5 rounded-xl border ${
-                    rule.passed
-                      ? 'bg-white border-[#E2D7C5] text-[#292524]'
-                      : 'bg-rose-50 border-rose-200 text-[#292524]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#F8F6F0] border border-[#DDD1BF] text-[#564735]">
-                      {rule.ruleId}
-                    </span>
-                    {rule.passed ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>PASSED</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-rose-700">
-                        <XCircle className="w-3.5 h-3.5" />
-                        <span>FAILED</span>
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="font-bold text-xs text-[#1C1917] mb-1">{rule.ruleName}</div>
-                  <p className="text-[11px] text-[#564735] mb-2 leading-relaxed">
-                    {rule.description}
-                  </p>
-                  <div className="text-[10px] text-[#A8A29E] font-mono truncate">
-                    {rule.clause}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <RuleViolationsGrid ruleViolations={result.ruleViolations} />
         </div>
       )}
     </div>
