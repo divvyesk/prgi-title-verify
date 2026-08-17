@@ -13,12 +13,11 @@ into the running state and moves to the next node per the edges below.
                        ^                        |
                        +---------- "no" --------+
 
-Node implementations here are STUBS (Prompt 2). Prompt 3 replaces
-interviewer/generator with real LLM calls (agents/nodes/interviewer.py,
-agents/nodes/generator.py); Prompt 4 replaces verifier/ranker
-(agents/nodes/verifier.py, agents/nodes/ranker.py) and adds the offline
-fallback. The graph SHAPE — nodes, edges, the retry condition — does not
-change across those prompts.
+interviewer/generator are real as of Prompt 3 — real LLM calls via
+agents/llm.py (agents/nodes/interviewer.py, agents/nodes/generator.py).
+Prompt 4 replaces verifier/ranker (agents/nodes/verifier.py,
+agents/nodes/ranker.py) and adds the offline fallback. The graph SHAPE —
+nodes, edges, the retry condition — does not change across those prompts.
 """
 
 from __future__ import annotations
@@ -27,30 +26,11 @@ from langgraph.graph import END, StateGraph
 
 from agents.clients import FixtureVerifyClient
 from agents.config import settings
+from agents.nodes.generator import generator_node
+from agents.nodes.interviewer import interviewer_node
 from agents.state import StudioState
 
 _verify_client = FixtureVerifyClient()
-
-
-def interviewer_node(state: StudioState) -> dict:
-    """STUB (Prompt 2). Real version (Prompt 3): an LLM call producing a
-    3-4 sentence creative brief from state['details']."""
-    details = state["details"]
-    brief = (
-        f"A {details.get('tone', 'neutral')}-toned {details.get('genre', 'publication')} "
-        f"for {details.get('state', 'the region')}, in {details.get('language', 'the local language')}. "
-        "[STUB BRIEF — Prompt 3 replaces this with a real LLM call.]"
-    )
-    return {"brief": brief}
-
-
-def generator_node(state: StudioState) -> dict:
-    """STUB (Prompt 2). Real version (Prompt 3): an LLM call seeded with
-    real regional titles from title_master.csv, producing exactly 18
-    candidates, with rejection feedback folded in on retries."""
-    attempt = state.get("attempt", 0)
-    candidates = [f"Stub Candidate Title {attempt}-{i}" for i in range(18)]
-    return {"candidates": candidates}
 
 
 def verifier_node(state: StudioState) -> dict:
