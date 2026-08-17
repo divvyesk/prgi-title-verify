@@ -23,6 +23,11 @@
   code, pre, .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
+
+  :focus-visible {
+    outline: 2px solid #92400E;
+    outline-offset: 2px;
+  }
 }
 
 /* Warm Beige Glass Panels & Card Styles */
@@ -121,5 +126,91 @@
     rgba(4, 120, 87, 0.4) 55%,
     transparent 100%
   );
+}
+
+/* ==========================================================================
+   OFFICIAL PRGI AUDIT MEMORANDUM - PRINT STYLESHEET (@media print)
+   Deliberately overrides the web theme for pristine, standardized black-on-white
+   government legal documentation / PDF output with zero JavaScript dependencies.
+   ========================================================================== */
+@media print {
+  /* Page setup for clean A4 legal documentation */
+  @page {
+    size: A4 portrait;
+    margin: 1.2cm 1.5cm;
+  }
+
+  /* Hide interactive UI, navigation, 3D canvases, modals, and buttons */
+  header,
+  nav,
+  footer,
+  button,
+  canvas,
+  .no-print,
+  .canvas-container,
+  .roadmap-modal,
+  [role="dialog"] > div[aria-hidden="true"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Force background to pure white and text to solid black */
+  html, body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Expand memorandum document to full width without borders or dialog backdrop */
+  #prgi-memorandum {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  [role="dialog"] {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure tables render with high-contrast borders and full width */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: avoid !important;
+  }
+
+  th, td {
+    border: 1px solid #333333 !important;
+    color: #000000 !important;
+    padding: 6px 8px !important;
+  }
+
+  th {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Prevent awkward page cuts */
+  h1, h2, h3, h4, h5, h6, tr, .avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 }
 

@@ -1,0 +1,47 @@
+{
+  "inputTitle": "Aditi National Strategy Review",
+  "normalizedTitle": "aditi national strategy review",
+  "detectedLanguage": "English",
+  "transliteratedTitle": "aditi national strategy review",
+  "coreWords": [
+    "aditi",
+    "national",
+    "strategy",
+    "review"
+  ],
+  "verdict": "APPROVED",
+  "verdictScore": 8.0,
+  "similarityBreakdown": {
+    "lexicalScore": 12.0,
+    "phoneticScore": 6.0,
+    "semanticScore": 9.0,
+    "coreWordScore": 5.0,
+    "blendedScore": 8.0
+  },
+  "clashingTitles": [],
+  "ruleViolations": [
+    {
+      "ruleId": "R-PASS-01",
+      "ruleName": "Single Generic Word Protection",
+      "severity": "INFO",
+      "description": "Title contains multiple distinctive tokens.",
+      "clause": "PRP Act 2023 Statutory Guidelines, Section 1.1 (Generic Token Minimum Complexity)",
+      "passed": true
+    },
+    {
+      "ruleId": "R-PASS-02",
+      "ruleName": "Deceptive Similarity Check",
+      "severity": "INFO",
+      "description": "No conflicting registered title found within threshold.",
+      "clause": "PRP Act 2023 Statutory Guidelines, Section 2.1 (Non-Deceptive Title Distinctiveness)",
+      "passed": true
+    }
+  ],
+  "explanation": "Title is distinct, compliant with all statutory guidelines, and clear of conflicts with registered publications in the jurisdiction.",
+  "recommendedAction": "Proceed with issuance of official Certificate of Title Verification.",
+  "guidelineCitations": [
+    "PRP Act 2023 Statutory Guidelines, Clear Status Clause 1.4"
+  ],
+  "processingTimeMs": 303,
+  "timestamp": "2026-08-17T09:12:04Z"
+}
