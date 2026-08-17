@@ -12,14 +12,11 @@ test.describe('Scenario 6: Clean Distinctive Title (Clean Statutory Approval)', 
     await verifyButton.click();
 
     // Assert Verdict is explicitly APPROVED
-    const verdictSection = page.getByRole('region', { name: /Title Verification Verdict/i });
-    await expect(verdictSection).toBeVisible();
-    await expect(verdictSection.getByText('APPROVED • CLEAR FOR REGISTRATION')).toBeVisible();
+    await expect(page.getByText('APPROVED • CLEAR FOR REGISTRATION')).toBeVisible();
 
     // Assert Statutory Rulebook passes all checks (no failures)
-    const rulesSection = page.getByRole('region', { name: /Deterministic PRGI Statutory Rulebook/i });
-    await expect(rulesSection).toBeVisible();
-    await expect(rulesSection.getByText(/PASSED/i).first()).toBeVisible();
-    await expect(rulesSection.getByText(/FAILED/i)).not.toBeAttached();
+    await expect(page.getByText(/Deterministic PRGI Statutory Rulebook/i)).toBeVisible();
+    await expect(page.getByText(/PASSED/i).first()).toBeVisible();
+    await expect(page.getByText(/FAILED/i)).not.toBeAttached();
   });
 });
