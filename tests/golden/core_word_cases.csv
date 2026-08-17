@@ -1,1 +1,15 @@
 query,candidate,expected_min,expected_max,note
+The Vidarbha Daily Express,Vidarbha Patrika,85,100,Root-hijacking demo: both reduce to core=vidarbha — must be near-100 (the canonical required case)
+The Daily News,The Weekly Times,0,15,Both titles are all-stopwords (core empty) — must return 0.0 per empty-core guard
+Dainik Jagran,Jagran Daily,90,100,Word-order reversal of the same core word jagran — Jaccard must return 100
+Rajasthan Patrika,Rajasthan Samachar,90,100,Shared distinctive root rajasthan — exact Jaccard match despite different second words
+Rajasthan Patrika,Gujarat Samachar,0,50,Different state names — fuzzy overlap between rajasthan and gujarat is low but non-zero
+Punjab Kesari,Punjab Bhaskar,60,90,Shared core token punjab; kesari vs bhaskar differ — Jaccard partial overlap
+Vidharbha Express,Vidarbha Patrika,85,100,Spelling variant vidharbha vs vidarbha — fuzzy overlap must catch this near-miss
+Hindustan Times,Hindustan Samachar,90,100,Shared core hindustan — straightforward Jaccard 100 after stripping times/samachar
+Deccan Herald,Deccan Chronicle,90,100,Shared core deccan — exact Jaccard match; herald and chronicle both stopwords
+The Tribune,Tribune Media,90,100,Single shared distinctive root tribune — must flag as clash
+Delhi Times,Delhi Chronicle,90,100,Shared core delhi — both times and chronicle are stopwords
+Navbharat Times,Navbharat Sandesh,0,10,Both titles strip to empty core (navbharat and sandesh are stopwords) — must return 0.0
+Kerala Kaumudi,Vidarbha Patrika,0,35,Completely different regions — no meaningful core overlap
+Deccan Herald,Deccan Herald,100,100,Identical titles must always return exactly 100
