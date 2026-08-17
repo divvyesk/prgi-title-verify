@@ -1,0 +1,65 @@
+{
+  "inputTitle": "Jaagran",
+  "normalizedTitle": "jaagran",
+  "detectedLanguage": "English",
+  "transliteratedTitle": "jaagran",
+  "coreWords": [
+    "jaagran"
+  ],
+  "verdict": "MANUAL_REVIEW",
+  "verdictScore": 61.0,
+  "similarityBreakdown": {
+    "lexicalScore": 58.0,
+    "phoneticScore": 88.0,
+    "semanticScore": 22.0,
+    "coreWordScore": 61.0,
+    "blendedScore": 61.0
+  },
+  "clashingTitles": [
+    {
+      "title": "AJMER JAGRAN",
+      "regNo": "54657",
+      "language": "Hindi",
+      "state": "Rajasthan",
+      "similarity": 88.0,
+      "matchType": "PHONETIC",
+      "reason": "Confusingly similar phonetic sound and pronunciation to a registered title sharing the same root."
+    },
+    {
+      "title": "ANCHALIK JAGRAN",
+      "regNo": "66491",
+      "language": "Hindi",
+      "state": "Madhya Pradesh",
+      "similarity": 71.0,
+      "matchType": "PHONETIC",
+      "reason": "Sounds-alike match on the shared root \"jagran\"."
+    },
+    {
+      "title": "BARDHAMAN JAGARANI",
+      "regNo": "44065",
+      "language": "Bengali",
+      "state": "West Bengal",
+      "similarity": 64.0,
+      "matchType": "CORE_WORD",
+      "matchedCoreWord": "jagran",
+      "reason": "Shares the distinctive root token \"jagran\" after filler-word stripping."
+    }
+  ],
+  "ruleViolations": [],
+  "explanation": "The proposed title has moderate phonetic proximity (88% clash) with existing registered title \"AJMER JAGRAN\". Requires scrutiny by the District Magistrate / PRGI reviewing officer.",
+  "recommendedAction": "Consider adding an authorized geographic prefix or distinctive institutional qualifier.",
+  "guidelineCitations": [
+    "PRGI Verification Guidelines, Section 3.1 (Borderline Substantial Discretion)"
+  ],
+  "stageTimings": {
+    "normalize": 2.1,
+    "shortlist": 51.4,
+    "score": 268.9,
+    "check": 5.8,
+    "explain": 96.0
+  },
+  "engine": "LIVE",
+  "cached": false,
+  "processingTimeMs": 424,
+  "timestamp": "2026-08-17T09:14:22Z"
+}

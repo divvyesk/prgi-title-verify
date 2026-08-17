@@ -1,0 +1,1802 @@
+[
+  {
+    "titleId": 14594,
+    "title": "CRIME SPURT",
+    "regNo": "UPHIN/2002/08908",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.9735,
+    "source": "trigram"
+  },
+  {
+    "titleId": 36051,
+    "title": "LIVESTOCK SPHERE",
+    "regNo": "DELENG/2012/40748",
+    "language": "English",
+    "state": "Delhi",
+    "rawScore": 0.9691,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 3280,
+    "title": "ALIGARH JOURNAL OF ENGLISH STUDIES",
+    "regNo": "29062",
+    "language": "English",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.9457,
+    "source": "bm25"
+  },
+  {
+    "titleId": 32101,
+    "title": "KARMAINI KI AWAJ",
+    "regNo": "UPHIN/2022/90670",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.9386,
+    "source": "vector"
+  },
+  {
+    "titleId": 71548,
+    "title": "TELUGU NIZALU",
+    "regNo": "45056",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.9384,
+    "source": "vector"
+  },
+  {
+    "titleId": 13436,
+    "title": "CHITRAKAM",
+    "regNo": "15348",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.9356,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 29259,
+    "title": "JANTA BULLETIN",
+    "regNo": "51448",
+    "language": "Punjabi",
+    "state": "Punjab",
+    "rawScore": 0.9343,
+    "source": "trigram"
+  },
+  {
+    "titleId": 3907,
+    "title": "AMHI VANJARI",
+    "regNo": "MAHMAR/2016/75004",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.9301,
+    "source": "trigram"
+  },
+  {
+    "titleId": 18291,
+    "title": "DOON PATHIK",
+    "regNo": "UTTHIN/2021/81013",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.9283,
+    "source": "bm25"
+  },
+  {
+    "titleId": 4167,
+    "title": "Amrut Vel",
+    "regNo": "MHMAR/25/A2962",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.9283,
+    "source": "vector"
+  },
+  {
+    "titleId": 77463,
+    "title": "VANYALOKA",
+    "regNo": "KARKAN/2023/89434",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.928,
+    "source": "bm25"
+  },
+  {
+    "titleId": 55368,
+    "title": "RAJPUT DARPAN",
+    "regNo": "MPHIN/2009/29540",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.9256,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 11397,
+    "title": "BRIJ VASI EXPRESS",
+    "regNo": "UPHIN/2016/69102",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.9243,
+    "source": "trigram"
+  },
+  {
+    "titleId": 12282,
+    "title": "CHALUKYA KARNATAKA",
+    "regNo": "KARKAN/2012/45343",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.9132,
+    "source": "bm25"
+  },
+  {
+    "titleId": 30498,
+    "title": "Justice Ambit",
+    "regNo": "RJBIL/26/A2945",
+    "language": "Hindi",
+    "state": "Rajasthan",
+    "rawScore": 0.8999,
+    "source": "vector"
+  },
+  {
+    "titleId": 28660,
+    "title": "JANAMANASACHI SHIDORI",
+    "regNo": "MAHMAR/2010/33438",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.8953,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 3480,
+    "title": "AMAN KA PRADESH",
+    "regNo": "MPHIN/2010/37107",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.8936,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 66303,
+    "title": "Siddhi Sagara",
+    "regNo": "KNKAN/25/A2275",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.8927,
+    "source": "trigram"
+  },
+  {
+    "titleId": 71492,
+    "title": "TELESCOPE TODAY",
+    "regNo": "UPHIN/26/A4882",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.888,
+    "source": "bm25"
+  },
+  {
+    "titleId": 73629,
+    "title": "THE SUNDAY STATESMAN",
+    "regNo": "59445",
+    "language": "English",
+    "state": "Delhi",
+    "rawScore": 0.8768,
+    "source": "vector"
+  },
+  {
+    "titleId": 78973,
+    "title": "VIJAYANAGARA TIMES",
+    "regNo": "KARKAN/2023/88088",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.8756,
+    "source": "bm25"
+  },
+  {
+    "titleId": 26065,
+    "title": "INDIAN AGE",
+    "regNo": "KARENG/2014/57502",
+    "language": "English",
+    "state": "Karnataka",
+    "rawScore": 0.8744,
+    "source": "trigram"
+  },
+  {
+    "titleId": 28896,
+    "title": "JANEPHAL TIMES",
+    "regNo": "MAHBIL/2015/65575",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.8703,
+    "source": "vector"
+  },
+  {
+    "titleId": 58944,
+    "title": "SAHITYA GODHULI",
+    "regNo": "ODIODI/2015/65936",
+    "language": "Oriya",
+    "state": "Odisha",
+    "rawScore": 0.8654,
+    "source": "trigram"
+  },
+  {
+    "titleId": 36466,
+    "title": "LOK SANSKAR",
+    "regNo": "MAHMAR/2010/35626",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.8595,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 852,
+    "title": "AAPKI KHABAR",
+    "regNo": "DELHIN/2001/05619",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.8578,
+    "source": "vector"
+  },
+  {
+    "titleId": 55053,
+    "title": "RAJCHAKRA SANBAD PATRIKA",
+    "regNo": "WBBEN/2001/06436",
+    "language": "Bengali",
+    "state": "West Bengal",
+    "rawScore": 0.851,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 77302,
+    "title": "VANAKRUPA",
+    "regNo": "KARKAN/1981/06135",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.8374,
+    "source": "bm25"
+  },
+  {
+    "titleId": 44663,
+    "title": "NAYA RAIPUR POST",
+    "regNo": "CHHHIN/2014/56115",
+    "language": "Hindi",
+    "state": "Chhattisgarh",
+    "rawScore": 0.8335,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 44184,
+    "title": "NAVA MARATHA",
+    "regNo": "11439",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.8286,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 20929,
+    "title": "GARHWAL KI PEEDA",
+    "regNo": "UTTHIN/2015/60574",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.8256,
+    "source": "trigram"
+  },
+  {
+    "titleId": 55458,
+    "title": "Rajya Samskarana",
+    "regNo": "TGBIL/26/A6717",
+    "language": "Telugu",
+    "state": "Telangana",
+    "rawScore": 0.8243,
+    "source": "bm25"
+  },
+  {
+    "titleId": 28224,
+    "title": "JAN PRASTAVANA",
+    "regNo": "DELHIN/2014/57754",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.8167,
+    "source": "bm25"
+  },
+  {
+    "titleId": 12158,
+    "title": "CHAITANYA LOK",
+    "regNo": "MPBIL/2013/51467",
+    "language": "Santhali",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.8167,
+    "source": "trigram"
+  },
+  {
+    "titleId": 49863,
+    "title": "PICTURE PLUS",
+    "regNo": "DELBIL/2016/69352",
+    "language": "English",
+    "state": "Delhi",
+    "rawScore": 0.814,
+    "source": "bm25"
+  },
+  {
+    "titleId": 36424,
+    "title": "LOK SAAR",
+    "regNo": "MPHIN/2016/70881",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.813,
+    "source": "vector"
+  },
+  {
+    "titleId": 20382,
+    "title": "Front vision",
+    "regNo": "UAHIN/26/A1255",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.8101,
+    "source": "trigram"
+  },
+  {
+    "titleId": 47118,
+    "title": "NUTAN SATTA PRAVAH",
+    "regNo": "UPHIN/1999/00608",
+    "language": "English",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.7967,
+    "source": "vector"
+  },
+  {
+    "titleId": 13398,
+    "title": "CHIRAG PRAKASH",
+    "regNo": "UPHIN/26/A3051",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.792,
+    "source": "vector"
+  },
+  {
+    "titleId": 45148,
+    "title": "NETI SHUBHODAYA",
+    "regNo": "APTEL/26/A1193",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.7876,
+    "source": "trigram"
+  },
+  {
+    "titleId": 5697,
+    "title": "ARANYAGARJANA",
+    "regNo": "TEL/2017/72546",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.7823,
+    "source": "vector"
+  },
+  {
+    "titleId": 12678,
+    "title": "CHARCHA AAJ KI",
+    "regNo": "MPHIN/2017/74514",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.7791,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 49681,
+    "title": "Peoples Update",
+    "regNo": "MPHIN/26/A5844",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.7684,
+    "source": "vector"
+  },
+  {
+    "titleId": 10330,
+    "title": "BHOOMIMANCH",
+    "regNo": "MAHMAR/2019/77318",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.7653,
+    "source": "trigram"
+  },
+  {
+    "titleId": 79197,
+    "title": "VILLAGE ERA",
+    "regNo": "HARHIN/2020/79949",
+    "language": "Hindi",
+    "state": "Haryana",
+    "rawScore": 0.762,
+    "source": "bm25"
+  },
+  {
+    "titleId": 34674,
+    "title": "KRANTIKARI SANKET",
+    "regNo": "54158",
+    "language": "Hindi",
+    "state": "Chhattisgarh",
+    "rawScore": 0.7605,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 70350,
+    "title": "Tadaf Dar Neta",
+    "regNo": "MHMAR/26/A5924",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.7593,
+    "source": "bm25"
+  },
+  {
+    "titleId": 16363,
+    "title": "DESH KE RAHI",
+    "regNo": "UTTHIN/2010/33008",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.7577,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 60283,
+    "title": "SAMAY KI PAHAL",
+    "regNo": "MPHIN/1999/10343",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.7571,
+    "source": "trigram"
+  },
+  {
+    "titleId": 81136,
+    "title": "What Packaging",
+    "regNo": "MHENG/26/A5420",
+    "language": "English",
+    "state": "Maharashtra",
+    "rawScore": 0.7479,
+    "source": "trigram"
+  },
+  {
+    "titleId": 47466,
+    "title": "OM SARTHAK",
+    "regNo": "ODIODI/2021/82436",
+    "language": "Oriya",
+    "state": "Odisha",
+    "rawScore": 0.7376,
+    "source": "bm25"
+  },
+  {
+    "titleId": 72423,
+    "title": "THE Florence Nightingale TIMES",
+    "regNo": "RJENG/26/A1850",
+    "language": "English",
+    "state": "Rajasthan",
+    "rawScore": 0.7312,
+    "source": "bm25"
+  },
+  {
+    "titleId": 82463,
+    "title": "ZARB-E-KALEEM",
+    "regNo": "38998",
+    "language": "Urdu",
+    "state": "Telangana",
+    "rawScore": 0.731,
+    "source": "vector"
+  },
+  {
+    "titleId": 25206,
+    "title": "HOME NEWS",
+    "regNo": "UPHIN/2016/69910",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.7249,
+    "source": "vector"
+  },
+  {
+    "titleId": 9118,
+    "title": "BETWA KI RAHEN",
+    "regNo": "MPHIN/2021/90214",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.7216,
+    "source": "trigram"
+  },
+  {
+    "titleId": 38430,
+    "title": "MAHIR",
+    "regNo": "DELURD/2013/50272",
+    "language": "Urdu",
+    "state": "Delhi",
+    "rawScore": 0.7201,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 6008,
+    "title": "ARTH MANTRA",
+    "regNo": "MAHMAR/2019/78243",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.7191,
+    "source": "bm25"
+  },
+  {
+    "titleId": 75740,
+    "title": "UJJWALA KIRANA",
+    "regNo": "KARKAN/2018/76436",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.713,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 29874,
+    "title": "JHANSI SAMACHAR",
+    "regNo": "13590",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.7097,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 37933,
+    "title": "MAHANAGAR TIMES",
+    "regNo": "UPHIN/2004/12304",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.6981,
+    "source": "vector"
+  },
+  {
+    "titleId": 49889,
+    "title": "Pillar of Economy",
+    "regNo": "GJGUJ/26/A6079",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.6896,
+    "source": "vector"
+  },
+  {
+    "titleId": 10460,
+    "title": "BHOPAL SULTAN",
+    "regNo": "MPHIN/2016/67877",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.6816,
+    "source": "trigram"
+  },
+  {
+    "titleId": 30515,
+    "title": "JUTE MAGAZINE",
+    "regNo": "23799",
+    "language": "Hindi",
+    "state": "",
+    "rawScore": 0.6781,
+    "source": "bm25"
+  },
+  {
+    "titleId": 48586,
+    "title": "PARAKRAMI",
+    "regNo": "MAHMAR/2021/90037",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.674,
+    "source": "trigram"
+  },
+  {
+    "titleId": 13240,
+    "title": "CHHAYA DRISHTI",
+    "regNo": "UPHIN/2021/82962",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.6671,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 59495,
+    "title": "SALT LAKE SHAKTI",
+    "regNo": "WBHIN/2008/23751",
+    "language": "Hindi",
+    "state": "West Bengal",
+    "rawScore": 0.6635,
+    "source": "bm25"
+  },
+  {
+    "titleId": 21322,
+    "title": "Ghatna New Shahibaug",
+    "regNo": "GJGUJ/26/A6826",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.6609,
+    "source": "vector"
+  },
+  {
+    "titleId": 36437,
+    "title": "LOK SAKSHAM VARTA",
+    "regNo": "MPHIN/2021/86068",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.658,
+    "source": "trigram"
+  },
+  {
+    "titleId": 46632,
+    "title": "NISHASTRA YODHA",
+    "regNo": "MHMAR/26/A1288",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.6538,
+    "source": "bm25"
+  },
+  {
+    "titleId": 9360,
+    "title": "BHARAT KI TRENDING KHABREN",
+    "regNo": "UPHIN/26/A5817",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.6529,
+    "source": "trigram"
+  },
+  {
+    "titleId": 47885,
+    "title": "PAGE ONE",
+    "regNo": "DELENG/2007/22463",
+    "language": "English",
+    "state": "Delhi",
+    "rawScore": 0.6484,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 34996,
+    "title": "KRUSHI VICHAR",
+    "regNo": "MAHMAR/2014/65198",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.6437,
+    "source": "vector"
+  },
+  {
+    "titleId": 70076,
+    "title": "SWATANTRA CHETNA",
+    "regNo": "UPHIN/2010/33193",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.6395,
+    "source": "vector"
+  },
+  {
+    "titleId": 21420,
+    "title": "GIRNAR AWAZ",
+    "regNo": "GUJGUJ/2019/78284",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.6335,
+    "source": "bm25"
+  },
+  {
+    "titleId": 27463,
+    "title": "JAGSACH",
+    "regNo": "HARHIN/2019/78011",
+    "language": "Hindi",
+    "state": "Haryana",
+    "rawScore": 0.6303,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 79906,
+    "title": "VISHWA VIJETA",
+    "regNo": "MAHMAR/2021/83575",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.6169,
+    "source": "bm25"
+  },
+  {
+    "titleId": 32090,
+    "title": "KARMA SUDHA",
+    "regNo": "64470",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.6166,
+    "source": "trigram"
+  },
+  {
+    "titleId": 60655,
+    "title": "Sampoorn News Network",
+    "regNo": "MPHIN/26/A0195",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.614,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 22434,
+    "title": "GUDACHARI",
+    "regNo": "APTEL/2011/36849",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.6123,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 49801,
+    "title": "PHIR EK NAI DUNIYA",
+    "regNo": "64571",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.6098,
+    "source": "vector"
+  },
+  {
+    "titleId": 28788,
+    "title": "JANATA PARISHAD",
+    "regNo": "35793",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.5991,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 42570,
+    "title": "NAALAI NAMADHE",
+    "regNo": "TNTAM/2023/88660",
+    "language": "Tamil",
+    "state": "Tamil Nadu",
+    "rawScore": 0.5908,
+    "source": "vector"
+  },
+  {
+    "titleId": 35385,
+    "title": "KUTCH RACHANA",
+    "regNo": "GUJGUJ/2019/78536",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.5836,
+    "source": "trigram"
+  },
+  {
+    "titleId": 4209,
+    "title": "ANAD MAHASAGAR",
+    "regNo": "MAHMAR/2021/80208",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.5812,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 73066,
+    "title": "THE MUMBAI CENTRAL",
+    "regNo": "MAHHIN/2013/49552",
+    "language": "Hindi",
+    "state": "Maharashtra",
+    "rawScore": 0.5807,
+    "source": "bm25"
+  },
+  {
+    "titleId": 7333,
+    "title": "AYURVEDA ACHCHE JEEVAN KE LIYE",
+    "regNo": "KERHIN/2014/68972",
+    "language": "Hindi",
+    "state": "Kerala",
+    "rawScore": 0.5763,
+    "source": "trigram"
+  },
+  {
+    "titleId": 30024,
+    "title": "JIVAN DAYANI",
+    "regNo": "UPHIN/2005/21858",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.5694,
+    "source": "bm25"
+  },
+  {
+    "titleId": 74407,
+    "title": "TIMES OF PALANPUR",
+    "regNo": "GUJGUJ/2015/63775",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.564,
+    "source": "trigram"
+  },
+  {
+    "titleId": 41350,
+    "title": "Mission Sach Ground Report",
+    "regNo": "RJHIN/26/A3941",
+    "language": "Hindi",
+    "state": "Rajasthan",
+    "rawScore": 0.5624,
+    "source": "vector"
+  },
+  {
+    "titleId": 8677,
+    "title": "BATKAHI",
+    "regNo": "UPHIN/2021/82967",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.5618,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 41248,
+    "title": "Mira Bhayander ki awaz",
+    "regNo": "MHHIN/25/A5161",
+    "language": "Hindi",
+    "state": "Maharashtra",
+    "rawScore": 0.5596,
+    "source": "bm25"
+  },
+  {
+    "titleId": 52647,
+    "title": "PRAVACHANA SABDAM",
+    "regNo": "KERMAL/2000/04129",
+    "language": "Malayalam",
+    "state": "Kerala",
+    "rawScore": 0.5558,
+    "source": "trigram"
+  },
+  {
+    "titleId": 27656,
+    "title": "JAIN SAMACHAR MANCH",
+    "regNo": "RAJHIN/2017/73312",
+    "language": "Hindi",
+    "state": "Rajasthan",
+    "rawScore": 0.5497,
+    "source": "vector"
+  },
+  {
+    "titleId": 35096,
+    "title": "Kuber Khazana",
+    "regNo": "MPHIN/26/A2745",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.5458,
+    "source": "bm25"
+  },
+  {
+    "titleId": 65501,
+    "title": "SHIVKRANTI",
+    "regNo": "MAHMAR/2008/28190",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.5378,
+    "source": "vector"
+  },
+  {
+    "titleId": 51922,
+    "title": "PRAJASAKTI",
+    "regNo": "APTEL/2007/20866",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.5309,
+    "source": "trigram"
+  },
+  {
+    "titleId": 18728,
+    "title": "EARLY MORNING",
+    "regNo": "JKENG/2012/47906",
+    "language": "English",
+    "state": "Jammu and Kashmir",
+    "rawScore": 0.5207,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 27872,
+    "title": "JAMBU LOCHAN TIMES",
+    "regNo": "JKENG/2015/65420",
+    "language": "English",
+    "state": "Jammu and Kashmir",
+    "rawScore": 0.518,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 34721,
+    "title": "KRISHAK DUNIYA",
+    "regNo": "28361",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.5148,
+    "source": "vector"
+  },
+  {
+    "titleId": 60208,
+    "title": "SAMAY BHASKAR",
+    "regNo": "DELHIN/2013/53273",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.5078,
+    "source": "bm25"
+  },
+  {
+    "titleId": 32328,
+    "title": "KARUNA",
+    "regNo": "6844",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.4994,
+    "source": "bm25"
+  },
+  {
+    "titleId": 18303,
+    "title": "DOON UJALA",
+    "regNo": "56879",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.4953,
+    "source": "trigram"
+  },
+  {
+    "titleId": 52416,
+    "title": "PRATHAM SWAR",
+    "regNo": "DELHIN/2009/28551",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.4926,
+    "source": "trigram"
+  },
+  {
+    "titleId": 70710,
+    "title": "TAPI MAIDHAN LINE",
+    "regNo": "MAHMAR/2015/63372",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.486,
+    "source": "vector"
+  },
+  {
+    "titleId": 76688,
+    "title": "UTTARANCHAL KA SAPNA",
+    "regNo": "UTTHIN/2005/15720",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.4845,
+    "source": "bm25"
+  },
+  {
+    "titleId": 56221,
+    "title": "RASHTRIYA NAGRIYA EVAM PANCHAYAT SAMACHAR",
+    "regNo": "MPHIN/2013/52007",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.4841,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 73645,
+    "title": "THE SUNDAY TIMES OF INDIA",
+    "regNo": "WBENG/1999/00957",
+    "language": "English",
+    "state": "West Bengal",
+    "rawScore": 0.4836,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 34441,
+    "title": "KOSHISH",
+    "regNo": "GUJGUJ/1999/00727",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.483,
+    "source": "trigram"
+  },
+  {
+    "titleId": 47513,
+    "title": "ONE TO ONE NEWS",
+    "regNo": "UPBIL/2016/73237",
+    "language": "English",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.4809,
+    "source": "bm25"
+  },
+  {
+    "titleId": 76550,
+    "title": "UTTARAKHAND ABHYUDAY",
+    "regNo": "UAHIN/26/A3063",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.4699,
+    "source": "vector"
+  },
+  {
+    "titleId": 64752,
+    "title": "SHAPATH TIMES",
+    "regNo": "DELHIN/2018/75107",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.4675,
+    "source": "bm25"
+  },
+  {
+    "titleId": 18133,
+    "title": "DLA AM",
+    "regNo": "UPENG/2007/21067",
+    "language": "English",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.4661,
+    "source": "vector"
+  },
+  {
+    "titleId": 28749,
+    "title": "JANASAMUDRAM",
+    "regNo": "APTEL/25/A5020",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.4652,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 66850,
+    "title": "SKYLINE",
+    "regNo": "APENG/2002/07362",
+    "language": "English",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.457,
+    "source": "trigram"
+  },
+  {
+    "titleId": 6177,
+    "title": "ARYAN EXPRESS",
+    "regNo": "UTTHIN/2010/36536",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.4561,
+    "source": "vector"
+  },
+  {
+    "titleId": 20036,
+    "title": "FINAL ALERT",
+    "regNo": "MPHIN/25/A4858",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.4474,
+    "source": "bm25"
+  },
+  {
+    "titleId": 82306,
+    "title": "YUVA SOCH",
+    "regNo": "DELBIL/2010/33887",
+    "language": "English",
+    "state": "Delhi",
+    "rawScore": 0.4369,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 11917,
+    "title": "CALCUTTA STATISTICAL ASSOCIATION BULLETIN",
+    "regNo": "30006",
+    "language": "English",
+    "state": "Delhi",
+    "rawScore": 0.4297,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 14373,
+    "title": "CRICKET DIARY",
+    "regNo": "UPHIN/2011/42067",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.427,
+    "source": "trigram"
+  },
+  {
+    "titleId": 50085,
+    "title": "POLICE FLASH NEWS",
+    "regNo": "MAHMAR/2013/50840",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.4137,
+    "source": "trigram"
+  },
+  {
+    "titleId": 50498,
+    "title": "POWERDAY",
+    "regNo": "APTEL/2009/42651",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.4117,
+    "source": "vector"
+  },
+  {
+    "titleId": 55399,
+    "title": "RAJSHAKTI AWAHAN",
+    "regNo": "MAHMAR/2016/75172",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.4093,
+    "source": "trigram"
+  },
+  {
+    "titleId": 20972,
+    "title": "GARIMA KA VIKAS",
+    "regNo": "MPHIN/25/A3679",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.4088,
+    "source": "vector"
+  },
+  {
+    "titleId": 8328,
+    "title": "BANIJYO BEEJ",
+    "regNo": "WBBEN/26/A3981",
+    "language": "Bengali",
+    "state": "West Bengal",
+    "rawScore": 0.4025,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 69418,
+    "title": "SUVARN INDIA",
+    "regNo": "MAHMAR/2022/89697",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.4021,
+    "source": "vector"
+  },
+  {
+    "titleId": 78238,
+    "title": "VICHAR ASTRA",
+    "regNo": "MAHMAR/2014/58651",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.4018,
+    "source": "bm25"
+  },
+  {
+    "titleId": 78170,
+    "title": "VETRI THALAPATHI",
+    "regNo": "TNTAM/2022/82716",
+    "language": "Tamil",
+    "state": "Tamil Nadu",
+    "rawScore": 0.3952,
+    "source": "bm25"
+  },
+  {
+    "titleId": 1505,
+    "title": "ACTION INDIA",
+    "regNo": "DELHIN/2006/19302",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.3852,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 72578,
+    "title": "THE HINDU",
+    "regNo": "KARENG/2002/50180",
+    "language": "English",
+    "state": "Karnataka",
+    "rawScore": 0.382,
+    "source": "bm25"
+  },
+  {
+    "titleId": 61414,
+    "title": "SANGIN EXPRESS",
+    "regNo": "MPHIN/2016/71034",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.3804,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 44653,
+    "title": "NAYA NAZARIYA",
+    "regNo": "MPHIN/26/A4844",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.3728,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 32956,
+    "title": "KESARIA KRANTI",
+    "regNo": "65606",
+    "language": "Hindi",
+    "state": "Rajasthan",
+    "rawScore": 0.3632,
+    "source": "trigram"
+  },
+  {
+    "titleId": 70447,
+    "title": "Takht Baaten",
+    "regNo": "CTHIN/25/A5055",
+    "language": "Hindi",
+    "state": "Chhattisgarh",
+    "rawScore": 0.3561,
+    "source": "trigram"
+  },
+  {
+    "titleId": 15016,
+    "title": "DAINIK BHASKAR",
+    "regNo": "CHHHIN/2008/28623",
+    "language": "Hindi",
+    "state": "Chhattisgarh",
+    "rawScore": 0.3492,
+    "source": "vector"
+  },
+  {
+    "titleId": 57051,
+    "title": "REPUBLIC REPORT",
+    "regNo": "MPBIL/26/A1470",
+    "language": "English",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.348,
+    "source": "bm25"
+  },
+  {
+    "titleId": 426,
+    "title": "AAJ KI AZADHI",
+    "regNo": "MAHMAR/2004/13566",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.3438,
+    "source": "trigram"
+  },
+  {
+    "titleId": 34976,
+    "title": "KRUSHI DUT",
+    "regNo": "MAHMAR/2013/49183",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.3434,
+    "source": "bm25"
+  },
+  {
+    "titleId": 38472,
+    "title": "MAHNAMA SUFI E MILLAT",
+    "regNo": "GUJMUL/2018/77000",
+    "language": "English",
+    "state": "Gujarat",
+    "rawScore": 0.3421,
+    "source": "trigram"
+  },
+  {
+    "titleId": 20733,
+    "title": "GANGA NEWS",
+    "regNo": "APTEL/2012/47549",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.3376,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 14623,
+    "title": "CRIME VASTAV",
+    "regNo": "KARKAN/2008/30200",
+    "language": "Kannada",
+    "state": "Chhattisgarh",
+    "rawScore": 0.3355,
+    "source": "vector"
+  },
+  {
+    "titleId": 34525,
+    "title": "KOVAI KURAL",
+    "regNo": "TNBIL/2013/54782",
+    "language": "English",
+    "state": "Tamil Nadu",
+    "rawScore": 0.329,
+    "source": "bm25"
+  },
+  {
+    "titleId": 59536,
+    "title": "SAMACHAR ANUSANDHAN",
+    "regNo": "MPHIN/2011/40511",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.3151,
+    "source": "vector"
+  },
+  {
+    "titleId": 13949,
+    "title": "CIVIL SERVICE PATHI",
+    "regNo": "ODIODI/2015/66270",
+    "language": "Oriya",
+    "state": "Odisha",
+    "rawScore": 0.3051,
+    "source": "bm25"
+  },
+  {
+    "titleId": 65678,
+    "title": "SHRADDHA PRABHA",
+    "regNo": "APTEL/2018/76089",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.3028,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 66608,
+    "title": "SINHAVLOKAN",
+    "regNo": "MHMAR/25/A0582",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.3024,
+    "source": "trigram"
+  },
+  {
+    "titleId": 79884,
+    "title": "VISHWA SHAKTI",
+    "regNo": "KNKAN/26/A1353",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.3019,
+    "source": "bm25"
+  },
+  {
+    "titleId": 26074,
+    "title": "INDIAN BUSINESS NEWS",
+    "regNo": "CHHHIN/2021/80762",
+    "language": "Hindi",
+    "state": "Chhattisgarh",
+    "rawScore": 0.2989,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 82025,
+    "title": "YUG VAHAK",
+    "regNo": "10108",
+    "language": "English",
+    "state": "Haryana",
+    "rawScore": 0.2956,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 23419,
+    "title": "HAMARA KRISHAK",
+    "regNo": "MPHIN/2016/68263",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.2936,
+    "source": "vector"
+  },
+  {
+    "titleId": 66606,
+    "title": "Sinhasan Rananeeti",
+    "regNo": "MPHIN/25/A3483",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.2838,
+    "source": "trigram"
+  },
+  {
+    "titleId": 39120,
+    "title": "Manas Archan",
+    "regNo": "MPHIN/26/A1076",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.2755,
+    "source": "vector"
+  },
+  {
+    "titleId": 21177,
+    "title": "GCOWN JOURNAL THE PURVIEW",
+    "regNo": "JKENG/2017/75991",
+    "language": "English",
+    "state": "Jammu and Kashmir",
+    "rawScore": 0.2735,
+    "source": "bm25"
+  },
+  {
+    "titleId": 70763,
+    "title": "TARAI DARPAN",
+    "regNo": "UPHIN/2013/52789",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.2683,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 49075,
+    "title": "PASHUDHAN GYAN",
+    "regNo": "HARHIN/2015/63352",
+    "language": "Hindi",
+    "state": "Haryana",
+    "rawScore": 0.2651,
+    "source": "trigram"
+  },
+  {
+    "titleId": 78570,
+    "title": "VIDHYA JAGAT",
+    "regNo": "GUJGUJ/2014/59069",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.2628,
+    "source": "bm25"
+  },
+  {
+    "titleId": 42553,
+    "title": "NAA ANVESHANA NAA NIGHA",
+    "regNo": "APTEL/25/A2421",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.2622,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 20035,
+    "title": "FINAL ALERT",
+    "regNo": "MPHIN/25/A4854",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.257,
+    "source": "vector"
+  },
+  {
+    "titleId": 75,
+    "title": "AACHRAN",
+    "regNo": "45267",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.2548,
+    "source": "trigram"
+  },
+  {
+    "titleId": 69580,
+    "title": "SWADESH",
+    "regNo": "22166",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.2511,
+    "source": "vector"
+  },
+  {
+    "titleId": 2553,
+    "title": "AJIT",
+    "regNo": "7107",
+    "language": "Punjabi",
+    "state": "Punjab",
+    "rawScore": 0.251,
+    "source": "trigram"
+  },
+  {
+    "titleId": 64108,
+    "title": "SHABAAS INDIA",
+    "regNo": "RAJHIN/2013/50192",
+    "language": "Hindi",
+    "state": "Rajasthan",
+    "rawScore": 0.2486,
+    "source": "vector"
+  },
+  {
+    "titleId": 40309,
+    "title": "MAZDOOR MURASU",
+    "regNo": "TNTAM/2009/30920",
+    "language": "Tamil",
+    "state": "Tamil Nadu",
+    "rawScore": 0.2322,
+    "source": "vector"
+  },
+  {
+    "titleId": 14664,
+    "title": "CROSS FIRE",
+    "regNo": "JHAHIN/2012/46774",
+    "language": "Hindi",
+    "state": "Jharkhand",
+    "rawScore": 0.2189,
+    "source": "bm25"
+  },
+  {
+    "titleId": 74430,
+    "title": "Times of Viraja",
+    "regNo": "KNKAN/26/A0960",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.2188,
+    "source": "vector"
+  },
+  {
+    "titleId": 47642,
+    "title": "ORUMA",
+    "regNo": "KERMAL/2007/19366",
+    "language": "Malayalam",
+    "state": "Kerala",
+    "rawScore": 0.2113,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 10324,
+    "title": "BHOOMIKA",
+    "regNo": "APTEL/2001/05362",
+    "language": "Telugu",
+    "state": "Telangana",
+    "rawScore": 0.2085,
+    "source": "trigram"
+  },
+  {
+    "titleId": 7594,
+    "title": "BACK STORY",
+    "regNo": "MPHIN/2011/39396",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.2075,
+    "source": "bm25"
+  },
+  {
+    "titleId": 31388,
+    "title": "KALNIRNAY",
+    "regNo": "MAHGUJ/2000/00491",
+    "language": "Gujarati",
+    "state": "Maharashtra",
+    "rawScore": 0.2027,
+    "source": "trigram"
+  },
+  {
+    "titleId": 63765,
+    "title": "SEARCHING EYES",
+    "regNo": "UPHIN/2010/48202",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.1948,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 31574,
+    "title": "KAMAL RAGHUVANSHI MAIL",
+    "regNo": "67314",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.1936,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 9073,
+    "title": "BETAL KI DUNIYA",
+    "regNo": "69081",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.1928,
+    "source": "vector"
+  },
+  {
+    "titleId": 11228,
+    "title": "BRAHMADHAM EXPRESS",
+    "regNo": "RAJHIN/2020/79910",
+    "language": "Hindi",
+    "state": "Rajasthan",
+    "rawScore": 0.1891,
+    "source": "bm25"
+  },
+  {
+    "titleId": 16830,
+    "title": "DHAB DHABA",
+    "regNo": "67379",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.1777,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 69888,
+    "title": "Swarna Bharat Times",
+    "regNo": "KNBIL/26/A5237",
+    "language": "Kannada",
+    "state": "Karnataka",
+    "rawScore": 0.1687,
+    "source": "trigram"
+  },
+  {
+    "titleId": 69229,
+    "title": "SURYA BULLETIN",
+    "regNo": "UAHIN/26/A5715",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.1633,
+    "source": "vector"
+  },
+  {
+    "titleId": 16485,
+    "title": "DESH UJALA",
+    "regNo": "UAHIN/26/A4581",
+    "language": "Hindi",
+    "state": "Uttarakhand",
+    "rawScore": 0.1606,
+    "source": "bm25"
+  },
+  {
+    "titleId": 62362,
+    "title": "SARTHI VISION INDIA",
+    "regNo": "MPHIN/2015/67308",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.1603,
+    "source": "vector"
+  },
+  {
+    "titleId": 21646,
+    "title": "GODIYA TIMES",
+    "regNo": "MPHIN/2004/13214",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.1546,
+    "source": "bm25"
+  },
+  {
+    "titleId": 55527,
+    "title": "RAKTA SURYA",
+    "regNo": "31207",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.1502,
+    "source": "bm25"
+  },
+  {
+    "titleId": 27763,
+    "title": "JALA SEDHYAM",
+    "regNo": "TNTEL/2018/75501",
+    "language": "Telugu",
+    "state": "Tamil Nadu",
+    "rawScore": 0.1477,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 72129,
+    "title": "THE COMPASSIONATE CHRIST",
+    "regNo": "TNTAM/2016/69641",
+    "language": "Tamil",
+    "state": "Tamil Nadu",
+    "rawScore": 0.1419,
+    "source": "trigram"
+  },
+  {
+    "titleId": 34744,
+    "title": "KRISHAK SADHANA",
+    "regNo": "MPHIN/2005/16663",
+    "language": "Hindi",
+    "state": "Madhya Pradesh",
+    "rawScore": 0.1392,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 79573,
+    "title": "VISAKHA KING",
+    "regNo": "APTEL/2023/87758",
+    "language": "Telugu",
+    "state": "Andhra Pradesh",
+    "rawScore": 0.136,
+    "source": "trigram"
+  },
+  {
+    "titleId": 26368,
+    "title": "INDORIYA SAMACHAR JAGAT",
+    "regNo": "RAJHIN/2014/57597",
+    "language": "Hindi",
+    "state": "Rajasthan",
+    "rawScore": 0.13,
+    "source": "trigram"
+  },
+  {
+    "titleId": 70752,
+    "title": "TAQAZA E WAQT",
+    "regNo": "UTTURD/2013/55381",
+    "language": "Urdu",
+    "state": "Uttarakhand",
+    "rawScore": 0.1171,
+    "source": "vector"
+  },
+  {
+    "titleId": 57488,
+    "title": "ROLLI SAMACHAR",
+    "regNo": "UPHIN/2003/12832",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.1161,
+    "source": "trigram"
+  },
+  {
+    "titleId": 40860,
+    "title": "MERI BHAWANA",
+    "regNo": "DELHIN/2007/22621",
+    "language": "Hindi",
+    "state": "Delhi",
+    "rawScore": 0.1149,
+    "source": "bm25"
+  },
+  {
+    "titleId": 52362,
+    "title": "PRATAP SAVERA",
+    "regNo": "MAHHIN/2011/37392",
+    "language": "Hindi",
+    "state": "Maharashtra",
+    "rawScore": 0.1055,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 32496,
+    "title": "KASHMIR KRANTI",
+    "regNo": "JKHIN/2022/83249",
+    "language": "Hindi",
+    "state": "Jammu and Kashmir",
+    "rawScore": 0.1005,
+    "source": "trigram"
+  },
+  {
+    "titleId": 15862,
+    "title": "DEBI PRANAM",
+    "regNo": "WBBIL/2015/64960",
+    "language": "English",
+    "state": "West Bengal",
+    "rawScore": 0.0986,
+    "source": "vector"
+  },
+  {
+    "titleId": 59243,
+    "title": "SAJAL SANDESH",
+    "regNo": "DELSAN/2013/53031",
+    "language": "Sanskrit",
+    "state": "Delhi",
+    "rawScore": 0.0964,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 67905,
+    "title": "SRISTIR EKUSH SHATAK",
+    "regNo": "WBBEN/2007/22519",
+    "language": "Bengali",
+    "state": "West Bengal",
+    "rawScore": 0.0946,
+    "source": "bm25"
+  },
+  {
+    "titleId": 49010,
+    "title": "PARYAVARAN BHARTI",
+    "regNo": "UPHIN/2010/37150",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.0926,
+    "source": "vector"
+  },
+  {
+    "titleId": 44379,
+    "title": "NAVIN KRISHI CHAKRA",
+    "regNo": "CHHHIN/2018/75887",
+    "language": "Hindi",
+    "state": "Chhattisgarh",
+    "rawScore": 0.0881,
+    "source": "vector"
+  },
+  {
+    "titleId": 72669,
+    "title": "THE IMAGE STAR",
+    "regNo": "DELBIL/2013/50934",
+    "language": "English",
+    "state": "Delhi",
+    "rawScore": 0.0785,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 29454,
+    "title": "JAREEDA AL HIJAZ",
+    "regNo": "KARBIL/2015/65961",
+    "language": "English",
+    "state": "Karnataka",
+    "rawScore": 0.0754,
+    "source": "bm25"
+  },
+  {
+    "titleId": 77176,
+    "title": "Vakra Vinyas",
+    "regNo": "UPHIN/26/A5417",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.067,
+    "source": "bm25"
+  },
+  {
+    "titleId": 2758,
+    "title": "AKHBAR E WATAN",
+    "regNo": "UPHIN/2024/90310",
+    "language": "Hindi",
+    "state": "Uttar Pradesh",
+    "rawScore": 0.0588,
+    "source": "trigram"
+  },
+  {
+    "titleId": 8394,
+    "title": "BAPACHA BAP",
+    "regNo": "MAHMAR/2011/44263",
+    "language": "Marathi",
+    "state": "Maharashtra",
+    "rawScore": 0.0587,
+    "source": "phonetic"
+  },
+  {
+    "titleId": 30164,
+    "title": "JORAVARNAGAR TIMES",
+    "regNo": "64342",
+    "language": "Gujarati",
+    "state": "Gujarat",
+    "rawScore": 0.05,
+    "source": "vector"
+  }
+]
