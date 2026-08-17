@@ -13,28 +13,40 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   className = '',
   delayMs = 0,
   direction = 'up',
-  threshold = 0.15
+  threshold = 0.05
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = typeof window !== 'undefined' && 
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
     if (prefersReducedMotion) {
       setIsVisible(true);
       return;
     }
 
+    // Immediate viewport bounds check on mount / tab-switch
+    if (elementRef.current) {
+      const rect = elementRef.current.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        setIsVisible(true);
+        return;
+      }
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting || entry.intersectionRatio > 0) {
           setIsVisible(true);
           observer.unobserve(entry.target);
         }
       },
       {
-        threshold,
-        rootMargin: '0px 0px -40px 0px'
+        threshold: Math.min(threshold, 0.01),
+        rootMargin: '100px 0px 100px 0px'
       }
     );
 
@@ -43,17 +55,23 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
       observer.observe(current);
     }
 
+    // Safety fallback timer: guarantee element is never permanently hidden
+    const safetyTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+
     return () => {
+      clearTimeout(safetyTimer);
       if (current) observer.unobserve(current);
     };
   }, [threshold]);
 
   const getInitialTransform = () => {
     switch (direction) {
-      case 'up': return 'translateY(28px)';
-      case 'down': return 'translateY(-28px)';
-      case 'left': return 'translateX(28px)';
-      case 'right': return 'translateX(-28px)';
+      case 'up': return 'translateY(20px)';
+      case 'down': return 'translateY(-20px)';
+      case 'left': return 'translateX(20px)';
+      case 'right': return 'translateX(-20px)';
       case 'none': return 'none';
     }
   };
@@ -61,7 +79,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   return (
     <div
       ref={elementRef}
-      className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${className}`}
+      className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${className}`}
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'none' : getInitialTransform(),

@@ -29,7 +29,7 @@ let globalTokenSequence = 42;
 
 export const useCases = (): UseCasesResult => {
   const [cases, setCases] = useState<OfficerCase[]>(fixtureCases);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [source, setSource] = useState<'LIVE' | 'FIXTURE'>('FIXTURE');
   const tokenSeqRef = useRef<number>(globalTokenSequence);
@@ -39,29 +39,34 @@ export const useCases = (): UseCasesResult => {
     setError(null);
 
     try {
-      // Attempt to query the backend endpoint if available
-      const response = await fetch('/v1/cases', {
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+      let response: Response | null = null;
+      try {
+        response = await fetch('/api/v1/cases', {
+          headers: { 'Accept': 'application/json' }
+        });
+      } catch {
+        response = await fetch('http://127.0.0.1:8000/v1/cases', {
+          headers: { 'Accept': 'application/json' }
+        });
+      }
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      if (!response || !response.ok) {
+        throw new Error(`HTTP ${response?.status || 500}: ${response?.statusText || 'Failed'}`);
       }
 
       const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        setCases(data);
+      const loadedCases = Array.isArray(data?.cases) ? data.cases : (Array.isArray(data) ? data : null);
+
+      if (loadedCases && loadedCases.length > 0) {
+        setCases(loadedCases);
         setSource('LIVE');
       } else {
         setCases(fixtureCases);
         setSource('FIXTURE');
       }
-    } catch (err) {
-      // Graceful fallback to fixture data on any network or 404 error
-      const message = err instanceof Error ? err.message : 'Backend unreachable';
-      setError(message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Backend unreachable';
+      setError(msg);
       setCases(fixtureCases);
       setSource('FIXTURE');
     } finally {
@@ -74,119 +79,106 @@ export const useCases = (): UseCasesResult => {
   }, [fetchCases]);
 
   const updateCaseStatus = useCallback((id: string, newStatus: OfficerCase['status'], note?: string) => {
-    setCases((prevCases) =>
-      prevCases.map((c) => {
-        if (c.id !== id) return c;
-        return {
-          ...c,
-          status: newStatus,
-          ...(note !== undefined ? { copilotDecisionNote: note } : {})
-        };
+    setCases((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          return {
+            ...c,
+            status: newStatus,
+            copilotDecisionNote: note !== undefined ? note : c.copilotDecisionNote
+          };
+        }
+        return c;
       })
     );
   }, []);
 
   const updateCaseNote = useCallback((id: string, note: string) => {
-    setCases((prevCases) =>
-      prevCases.map((c) => (c.id === id ? { ...c, copilotDecisionNote: note } : c))
+    setCases((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, copilotDecisionNote: note } : c))
     );
   }, []);
 
-  // Records a formal officer decision (Endorsement or Rejection) with generated token
-  const recordDecision = useCallback((id: string, action: 'APPROVED' | 'REJECTED', note: string): DecisionRecord => {
-    // NOTE: Sequence number generated client-side for SIH local mock; backend /v1/officer/endorse will assign authoritative sequential token in production.
-    tokenSeqRef.current += 1;
-    globalTokenSequence = tokenSeqRef.current;
-    
-    const seqStr = String(tokenSeqRef.current).padStart(5, '0');
-    const token = `PRGI/2026/OFF/${seqStr}`;
-    const timestamp = new Date().toISOString(); // ISO 8601 UTC
-    const officer = 'PRGI Verified Officer E-Token (Auth #DL-908)';
+  const recordDecision = useCallback(
+    (id: string, action: 'APPROVED' | 'REJECTED', note: string): DecisionRecord => {
+      const targetCase = cases.find((c) => c.id === id);
+      const year = new Date().getFullYear();
+      tokenSeqRef.current += 1;
+      const seqStr = String(tokenSeqRef.current).padStart(4, '0');
+      const actionCode = action === 'APPROVED' ? 'APP' : 'REJ';
+      const token = `PRGI-${year}-${actionCode}-${seqStr}`;
+      const nowIso = new Date().toISOString();
 
-    setCases((prevCases) =>
-      prevCases.map((c) => {
-        if (c.id !== id) return c;
-        return {
-          ...c,
-          status: action,
-          copilotDecisionNote: note,
-          decisionToken: token,
-          decisionTimestamp: timestamp,
-          decisionOfficer: officer
-        };
-      })
-    );
+      const newStatus: OfficerCase['status'] = action === 'APPROVED' ? 'APPROVED' : 'REJECTED';
 
-    return {
-      token,
-      timestamp,
-      action,
-      officer,
-      note
-    };
-  }, []);
+      updateCaseStatus(id, newStatus, note);
 
-  // Fetch or generate AI Copilot Decision Memo
-  const fetchDraftMemo = useCallback(async (caseData: OfficerCase): Promise<string> => {
-    try {
-      const res = await fetch('/v1/officer/draft-memo', {
+      const decisionRecord: DecisionRecord = {
+        token,
+        timestamp: nowIso,
+        action,
+        officer: 'DARSH_DESK_OFFICER_01',
+        note
+      };
+
+      fetch('/api/v1/officer/decide', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          caseId: caseData.id,
-          proposedTitle: caseData.proposedTitle,
-          verdict: caseData.verdict,
-          riskScore: caseData.riskScore,
-          state: caseData.state,
-          language: caseData.language
+          caseId: id,
+          action,
+          note,
+          referenceToken: token,
+          officerId: 'DARSH_DESK_OFFICER_01',
+          proposedTitle: targetCase?.proposedTitle || 'Unknown'
         })
+      }).catch(() => {
+        // Silently log in development
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.memo) return data.memo;
+      return decisionRecord;
+    },
+    [cases, updateCaseStatus]
+  );
+
+  const fetchDraftMemo = useCallback(async (caseData: OfficerCase): Promise<string> => {
+    try {
+      const response = await fetch(`/api/v1/officer/memo/${caseData.id}`);
+      if (response.ok) {
+        const text = await response.text();
+        if (text && text.trim().length > 0) return text;
       }
     } catch {
-      // Backend not running, proceed to fallback draft below
+      // Fall through to client template
     }
 
-    // Structured statutory legal draft fallback citing relevant clauses
-    if (caseData.verdict === 'MANUAL_REVIEW') {
-      return `OFFICIAL PRGI DECISION MEMORANDUM (DRAFT)
-Case Reference: ${caseData.id}
-Proposed Title: "${caseData.proposedTitle}"
-Jurisdiction: ${caseData.state} (${caseData.language}, ${caseData.periodicity})
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    return `GOVERNMENT OF INDIA
+PRESS REGISTRAR GENERAL OF INDIA (PRGI)
+MINISTRY OF INFORMATION AND BROADCASTING
 
-STATUTORY FINDINGS & CITATION:
-Under Press and Registration of Periodicals (PRP) Act 2023 Guidelines, Section 3.2(b) (Phonetic and Deceptive Resemblance), the proposed title exhibits moderate phonetic collision (${caseData.riskScore}% assessed conflict risk) with registered periodical "${caseData.primaryConflict || 'existing publications in circulation'}". Adding generic prefixes ("The", "Daily") without distinctive geographic or institutional tokens remains borderline.
+OFFICIAL DECISION MEMORANDUM
+Ref: PRGI/MEMO/${caseData.id}/${new Date().getFullYear()}
+Date of Review: ${timestamp}
 
-RECOMMENDED DISPOSITION:
-Endorse with requirement for addition of distinctive sub-district qualifier, or confirm geographic disambiguation prior to Certificate of Title Verification issuance.`;
-    }
+1. APPLICATION DETAILS
+Applicant Name: ${caseData.applicantName}
+Proposed Title: ${caseData.proposedTitle}
+State of Publication: ${caseData.state}
+Language: ${caseData.language}
+Periodicity: ${caseData.periodicity}
 
-    if (caseData.verdict === 'REJECTED') {
-      return `OFFICIAL PRGI DECISION MEMORANDUM (DRAFT)
-Case Reference: ${caseData.id}
-Proposed Title: "${caseData.proposedTitle}"
-Jurisdiction: ${caseData.state} (${caseData.language})
+2. STATUTORY CONFLICT EVALUATION
+Risk Assessment Index: ${caseData.riskScore}%
+Adjudicated Verdict: ${caseData.verdict}
+Primary Conflict Finding: ${caseData.primaryConflict || 'No blocking statutory conflict identified.'}
 
-STATUTORY FINDINGS & CITATION:
-The proposed title violates PRP Act 2023 Statutory Guidelines, Section 4.1 (Prohibition of Commercial Advertising Circulars and Deceptive Similarity). Assessed conflict risk of ${caseData.riskScore}% exceeds statutory thresholds.
+3. OFFICER DISCRETIONARY REMARKS & DISPOSITION
+${caseData.copilotDecisionNote || 'The title application has undergone automated phonetic, lexical, and semantic verification against the national master title registry. Recommended for statutory clearance subject to standard verification protocols.'}
 
-RECOMMENDED DISPOSITION:
-Summary rejection order issued. Advise applicant to utilize PRGI Agentic Title Studio for distinctive pre-cleared alternatives.`;
-    }
-
-    return `OFFICIAL PRGI DECISION MEMORANDUM (DRAFT)
-Case Reference: ${caseData.id}
-Proposed Title: "${caseData.proposedTitle}"
-Jurisdiction: ${caseData.state} (${caseData.language})
-
-STATUTORY FINDINGS & CITATION:
-Title passes all statutory admissibility checks under PRP Act 2023 Guidelines. Assessed conflict score is ${caseData.riskScore}% (well below the 45% threshold). No deceptively similar periodicals found in circulation.
-
-RECOMMENDED DISPOSITION:
-Approved for issuance of official Certificate of Title Verification.`;
+--------------------------------------------------
+Adjudicating Officer: DARSH_DESK_OFFICER_01
+PRGI Digital Title Verification Division, New Delhi`;
   }, []);
 
   return {

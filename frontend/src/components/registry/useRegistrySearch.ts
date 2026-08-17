@@ -29,9 +29,10 @@ export interface UseRegistrySearchResult {
 export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySearchResult => {
   const { query, state, language, periodicity, page, size } = params;
 
-  const [records, setRecords] = useState<TitleRecord[]>([]);
-  const [total, setTotal] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // Initialize with the first 50 sample titles so the screen is NEVER blank
+  const [records, setRecords] = useState<TitleRecord[]>(() => sampleTitles.slice(0, size || 50));
+  const [total, setTotal] = useState<number>(() => sampleTitles.length);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'LIVE' | 'OFFLINE'>('OFFLINE');
 
@@ -116,21 +117,28 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
       urlParams.set('page', String(page));
       urlParams.set('size', String(size));
 
-      // Try live API endpoint with Vite /api proxy or direct port 8000
-      const apiUrl = `/api/v1/registry/search?${urlParams.toString()}`;
-      const response = await fetch(apiUrl, {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+      let response: Response | null = null;
+      
+      // 1. Try Vite proxy route
+      try {
+        response = await fetch(`/api/v1/registry/search?${urlParams.toString()}`, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+      } catch {
+        // Fallback to direct port 8000
+        response = await fetch(`http://127.0.0.1:8000/v1/registry/search?${urlParams.toString()}`, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+      }
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      if (!response || !response.ok) {
+        throw new Error(`HTTP error: ${response?.statusText || 'failed'}`);
       }
 
       const data = await response.json();
-      if (data && Array.isArray(data.results)) {
+      if (data && Array.isArray(data.results) && data.results.length > 0) {
         setRecords(data.results);
         setTotal(typeof data.total === 'number' ? data.total : data.results.length);
         setMode('LIVE');
@@ -142,7 +150,6 @@ export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySear
       if (err instanceof Error && err.name === 'AbortError') {
         return; // Request was aborted due to new input
       }
-      // Silently fall back to offline client-side search
       const msg = err instanceof Error ? err.message : 'Server unreachable';
       setError(msg);
       performOfflineSearch();
