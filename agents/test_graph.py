@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import agents.graph as graph_module
+import agents.nodes.verifier as verifier_module
 from agents.config import settings
 from agents.graph import build_graph
 
@@ -38,8 +38,8 @@ def test_terminates_when_verifier_rejects_everything():
     actually running it with a client that always rejects, under a wall-
     clock timeout — a real assertion, not just trusting the attempt bound
     logic by inspection."""
-    original_client = graph_module._verify_client
-    graph_module._verify_client = _AlwaysRejectClient()
+    original_client = verifier_module._default_client
+    verifier_module._default_client = _AlwaysRejectClient()
     try:
         g = build_graph()
         t0 = time.time()
@@ -52,14 +52,20 @@ def test_terminates_when_verifier_rejects_everything():
             "attempt": 0,
         })
         elapsed = time.time() - t0
-        assert elapsed < 10, f"graph should terminate quickly, took {elapsed:.1f}s"
+        # 60s, not 10s: as of Prompt 3 the generator makes a REAL LLM call
+        # per attempt (interviewer + generator), and this test forces all
+        # max_attempts=3 retries. This bound is about proving the graph
+        # terminates at all (doesn't hang past a fallback chain exhausting
+        # all 4 models 3 times over), not about being fast — the actual
+        # performance target belongs to Prompt 6's live-backend timing.
+        assert elapsed < 60, f"graph should terminate within a bounded time, took {elapsed:.1f}s"
         assert final_state["attempt"] == settings.max_attempts, (
             f"should stop exactly at max_attempts={settings.max_attempts}, got {final_state['attempt']}"
         )
         assert final_state["verified"] == [], "always-reject client should leave verified empty"
         assert len(final_state["rejected"]) == 18, "the last attempt's 18 candidates should all be recorded as rejected"
     finally:
-        graph_module._verify_client = original_client
+        verifier_module._default_client = original_client
 
 
 def test_normal_run_reaches_ranker_with_survivors():
