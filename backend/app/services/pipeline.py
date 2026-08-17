@@ -333,7 +333,30 @@ def run_rules(title: str) -> list[RuleViolation]:
     if STUB["rules"]:
         return stub.check_rules(title)
     try:
-        return _real_rules_check(title)
+        raw_violations = _real_rules_check(title)
+        violations: list[RuleViolation] = []
+        for v in raw_violations:
+            if isinstance(v, RuleViolation):
+                violations.append(v)
+            elif hasattr(v, "model_dump"):
+                violations.append(RuleViolation.model_validate(v.model_dump()))
+            elif hasattr(v, "dict"):
+                violations.append(RuleViolation.model_validate(v.dict()))
+            elif isinstance(v, dict):
+                violations.append(RuleViolation.model_validate(v))
+            else:
+                violations.append(RuleViolation(
+                    rule_id=getattr(v, "rule_id", "R-UNKNOWN"),
+                    rule_name=getattr(v, "rule_name", "Unknown Rule"),
+                    category=getattr(v, "category", "GENERAL"),
+                    severity=getattr(v, "severity", "MEDIUM"),
+                    passed=getattr(v, "passed", True),
+                    description=getattr(v, "description", ""),
+                    guideline_clause=getattr(v, "guideline_clause", None),
+                    citation_verified=getattr(v, "citation_verified", False),
+                    matched_text=getattr(v, "matched_text", None),
+                ))
+        return violations
     except Exception:
         logger.exception("ml.rules.engine.check() raised — falling back to stub rule check for this request")
         return stub.check_rules(title)
