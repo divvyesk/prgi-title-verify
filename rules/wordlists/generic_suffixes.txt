@@ -1,0 +1,25 @@
+# rules/wordlists/generic_suffixes.txt
+# Terms that when added alone to an existing title constitute an insignificant
+# suffix/prefix per PRGI Guideline 8.
+# These are the exact examples given in Guideline 8.
+# One entry per line. Lowercase.
+daily
+dainik
+weekly
+saptahik
+monthly
+aaj
+today
+express
+news
+khabar
+samachar
+bulletin
+diary
+india
+national
+rashtriya
+sandhya
+evening
+morning
+the
