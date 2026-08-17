@@ -33,7 +33,7 @@ from ml.rules.types import RuleContext, RuleOutcome
 # ---------------------------------------------------------------------------
 # Load word lists at import time
 # ---------------------------------------------------------------------------
-_WL_DIR = Path(__file__).parent.parent.parent.parent / "rules" / "wordlists"
+_WL_DIR = Path(__file__).parent.parent.parent.parent / "data" / "rules" / "wordlists"
 
 
 def _load(filename: str) -> set[str]:

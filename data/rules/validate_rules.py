@@ -3,7 +3,7 @@ import sys
 
 def validate():
     try:
-        with open("rules/rules.json") as f:
+        with open("data/rules/rules.json") as f:
             rules = json.load(f)
     except Exception as e:
         print(f"Error loading rules.json: {e}")

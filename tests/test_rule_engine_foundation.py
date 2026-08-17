@@ -212,7 +212,7 @@ class TestEngineGuarantees:
         proving it was read from the file and not hard-coded.
         """
         import json
-        with open("rules/rules.json") as f:
+        with open("data/rules/rules.json") as f:
             rules_meta = {r["rule_id"]: r for r in json.load(f)}
 
         result = check_all("IBM", ctx("IBM"))

@@ -27,8 +27,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from ml.rules.engine import check_all  # noqa: F401 — triggers all @rule imports
 from ml.rules.registry import REGISTRY
 
-RULES_JSON = Path("rules/rules.json")
-COVERAGE_MD = Path("rules/coverage.md")
+RULES_JSON = Path("data/rules/rules.json")
+COVERAGE_MD = Path("data/rules/coverage.md")
 
 # Must match KNOWN_UNIMPLEMENTED in tests/test_rules.py
 KNOWN_UNIMPLEMENTED = {

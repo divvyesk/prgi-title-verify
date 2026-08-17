@@ -53,7 +53,7 @@ from ml.rules.types import RuleContext, RuleOutcome
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-RULES_JSON = Path("rules/rules.json")
+RULES_JSON = Path("data/rules/rules.json")
 TITLE_MASTER = Path("data/datasets/dataset1/data/processed/title_master.csv")
 RANDOM_SEED = 42
 

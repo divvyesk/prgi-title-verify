@@ -202,10 +202,10 @@ add_rule("R-REL-01", "Unverified/Missing", "Communal sensitivity", "Titles must 
 
 
 os.makedirs("rules", exist_ok=True)
-with open("rules/rules.json", "w") as f:
+with open("data/rules/rules.json", "w") as f:
     json.dump(rules, f, indent=2)
 
-with open("rules/coverage.md", "w") as f:
+with open("data/rules/coverage.md", "w") as f:
     f.write("# Rules Coverage\n\n")
     f.write("| Restriction | Rule ID | Implemented | Clause verified | Notes |\n")
     f.write("|---|---|---|---|---|\n")
