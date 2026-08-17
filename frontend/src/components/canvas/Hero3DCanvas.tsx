@@ -30,13 +30,13 @@ function createButterflyWingCurve(isRightWing = false, scale = 1): THREE.Catmull
   return new THREE.CatmullRomCurve3(points, true);
 }
 
-// 3D Pure Warm Beige Neon Butterfly (Soft Mellow Glow & Seamless Fit)
+// 3D Pure Neon Butterfly (Independent Vivid Colors, Unaffected by Adjudication State)
 function PureNeonButterfly({
   position,
   rotation = [0, 0, 0],
   scale = 1,
-  color = '#C27830',
-  glowColor = '#D97706',
+  color = '#D8005A',
+  glowColor = '#FF007F',
   wingAngleOffset = 0,
   flutterSpeed = 2.4
 }: {
@@ -90,7 +90,7 @@ function PureNeonButterfly({
           <meshBasicMaterial color="#1C1917" transparent opacity={0.3} />
         </mesh>
 
-        {/* Outer Radiant Warm Caramel/Amber Neon Tube (Soft Mellow Glow) */}
+        {/* Outer Radiant Saturated Neon Tube */}
         <mesh>
           <tubeGeometry args={[leftCurve, 48, 0.034 * scale, 12, true]} />
           <meshStandardMaterial
@@ -117,7 +117,7 @@ function PureNeonButterfly({
           <meshBasicMaterial color="#1C1917" transparent opacity={0.3} />
         </mesh>
 
-        {/* Outer Radiant Warm Caramel/Amber Neon Tube */}
+        {/* Outer Radiant Saturated Neon Tube */}
         <mesh>
           <tubeGeometry args={[rightCurve, 48, 0.034 * scale, 12, true]} />
           <meshStandardMaterial
@@ -373,45 +373,6 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
     return () => mql.removeEventListener('change', handler);
   }, []);
 
-  // Synchronized butterfly colors based on verdict
-  const butterflyColors = useMemo(() => {
-    if (verdict === 'APPROVED') {
-      return {
-        b1: { color: '#16A34A', glow: '#22C55E' },
-        b2: { color: '#15803D', glow: '#16A34A' },
-        b3: { color: '#4D7C0F', glow: '#65A30D' },
-        b4: { color: '#16A34A', glow: '#22C55E' },
-        b5: { color: '#15803D', glow: '#16A34A' },
-      };
-    }
-    if (verdict === 'REJECTED') {
-      return {
-        b1: { color: '#DC2626', glow: '#EF4444' },
-        b2: { color: '#B91C1C', glow: '#DC2626' },
-        b3: { color: '#991B1B', glow: '#EF4444' },
-        b4: { color: '#DC2626', glow: '#EF4444' },
-        b5: { color: '#B91C1C', glow: '#DC2626' },
-      };
-    }
-    if (verdict === 'MANUAL_REVIEW') {
-      return {
-        b1: { color: '#D97706', glow: '#F59E0B' },
-        b2: { color: '#B45309', glow: '#D97706' },
-        b3: { color: '#CA8A04', glow: '#EAB308' },
-        b4: { color: '#D97706', glow: '#F59E0B' },
-        b5: { color: '#B45309', glow: '#D97706' },
-      };
-    }
-    // Default & Before Verdict: Warm multi-tone caramel, honey, amber, and bronze
-    return {
-      b1: { color: '#C27830', glow: '#D97706' },
-      b2: { color: '#B45309', glow: '#D97706' },
-      b3: { color: '#A16207', glow: '#CA8A04' },
-      b4: { color: '#C27830', glow: '#D97706' },
-      b5: { color: '#B45309', glow: '#D97706' },
-    };
-  }, [verdict]);
-
   if (reducedMotion) {
     return (
       <div className="w-full h-full min-h-[340px] sm:min-h-[420px] relative bg-transparent p-6 text-center space-y-3 flex flex-col items-center justify-center">
@@ -455,65 +416,65 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
 
         <Suspense fallback={null}>
           <group position={[0, 0.05, 0]}>
-            {/* Center Pure 3D Warm Neon Title */}
+            {/* Center Pure 3D Neon Title (Unified Color on Verdict) */}
             <PureNeonTitle
               title={title || 'Times India'}
               verdict={verdict}
               isScanning={isScanning}
             />
 
-            {/* Surrounding Butterflies Synchronized with Verdict State */}
-            {/* 1. Top-Right Butterfly */}
+            {/* Surrounding Butterflies in 5 Distinct Permanent Colors (Unaffected by Accept / Reject / Manual) */}
+            {/* 1. Top-Right: Hot Pink / Magenta Butterfly */}
             <PureNeonButterfly
               position={[1.25, 0.58, 0.2]}
               rotation={[0.10, -0.22, 0.18]}
               scale={0.52}
-              color={butterflyColors.b1.color}
-              glowColor={butterflyColors.b1.glow}
+              color="#D8005A"
+              glowColor="#FF007F"
               wingAngleOffset={0}
               flutterSpeed={2.2}
             />
 
-            {/* 2. Top-Left Butterfly */}
+            {/* 2. Top-Left: Electric Cyan / Aqua Butterfly */}
             <PureNeonButterfly
               position={[-1.25, 0.54, 0.2]}
               rotation={[0.12, 0.25, -0.20]}
               scale={0.48}
-              color={butterflyColors.b2.color}
-              glowColor={butterflyColors.b2.glow}
+              color="#0096C7"
+              glowColor="#00D2FF"
               wingAngleOffset={1.2}
               flutterSpeed={2.6}
             />
 
-            {/* 3. Bottom-Left Butterfly */}
+            {/* 3. Bottom-Left: Warm Caramel / Honey Butterfly */}
             <PureNeonButterfly
               position={[-1.20, -0.52, 0.22]}
               rotation={[-0.08, 0.18, 0.14]}
               scale={0.46}
-              color={butterflyColors.b3.color}
-              glowColor={butterflyColors.b3.glow}
+              color="#C27830"
+              glowColor="#D97706"
               wingAngleOffset={2.4}
               flutterSpeed={2.0}
             />
 
-            {/* 4. Bottom-Right Butterfly */}
+            {/* 4. Bottom-Right: Radiant Champagne Gold Butterfly */}
             <PureNeonButterfly
               position={[1.22, -0.48, 0.2]}
               rotation={[-0.10, -0.20, -0.15]}
               scale={0.45}
-              color={butterflyColors.b4.color}
-              glowColor={butterflyColors.b4.glow}
+              color="#D4AF37"
+              glowColor="#F59E0B"
               wingAngleOffset={3.6}
               flutterSpeed={2.4}
             />
 
-            {/* 5. Center-Top Floating Mini Butterfly */}
+            {/* 5. Center-Top: Vibrant Orchid Violet Butterfly */}
             <PureNeonButterfly
               position={[0.0, 0.76, 0.15]}
               rotation={[0.04, 0.08, -0.06]}
               scale={0.38}
-              color={butterflyColors.b5.color}
-              glowColor={butterflyColors.b5.glow}
+              color="#9333EA"
+              glowColor="#C084FC"
               wingAngleOffset={4.8}
               flutterSpeed={2.8}
             />
