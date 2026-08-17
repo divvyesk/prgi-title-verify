@@ -15,28 +15,28 @@ function createButterflyWingCurve(isRightWing = false, scale = 1): THREE.Catmull
   const points = [
     new THREE.Vector3(0.01 * dir * scale, 0.03 * scale, 0),
     // Upper large wing loop
-    new THREE.Vector3(0.24 * dir * scale, 0.42 * scale, 0.03 * scale),
-    new THREE.Vector3(0.58 * dir * scale, 0.82 * scale, 0.05 * scale),
-    new THREE.Vector3(0.72 * dir * scale, 0.60 * scale, 0.04 * scale),
-    new THREE.Vector3(0.42 * dir * scale, 0.28 * scale, 0.02 * scale),
-    new THREE.Vector3(0.16 * dir * scale, 0.08 * scale, 0.01 * scale),
+    new THREE.Vector3(0.24 * dir * scale, 0.44 * scale, 0.03 * scale),
+    new THREE.Vector3(0.60 * dir * scale, 0.86 * scale, 0.05 * scale),
+    new THREE.Vector3(0.75 * dir * scale, 0.62 * scale, 0.04 * scale),
+    new THREE.Vector3(0.44 * dir * scale, 0.30 * scale, 0.02 * scale),
+    new THREE.Vector3(0.18 * dir * scale, 0.09 * scale, 0.01 * scale),
     // Lower secondary wing loop
-    new THREE.Vector3(0.46 * dir * scale, -0.16 * scale, 0.02 * scale),
-    new THREE.Vector3(0.56 * dir * scale, -0.48 * scale, 0.03 * scale),
-    new THREE.Vector3(0.32 * dir * scale, -0.60 * scale, 0.02 * scale),
-    new THREE.Vector3(0.12 * dir * scale, -0.25 * scale, 0.01 * scale),
+    new THREE.Vector3(0.48 * dir * scale, -0.16 * scale, 0.02 * scale),
+    new THREE.Vector3(0.58 * dir * scale, -0.50 * scale, 0.03 * scale),
+    new THREE.Vector3(0.34 * dir * scale, -0.64 * scale, 0.02 * scale),
+    new THREE.Vector3(0.12 * dir * scale, -0.26 * scale, 0.01 * scale),
     new THREE.Vector3(0.01 * dir * scale, -0.03 * scale, 0),
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }
 
-// 3D Pure Neon Butterfly (No plates or boxes — pure glowing neon tubes)
+// 3D Pure Neon Butterfly (High-Intensity Uncapped Luminescence)
 function PureNeonButterfly({
   position,
   rotation = [0, 0, 0],
   scale = 1,
-  color = '#FF1493',
-  glowColor = '#FF007F',
+  color = '#FF007F',
+  glowColor = '#FF1493',
   wingAngleOffset = 0,
   flutterSpeed = 2.4
 }: {
@@ -59,14 +59,14 @@ function PureNeonButterfly({
     const t = state.clock.getElapsedTime();
     if (leftWingRef.current && rightWingRef.current) {
       // Gentle rhythmic wing flutter
-      const flutter = Math.sin(t * flutterSpeed + wingAngleOffset) * 0.18;
+      const flutter = Math.sin(t * flutterSpeed + wingAngleOffset) * 0.22;
       leftWingRef.current.rotation.y = flutter;
       rightWingRef.current.rotation.y = -flutter;
     }
     if (groupRef.current) {
       // Gentle spatial hover
       groupRef.current.position.y = position[1] + Math.sin(t * 1.6 + wingAngleOffset) * 0.05;
-      groupRef.current.rotation.z = rotation[2] + Math.cos(t * 1.2 + wingAngleOffset) * 0.04;
+      groupRef.current.rotation.z = rotation[2] + Math.cos(t * 1.2 + wingAngleOffset) * 0.05;
     }
   });
 
@@ -74,66 +74,59 @@ function PureNeonButterfly({
     <group ref={groupRef} position={position} rotation={rotation}>
       {/* 1. Center Glowing Body Tube */}
       <mesh position={[0, 0, 0]}>
-        <capsuleGeometry args={[0.026 * scale, 0.42 * scale, 12, 16]} />
-        <meshStandardMaterial
-          color="#FFFFFF"
-          emissive={color}
-          emissiveIntensity={6.0}
-          roughness={0.05}
-        />
+        <capsuleGeometry args={[0.028 * scale, 0.44 * scale, 12, 16]} />
+        <meshBasicMaterial color="#FFFFFF" toneMapped={false} />
       </mesh>
 
       {/* 2. Left Wing Neon Tubes */}
       <group ref={leftWingRef}>
-        {/* Outer Radiant Glow Halo Tube */}
+        {/* Outer Radiant Glow Halo Tube (Raw Uncapped Emissive) */}
         <mesh>
-          <tubeGeometry args={[leftCurve, 64, 0.042 * scale, 12, true]} />
+          <tubeGeometry args={[leftCurve, 64, 0.048 * scale, 12, true]} />
           <meshStandardMaterial
             color={color}
             emissive={glowColor}
-            emissiveIntensity={6.5}
-            roughness={0.1}
-            transparent
-            opacity={0.95}
+            emissiveIntensity={8.5}
+            roughness={0.0}
+            toneMapped={false}
           />
         </mesh>
 
         {/* Inner White-Hot Gas Core Filament */}
-        <mesh position={[0, 0, 0.008]}>
-          <tubeGeometry args={[leftCurve, 64, 0.016 * scale, 8, true]} />
-          <meshBasicMaterial color="#FFFFFF" />
+        <mesh position={[0, 0, 0.01]}>
+          <tubeGeometry args={[leftCurve, 64, 0.018 * scale, 8, true]} />
+          <meshBasicMaterial color="#FFFFFF" toneMapped={false} />
         </mesh>
       </group>
 
       {/* 3. Right Wing Neon Tubes */}
       <group ref={rightWingRef}>
-        {/* Outer Radiant Glow Halo Tube */}
+        {/* Outer Radiant Glow Halo Tube (Raw Uncapped Emissive) */}
         <mesh>
-          <tubeGeometry args={[rightCurve, 64, 0.042 * scale, 12, true]} />
+          <tubeGeometry args={[rightCurve, 64, 0.048 * scale, 12, true]} />
           <meshStandardMaterial
             color={color}
             emissive={glowColor}
-            emissiveIntensity={6.5}
-            roughness={0.1}
-            transparent
-            opacity={0.95}
+            emissiveIntensity={8.5}
+            roughness={0.0}
+            toneMapped={false}
           />
         </mesh>
 
         {/* Inner White-Hot Gas Core Filament */}
-        <mesh position={[0, 0, 0.008]}>
-          <tubeGeometry args={[rightCurve, 64, 0.016 * scale, 8, true]} />
-          <meshBasicMaterial color="#FFFFFF" />
+        <mesh position={[0, 0, 0.01]}>
+          <tubeGeometry args={[rightCurve, 64, 0.018 * scale, 8, true]} />
+          <meshBasicMaterial color="#FFFFFF" toneMapped={false} />
         </mesh>
       </group>
 
       {/* High-Intensity Butterfly Point Light */}
-      <pointLight color={glowColor} intensity={3.5} distance={2.5} />
+      <pointLight color={glowColor} intensity={5.0} distance={3.0} />
     </group>
   );
 }
 
-// 3D Pure Neon Title Text (No background plate — just brilliant glowing 3D letters)
+// 3D Pure Neon Title Text (High-Intensity Uncapped Neon Tube Lettering)
 function PureNeonTitle({
   title,
   verdict,
@@ -192,12 +185,12 @@ function PureNeonTitle({
   const fontSize = words.length > 3 ? 0.44 : 0.54;
 
   // 3D Depth slice offsets for thick volumetric neon extrusion
-  const depthLayers = [-0.06, -0.04, -0.02, 0.0];
+  const depthLayers = [-0.08, -0.05, -0.02, 0.0];
 
   return (
     <group ref={signRef}>
       {/* Line 1: Primary Glowing 3D Neon Text */}
-      <group position={[0, line2 ? 0.32 : 0, 0]}>
+      <group position={[0, line2 ? 0.34 : 0, 0]}>
         {/* Volumetric 3D Neon Extrusion Tube Slices */}
         {depthLayers.map((zOffset, idx) => (
           <Text
@@ -208,7 +201,7 @@ function PureNeonTitle({
             textAlign="center"
             anchorX="center"
             anchorY="middle"
-            outlineWidth={0.055}
+            outlineWidth={0.065}
             outlineColor={primaryColor}
             letterSpacing={0.06}
           >
@@ -216,26 +209,27 @@ function PureNeonTitle({
             <meshStandardMaterial
               color={primaryColor}
               emissive={glowColor}
-              emissiveIntensity={5.5}
-              roughness={0.1}
+              emissiveIntensity={8.0}
+              roughness={0.0}
+              toneMapped={false}
             />
           </Text>
         ))}
 
         {/* Front White-Hot Gas Core Filament */}
         <Text
-          position={[0, 0, 0.022]}
+          position={[0, 0, 0.025]}
           fontSize={fontSize}
           maxWidth={4.0}
           textAlign="center"
           anchorX="center"
           anchorY="middle"
-          outlineWidth={0.016}
+          outlineWidth={0.018}
           outlineColor="#FFFFFF"
           letterSpacing={0.06}
         >
           {line1}
-          <meshBasicMaterial color="#FFFFFF" />
+          <meshBasicMaterial color="#FFFFFF" toneMapped={false} />
         </Text>
       </group>
 
@@ -251,7 +245,7 @@ function PureNeonTitle({
               textAlign="center"
               anchorX="center"
               anchorY="middle"
-              outlineWidth={0.055}
+              outlineWidth={0.065}
               outlineColor={secondaryColor}
               letterSpacing={0.06}
             >
@@ -259,62 +253,64 @@ function PureNeonTitle({
               <meshStandardMaterial
                 color={secondaryColor}
                 emissive={secondaryGlow}
-                emissiveIntensity={5.5}
-                roughness={0.1}
+                emissiveIntensity={8.0}
+                roughness={0.0}
+                toneMapped={false}
               />
             </Text>
           ))}
 
           {/* Front White-Hot Gas Core Filament */}
           <Text
-            position={[0, 0, 0.022]}
+            position={[0, 0, 0.025]}
             fontSize={fontSize * 0.94}
             maxWidth={4.0}
             textAlign="center"
             anchorX="center"
             anchorY="middle"
-            outlineWidth={0.016}
+            outlineWidth={0.018}
             outlineColor="#FFFFFF"
             letterSpacing={0.06}
           >
             {line2}
-            <meshBasicMaterial color="#FFFFFF" />
+            <meshBasicMaterial color="#FFFFFF" toneMapped={false} />
           </Text>
         </group>
       )}
 
       {/* Subtitle Minimal Neon Caption */}
       <Text
-        position={[0, line2 ? -0.84 : -0.62, 0.01]}
+        position={[0, line2 ? -0.88 : -0.66, 0.01]}
         fontSize={0.13}
         letterSpacing={0.16}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.014}
+        outlineWidth={0.016}
         outlineColor={primaryColor}
       >
         ✦ PRGI STATUTORY CLEARANCE ✦
         <meshStandardMaterial
-          color="#FFFDF7"
+          color="#FFFFFF"
           emissive={primaryColor}
-          emissiveIntensity={3.5}
+          emissiveIntensity={5.0}
+          toneMapped={false}
         />
       </Text>
 
       {/* High-Power Front & Back Radiance Lights */}
-      <pointLight position={[0, 0.2, 0.8]} color={glowColor} intensity={5.0} distance={5.5} />
-      <pointLight position={[0, -0.3, 0.8]} color={secondaryGlow} intensity={4.5} distance={5.5} />
-      <pointLight position={[0, 0, -0.5]} color={glowColor} intensity={3.0} distance={4.0} />
+      <pointLight position={[0, 0.2, 0.8]} color={glowColor} intensity={7.0} distance={6.0} />
+      <pointLight position={[0, -0.3, 0.8]} color={secondaryGlow} intensity={6.5} distance={6.0} />
+      <pointLight position={[0, 0, -0.6]} color={glowColor} intensity={4.5} distance={4.5} />
 
       {/* Laser Scanning Line during verification */}
       {isScanning && (
         <group position={[0, 0, 0.16]}>
           <mesh>
             <planeGeometry args={[4.2, 0.05]} />
-            <meshBasicMaterial color="#00F0FF" transparent opacity={0.95} />
+            <meshBasicMaterial color="#00F0FF" transparent opacity={0.95} toneMapped={false} />
           </mesh>
-          <pointLight color="#00F0FF" intensity={6} distance={3} />
+          <pointLight color="#00F0FF" intensity={8} distance={3} />
         </group>
       )}
     </group>
@@ -335,17 +331,17 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
 
   if (reducedMotion) {
     return (
-      <div className="w-full h-full min-h-[340px] relative flex flex-col items-center justify-center p-6 text-center space-y-3">
-        <div className="text-xs font-mono uppercase tracking-widest text-[#78716C]">
-          PRGI Verification Neon Specimen
+      <div className="w-full h-full min-h-[360px] sm:min-h-[420px] relative rounded-3xl bg-[#08060F] p-6 text-center space-y-3 flex flex-col items-center justify-center border border-[#1E1730] shadow-2xl">
+        <div className="text-xs font-mono uppercase tracking-widest text-[#FF007F]">
+          ✦ PRGI Verification Neon Specimen ✦
         </div>
-        <h2 className="font-editorial text-4xl sm:text-5xl font-bold text-[#1C1917] tracking-tight">
+        <h2 className="font-editorial text-4xl sm:text-5xl font-bold text-white tracking-tight">
           {title || 'Times India'}
         </h2>
         <div className={`text-xs font-mono font-bold uppercase px-3 py-1 rounded-full ${
-          verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-          verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
-          'bg-amber-100 text-amber-900 border border-amber-300'
+          verdict === 'APPROVED' ? 'bg-emerald-950 text-emerald-300 border border-emerald-500' :
+          verdict === 'REJECTED' ? 'bg-rose-950 text-rose-300 border border-rose-500' :
+          'bg-amber-950 text-amber-300 border border-amber-500'
         }`}>
           {verdict || 'Scanning Admissibility'}
         </div>
@@ -354,15 +350,29 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
   }
 
   return (
-    <div className="w-full h-full min-h-[340px] relative flex items-center justify-center pointer-events-auto select-none">
+    <div className="w-full h-full min-h-[360px] sm:min-h-[420px] relative rounded-3xl overflow-hidden bg-[#07050E] border border-[#221838] shadow-2xl flex items-center justify-center pointer-events-auto select-none">
+      {/* Subtle Ambient Radial Glow Backing */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#FF007F]/10 via-transparent to-[#00F0FF]/10 pointer-events-none" />
+
       <Canvas
         camera={{ position: [0, 0, 4.2], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: false, toneMapping: THREE.NoToneMapping }}
       >
-        {/* Soft Ambient Lighting */}
-        <ambientLight intensity={1.2} />
-        <directionalLight position={[4, 6, 5]} intensity={1.6} color="#FFFDF7" />
-        <directionalLight position={[-4, -3, 3]} intensity={0.9} color="#FFE4E6" />
+        {/* Dark Obsidian Background so Neon Explodes with Vibrancy */}
+        <color attach="background" args={['#07050E']} />
+
+        {/* Soft Ambient Light */}
+        <ambientLight intensity={0.6} />
+
+        {/* Reflective Dark Floor beneath the Neon Sign to catch specular reflections */}
+        <mesh position={[0, -1.8, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[12, 12]} />
+          <meshStandardMaterial
+            color="#05030A"
+            roughness={0.2}
+            metalness={0.8}
+          />
+        </mesh>
 
         {/* Orbit Controls: Rotatable by Mouse, Static Sign */}
         <OrbitControls
@@ -376,7 +386,7 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
         />
 
         <Suspense fallback={null}>
-          <group position={[0, 0, 0]}>
+          <group position={[0, 0.1, 0]}>
             {/* Center Pure 3D Neon Title (No background plate) */}
             <PureNeonTitle
               title={title || 'Times India'}
