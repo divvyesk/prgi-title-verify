@@ -127,7 +127,7 @@ Open **`http://localhost:5173`** in your browser.
 **Services Launched:**
 | Service | Image / Context | Port | Healthcheck |
 | :--- | :--- | :--- | :--- |
-| **`db`** | `pgvector/pgvector:pg16` | `5432` | `pg_isready` check on init |
+| **`db`** | `pgvector/pgvector:pg17` | `5432` | `pg_isready` check on init |
 | **`backend`** | `../backend` (FastAPI) | `8000` | HTTP GET `/v1/health` |
 | **`frontend`** | `../frontend` (Vite / React) | `5173` | Starts after backend is up |
 
