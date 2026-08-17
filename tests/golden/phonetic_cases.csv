@@ -1,0 +1,18 @@
+query,candidate,expected_min,expected_max,note
+Jagran,Jaagran,85,100,Vowel doubling — DM identical (JKRN) and skeleton identical (jgrn)
+Dainik,Daynik,85,100,ai→ay vowel variant — DM identical (TNK)
+Samachar,Samaachaar,85,100,Long vowel variant — DM secondary code overlap (SMKR)
+Kaumudi,Kaumudi,100,100,Identical titles must always return exactly 100
+Vidarbha,Bangalore,0,20,Completely different — DM codes and skeletons do not overlap
+Dainik Jagran,Jagran Dainik,85,100,Word reorder — sorted DM codes must match (order-independent)
+Dainik Jagran,Dayanik Jaagran,85,100,Reorder plus vowel variants — both layers agree
+Times India,India Times,85,100,Classic word-swap — sorted DM codes identical
+Vidarbha,Vidharbha,80,100,Extra h in transliteration — DM identical (FTRP) and skeleton close
+Rajasthan Patrika,Gujarat Samachar,0,40,Totally different regions — DM 0 and skeleton noise ~38
+Jagran,Dainik Jagran,40,70,1-word vs 2-word — token-count penalty fires on DM 50 and skeleton 67
+Deccan Herald,Deccan Chronicle,30,70,One shared word phonetically — DM 50 and skeleton 50
+Hindustan Times,Hindustan Samachar,40,75,One shared word — skeleton drives score (~73)
+Kerala Kaumudi,Kaumudi Weekly,40,85,Shared kaumudi — skeleton correctly reflects shared distinctive word
+,Jagran,0,0,Empty query must return 0
+Deccan Herald,Deccan Herald,100,100,Identical titles must always return exactly 100
+Tribune,Patrika,0,55,Different single words — DM 0 but short skeleton noise at ~50
