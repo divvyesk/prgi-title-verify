@@ -1,0 +1,52 @@
+# Without this file the build context was ~1.5GB and every `docker compose
+# build` spent minutes just uploading it. backend/.venv alone is 1.1GB and
+# frontend/node_modules is 401MB — neither belongs in a Linux image, and a
+# macOS-built virtualenv copied into the container would be actively broken.
+
+# Virtualenvs and installed packages (rebuilt inside the image from
+# requirements.txt — never ship the host's copy)
+.venv/
+*/.venv/
+**/.venv/
+venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Node
+node_modules/
+**/node_modules/
+frontend/dist/
+dist/
+
+# VCS and tooling
+.git/
+.github/
+.claude/
+.antigravity/
+.playwright/
+
+# Raw scraped source data — the backend reads the processed CSV, which the
+# Dockerfile copies explicitly. data/datasets/dataset1/data/raw alone is 30MB
+# of per-page scrape output that nothing at runtime touches.
+data/datasets/*/data/raw/
+
+# Model weights and caches
+models/
+*.npy
+*.pt
+*.bin
+agents/cache/
+!agents/cache/seed/
+
+# Local env files — secrets must never enter an image layer
+.env
+*/.env
+**/.env
+!**/.env.example
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+.idea/
+*.log
