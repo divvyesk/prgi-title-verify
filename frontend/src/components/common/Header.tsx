@@ -23,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   onOpenRoadmap,
+  onReplayIntro,
   soundEnabled,
   setSoundEnabled,
   useLiveApi,
@@ -151,6 +152,20 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-stone-400" />}
           </button>
+
+          {/* Replay Intro Button */}
+          {onReplayIntro && (
+            <button
+              onClick={() => {
+                sound.playClick();
+                onReplayIntro();
+              }}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#78716C] hover:text-[#1C1917] hover:bg-[#EFEAE1] rounded-lg transition-colors cursor-pointer"
+              title="Replay cinematic laser scan intro"
+            >
+              <span>Replay Intro</span>
+            </button>
+          )}
 
           {/* Roadmap Modal */}
           <button

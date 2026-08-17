@@ -11,7 +11,15 @@ import { LoadingIntro } from './components/loading/LoadingIntro';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 export function App() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('skipIntro') === '1' || params.get('skipIntro') === 'true') {
+        return false;
+      }
+    }
+    return true;
+  });
   const [activeTab, setActiveTab] = useState<'verifier' | 'agents' | 'officer' | 'registry'>('verifier');
   const [roadmapOpen, setRoadmapOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);

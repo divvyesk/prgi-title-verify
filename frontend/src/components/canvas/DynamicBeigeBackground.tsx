@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -56,16 +56,29 @@ function AmbientWarmParticles() {
 }
 
 export const DynamicBeigeBackground: React.FC = () => {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mql.matches);
+
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#FBF9F4]">
-      {/* 3D Subtle Ambient Canvas */}
-      <Canvas
-        camera={{ position: [0, 0, 7], fov: 60 }}
-        gl={{ alpha: true, antialias: true }}
-        className="pointer-events-none"
-      >
-        <AmbientWarmParticles />
-      </Canvas>
+      {/* If reduced motion is requested, render static clean surface instead of Three.js loop */}
+      {!reducedMotion && (
+        <Canvas
+          camera={{ position: [0, 0, 7], fov: 60 }}
+          gl={{ alpha: true, antialias: true }}
+          className="pointer-events-none"
+        >
+          <AmbientWarmParticles />
+        </Canvas>
+      )}
     </div>
   );
 };

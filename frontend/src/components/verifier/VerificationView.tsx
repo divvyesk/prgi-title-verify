@@ -158,6 +158,7 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
       setInputTitle(initialTitle);
       handleVerify(initialTitle);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTitle]);
 
   const copyVerificationReport = () => {

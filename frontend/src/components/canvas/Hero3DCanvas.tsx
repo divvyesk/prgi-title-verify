@@ -402,12 +402,43 @@ function CursorSpecularLight({ color }: { color: string }) {
 }
 
 export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning }) => {
+  const [reducedMotion, setReducedMotion] = React.useState(false);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mql.matches);
+
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
   const lightColor = useMemo(() => {
     if (verdict === 'APPROVED') return '#10B981';
     if (verdict === 'REJECTED') return '#EF4444';
     if (verdict === 'MANUAL_REVIEW') return '#F59E0B';
     return '#FBBF24';
   }, [verdict]);
+
+  if (reducedMotion) {
+    return (
+      <div className="w-full h-full min-h-[300px] relative flex flex-col items-center justify-center p-6 text-center space-y-3">
+        <div className="text-xs font-mono uppercase tracking-widest text-[#78716C]">
+          PRGI Verification Specimen
+        </div>
+        <h2 className="font-editorial text-4xl sm:text-5xl font-bold text-[#1C1917] tracking-tight">
+          {title || 'Times India'}
+        </h2>
+        <div className={`text-xs font-mono font-bold uppercase px-3 py-1 rounded-full ${
+          verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+          verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
+          'bg-amber-100 text-amber-900 border border-amber-300'
+        }`}>
+          {verdict || 'Scanning Admissibility'}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full min-h-[300px] relative flex items-center justify-center pointer-events-auto">
