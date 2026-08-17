@@ -4,24 +4,26 @@
 
 @layer base {
   body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #F8F6F0;
-    color: #292524;
+    color: #1C1917;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
-    letter-spacing: -0.02em;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    letter-spacing: -0.025em;
     color: #1C1917;
+    font-weight: 700;
   }
 
   .font-poppins {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   }
 
-  .font-editorial {
-    font-family: 'Newsreader', serif;
+  .font-display {
+    font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
   }
 
   code, pre, .font-mono {
@@ -29,117 +31,75 @@
   }
 }
 
-/* Warm Beige Luxury Glass Panels & Card Styles */
-.beige-card, .indigo-card {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #E8E0D2;
-  box-shadow: 0 10px 30px -4px rgba(45, 38, 28, 0.05), 0 1px 3px 0 rgba(45, 38, 28, 0.02);
-}
-
-.beige-card-subtle, .indigo-card-subtle {
-  background: rgba(250, 247, 242, 0.75);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid #EFE8DC;
-}
-
-.beige-card-elevated, .indigo-card-elevated {
+/* Impeccable Clean Surfaces & Cards (No AI Frosted Glass / Slop) */
+.beige-card {
   background: #FFFFFF;
-  border: 1px solid #E2D7C5;
-  box-shadow: 0 16px 40px -6px rgba(45, 38, 28, 0.08), 0 2px 6px -1px rgba(45, 38, 28, 0.04);
+  border: 1px solid #E7E5E4;
+  box-shadow: 0 1px 3px 0 rgba(28, 25, 23, 0.04), 0 1px 2px -1px rgba(28, 25, 23, 0.03);
 }
 
-.beige-card-gold {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.6) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid #FCD34D;
-  box-shadow: 0 8px 30px -4px rgba(180, 83, 9, 0.08);
+.beige-card-subtle {
+  background: #FAF9F6;
+  border: 1px solid #E7E5E4;
 }
 
-.beige-card-success, .indigo-card-success {
-  background: linear-gradient(135deg, rgba(209, 250, 229, 0.6) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid #6EE7B7;
-  box-shadow: 0 8px 30px -4px rgba(4, 120, 87, 0.08);
+.beige-card-elevated {
+  background: #FFFFFF;
+  border: 1px solid #D6D3D1;
+  box-shadow: 0 4px 6px -1px rgba(28, 25, 23, 0.05), 0 2px 4px -2px rgba(28, 25, 23, 0.05);
 }
 
-.beige-card-warning, .indigo-card-warning {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.6) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid #FCD34D;
-  box-shadow: 0 8px 30px -4px rgba(180, 83, 9, 0.08);
+/* Solid, High-Contrast Verdict Surfaces (Grounded, No Slop Gradients) */
+.beige-card-success {
+  background: #FFFFFF;
+  border: 1.5px solid #059669;
+  box-shadow: 0 4px 12px -2px rgba(5, 150, 105, 0.08);
 }
 
-.beige-card-danger, .indigo-card-danger {
-  background: linear-gradient(135deg, rgba(254, 226, 226, 0.6) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid #FCA5A5;
-  box-shadow: 0 8px 30px -4px rgba(185, 28, 28, 0.08);
+.beige-card-warning {
+  background: #FFFFFF;
+  border: 1.5px solid #D97706;
+  box-shadow: 0 4px 12px -2px rgba(217, 119, 6, 0.08);
 }
 
-/* Interactive Mouse-Reactive Spotlight Sheen on Cards */
-.mouse-spotlight {
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1), border-color 0.25s ease;
+.beige-card-danger {
+  background: #FFFFFF;
+  border: 1.5px solid #DC2626;
+  box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.08);
 }
 
-.mouse-spotlight::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(
-    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(217, 119, 6, 0.09),
-    transparent 50%
-  );
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  pointer-events: none;
-  z-index: 1;
+/* Crisp Interactive Hover Elements */
+.interactive-card {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.mouse-spotlight:hover::before {
-  opacity: 1;
+.interactive-card:hover {
+  border-color: #A8A29E;
+  box-shadow: 0 4px 12px -2px rgba(28, 25, 23, 0.06);
 }
 
-.mouse-spotlight:hover {
-  transform: translateY(-2px);
-  border-color: #D97706;
-  box-shadow: 0 14px 32px -4px rgba(180, 83, 9, 0.1), 0 4px 12px -2px rgba(45, 38, 28, 0.04);
+/* Micro Focus & Selection Styles */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #1C1917 !important;
+  box-shadow: 0 0 0 1px #1C1917;
 }
 
-/* Custom Scrollbar for Beige Theme */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F0EBE0;
+  background: #F5F2EA;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CFC0A8;
-  border-radius: 4px;
+  background: #D6D3D1;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #B5A285;
-}
-
-/* Subtle Warm Dot Mesh Background */
-.bg-warm-mesh {
-  background-image: radial-gradient(#E2D7C5 1.2px, transparent 1.2px);
-  background-size: 24px 24px;
-}
-
-.bg-stipple-mesh {
-  background-image: radial-gradient(#E2D7C5 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-.bg-warm-gradient {
-  background: radial-gradient(circle at 50% 0%, rgba(254, 243, 199, 0.6) 0%, rgba(248, 246, 240, 0) 70%);
+  background: #A8A29E;
 }

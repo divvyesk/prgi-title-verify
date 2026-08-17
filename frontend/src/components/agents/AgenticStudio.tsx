@@ -53,7 +53,7 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
     totalGenerated: 18,
     collidedCount: 14,
     survivingCount: 4,
-    collisionSample: 'Krishi Chetna (DELHIN/2014/19283 - 94% Lexical clash)'
+    collisionSample: 'Krishi Chetna (DELHIN/2014/19283 · 94% Lexical clash)'
   });
 
   useEffect(() => {
@@ -128,7 +128,7 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
         totalGenerated: 18,
         collidedCount: 14,
         survivingCount: 4,
-        collisionSample: 'Dainik Krishi (UPENG/2011/39102 - 96% Lexical permutation)'
+        collisionSample: 'Dainik Krishi (UPENG/2011/39102 · 96% Lexical permutation)'
       });
     }, 1400);
 
@@ -138,7 +138,6 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
     }, 2200);
 
     try {
-      // Call real POST /v1/alternatives endpoint with 45s timeout
       const response = await generateAlternatives({
         genre: topic,
         state,
@@ -153,7 +152,6 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
     } catch (err) {
       console.warn('[AgenticStudio] Live endpoint fallback to embedded multi-agent synthesizer:', err);
       
-      // Synthesize rich language-aware fallback candidates
       const prefixMap: Record<string, string[]> = {
         Hindi: [
           'Navin Krishi Sandarbh', 
@@ -217,37 +215,33 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Header Info */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E8E0D2] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E7E5E4] pb-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-            <span>Autonomous Title Studio &amp; Pre-Verification</span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-poppins font-extrabold text-[#1C1917]">
-            AI Agentic Title Studio
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-[#1C1917] tracking-tight">
+            Autonomous Title Generation &amp; Pre-Verification
           </h1>
-          <p className="text-sm text-[#564735] mt-1 max-w-3xl leading-relaxed font-poppins">
-            When a proposed title clashes, our 4-Agent collaborative loop generates 15-20 distinctive candidates, immediately verifies them against the PRGI statutory rulebook &amp; 82,713 registry, prunes collisions, and delivers 100% pre-cleared alternatives.
+          <p className="text-sm text-[#57534E] mt-1 max-w-3xl leading-relaxed font-medium">
+            When a proposed title clashes, our 4-Agent collaborative loop generates 15–20 distinctive candidates, immediately verifies them against the PRGI statutory rulebook &amp; 82,713 registry, prunes collisions, and delivers 100% pre-cleared alternatives.
           </p>
         </div>
 
         {generationTimeMs && (
-          <div className="flex items-center gap-2 text-xs font-mono bg-white px-3.5 py-2 rounded-xl border border-[#DDD1BF] shadow-2xs self-start md:self-auto">
+          <div className="flex items-center gap-2 text-xs font-mono bg-white px-3.5 py-2 rounded-xl border border-[#E7E5E4] shadow-2xs self-start md:self-auto">
             <Zap className="w-4 h-4 text-amber-700" />
-            <span className="text-[#75634B]">Last Generation Time:</span>
+            <span className="text-[#78716C]">Generation Latency:</span>
             <span className="font-bold text-[#1C1917]">{generationTimeMs} ms</span>
           </div>
         )}
       </div>
 
       {/* 4-Agent Pipeline Progression Visualization */}
-      <div className="beige-card rounded-3xl p-6 sm:p-7 space-y-4 shadow-sm">
+      <div className="beige-card rounded-2xl p-6 sm:p-7 space-y-4">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-bold text-[#75634B] uppercase tracking-wider font-mono">
-            4-Agent Autonomous Workflow Pipeline
+          <div className="text-xs font-bold text-[#78716C] uppercase tracking-wider font-mono">
+            4-Agent Multi-Cycle Workflow
           </div>
           {isGenerating && (
-            <span className="text-[11px] font-mono text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full font-bold animate-pulse">
+            <span className="text-xs font-mono text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-md font-bold motion-safe:animate-pulse">
               Workflow Active (LLM + 4-D Screening)
             </span>
           )}
@@ -290,27 +284,27 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
             return (
               <div
                 key={agent.role}
-                className={`p-4 rounded-2xl border transition-all relative ${
+                className={`p-4 rounded-xl border transition-all relative ${
                   isAgentActive
-                    ? 'bg-amber-100/90 border-amber-500 shadow-md scale-[1.02] ring-2 ring-amber-300'
+                    ? 'bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-300'
                     : isAgentPassed
-                    ? 'bg-white border-[#E2D7C5]'
-                    : 'bg-[#FAF7F2]/70 border-[#EFE8DC]'
+                    ? 'bg-white border-[#E7E5E4]'
+                    : 'bg-[#FAF9F6] border-[#E7E5E4]'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className={`p-2 rounded-xl border ${agent.bgColor} ${agent.color}`}>
+                    <div className={`p-2 rounded-lg border ${agent.bgColor} ${agent.color}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className="font-bold text-xs text-[#1C1917]">{agent.role}</span>
                   </div>
                   {isAgentPassed && <CheckCircle2 className="w-4 h-4 text-emerald-700" />}
                 </div>
-                <p className="text-[11px] text-[#564735] leading-relaxed">{agent.desc}</p>
+                <p className="text-[11px] text-[#57534E] leading-relaxed font-medium">{agent.desc}</p>
                 {isAgentActive && (
-                  <div className="mt-2 text-[10px] text-amber-900 font-mono flex items-center gap-1.5 font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-ping"></span>
+                  <div className="mt-2 text-xs text-amber-900 font-mono flex items-center gap-1.5 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-600 motion-safe:animate-pulse"></span>
                     <span>Processing Agent Step...</span>
                   </div>
                 )}
@@ -321,29 +315,29 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
 
         {/* Visible Pruning & Collision Retry Telemetry */}
         {retryInfo && (
-          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-[#E7E5E4] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-amber-200 text-amber-900 shrink-0">
+              <div className="p-2 rounded-lg bg-[#EFE8DC] text-amber-900 shrink-0">
                 <Flame className="w-4 h-4 text-amber-800" />
               </div>
               <div>
-                <div className="font-bold text-amber-950 flex items-center gap-2">
-                  <span>Automated Collision Pruning &amp; Regeneration Cycle</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900 border border-amber-300">
+                <div className="font-bold text-[#1C1917] flex items-center gap-2">
+                  <span>Automated Collision Pruning &amp; Self-Regeneration Cycle</span>
+                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#EAE6DF] text-[#44403C] border border-[#DDD6CE]">
                     Cycle {retryInfo.cycle}
                   </span>
                 </div>
-                <p className="text-amber-900 text-[11px] mt-0.5">
-                  <strong>{retryInfo.collidedCount} of {retryInfo.totalGenerated}</strong> candidate proposals collided with registered titles during 4-D testing and were pruned.
+                <p className="text-[#57534E] text-xs mt-0.5 font-medium">
+                  <strong className="text-[#1C1917]">{retryInfo.collidedCount} of {retryInfo.totalGenerated}</strong> candidate proposals collided with registered titles during 4-D testing and were pruned.
                 </p>
-                <p className="text-[10px] text-amber-800/80 font-mono mt-0.5">
+                <p className="text-xs text-[#78716C] font-mono mt-0.5">
                   Example collision pruned: <em>"{retryInfo.collisionSample}"</em>
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-              <span className="font-mono text-emerald-800 font-bold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-lg text-xs">
+              <span className="font-mono text-emerald-800 font-bold bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-lg text-xs">
                 {retryInfo.survivingCount} Surviving Clean Titles
               </span>
             </div>
@@ -354,42 +348,42 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
       {/* Main Workspace Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Input Brief & Parameters Card */}
-        <div className="lg:col-span-4 beige-card rounded-3xl p-6 space-y-4 shadow-sm">
-          <div className="flex items-center gap-2 text-sm font-bold text-[#1C1917] border-b border-[#E8E0D2] pb-3">
+        <div className="lg:col-span-4 beige-card rounded-2xl p-6 space-y-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-[#1C1917] border-b border-[#E7E5E4] pb-3">
             <Bot className="w-4 h-4 text-amber-700" />
             <span>Title Brief &amp; Context</span>
           </div>
 
           <div className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-[#564735] font-semibold mb-1">Publication Theme / Domain</label>
+              <label className="block text-[#57534E] font-semibold mb-1">Publication Theme / Domain</label>
               <input
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g. Daily National Defense & Geopolitics"
-                className="w-full bg-white border border-[#DDD1BF] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none focus:border-amber-600 shadow-2xs"
+                className="w-full bg-white border border-[#D6D3D1] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
               />
             </div>
 
             <div>
-              <label className="block text-[#564735] font-semibold mb-1">Root Keywords &amp; Seed Tokens</label>
+              <label className="block text-[#57534E] font-semibold mb-1">Root Keywords &amp; Seed Tokens</label>
               <input
                 type="text"
                 value={keywords}
                 onChange={(e) => setKeywords(e.target.value)}
                 placeholder="e.g. Defence, Raksha, Rashtra, Strategy"
-                className="w-full bg-white border border-[#DDD1BF] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none focus:border-amber-600 shadow-2xs"
+                className="w-full bg-white border border-[#D6D3D1] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[#564735] font-semibold mb-1">Language</label>
+                <label className="block text-[#57534E] font-semibold mb-1">Language</label>
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="w-full bg-white border border-[#DDD1BF] rounded-xl px-2.5 py-2 text-[#1C1917] font-medium focus:outline-none focus:border-amber-600"
+                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
                   <option value="Hindi">Hindi (हिंदी)</option>
                   <option value="English">English</option>
@@ -402,11 +396,11 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
               </div>
 
               <div>
-                <label className="block text-[#564735] font-semibold mb-1">Periodicity</label>
+                <label className="block text-[#57534E] font-semibold mb-1">Periodicity</label>
                 <select
                   value={periodicity}
                   onChange={(e) => setPeriodicity(e.target.value)}
-                  className="w-full bg-white border border-[#DDD1BF] rounded-xl px-2.5 py-2 text-[#1C1917] font-medium focus:outline-none focus:border-amber-600"
+                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
                   <option value="Daily">Daily</option>
                   <option value="Weekly">Weekly</option>
@@ -419,11 +413,11 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[#564735] font-semibold mb-1">Target State</label>
+                <label className="block text-[#57534E] font-semibold mb-1">Target State</label>
                 <select
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="w-full bg-white border border-[#DDD1BF] rounded-xl px-2.5 py-2 text-[#1C1917] font-medium focus:outline-none focus:border-amber-600"
+                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
                   <option value="Uttar Pradesh">Uttar Pradesh</option>
                   <option value="Maharashtra">Maharashtra</option>
@@ -435,11 +429,11 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
               </div>
 
               <div>
-                <label className="block text-[#564735] font-semibold mb-1">Editorial Tone</label>
+                <label className="block text-[#57534E] font-semibold mb-1">Editorial Tone</label>
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="w-full bg-white border border-[#DDD1BF] rounded-xl px-2.5 py-2 text-[#1C1917] font-medium focus:outline-none focus:border-amber-600"
+                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
                   <option value="Authoritative & Progressive">Authoritative</option>
                   <option value="Modern & Analytical">Analytical</option>
@@ -449,18 +443,18 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
               </div>
             </div>
 
-            {/* In-Flight Workflow Notice */}
-            <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E0D2] flex items-start gap-2 text-[11px] text-[#75634B]">
+            {/* In-Flight Notice */}
+            <div className="p-3 rounded-xl bg-[#FAF9F6] border border-[#E7E5E4] flex items-start gap-2 text-xs text-[#57534E]">
               <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <span>
-                This multi-agent LLM pipeline runs end-to-end statutory verification. Full generation can take up to 45 seconds.
+                Runs end-to-end statutory verification. Full generation can take up to 45 seconds.
               </span>
             </div>
 
             <button
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="w-full mt-3 py-3.5 rounded-2xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full mt-3 py-3.5 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               {isGenerating ? (
                 <>
@@ -478,18 +472,18 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
         </div>
 
         {/* Right: Pre-Verified Generated Titles List */}
-        <div className="lg:col-span-8 beige-card rounded-3xl p-6 sm:p-7 space-y-4 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8E0D2] pb-3">
+        <div className="lg:col-span-8 beige-card rounded-2xl p-6 sm:p-7 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E7E5E4] pb-3">
             <div>
               <h2 className="text-base font-bold text-[#1C1917] flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-700" />
                 <span>Pre-Verified Conflict-Free Titles</span>
               </h2>
-              <p className="text-xs text-[#75634B]">
-                Every recommendation has already cleared our 82k registry lookup &amp; PRGI statutory rules.
+              <p className="text-xs text-[#78716C] font-medium">
+                Every suggestion has cleared our 82k registry lookup &amp; PRGI statutory rules.
               </p>
             </div>
-            <span className="text-xs font-mono text-emerald-800 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full font-bold self-start sm:self-auto">
+            <span className="text-xs font-mono text-emerald-800 bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-md font-bold self-start sm:self-auto">
               100% Clearance Rate
             </span>
           </div>
@@ -498,30 +492,30 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
             {candidates.map((candidate) => (
               <div
                 key={candidate.id}
-                className="p-5 rounded-2xl bg-white border border-[#DDD1BF] hover:border-amber-300 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs"
+                className="p-5 rounded-xl bg-white border border-[#E7E5E4] hover:border-[#D6D3D1] transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs"
               >
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-base font-bold text-[#1C1917] font-poppins">
+                    <span className="text-base font-bold text-[#1C1917]">
                       {candidate.title}
                     </span>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold border border-emerald-300 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                    <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 font-bold border border-emerald-300 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
                       <span>Verified Clear</span>
                     </span>
-                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#F0EBE0] text-[#564735] font-mono">
+                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-[#FAF9F6] text-[#57534E] font-mono border border-[#E7E5E4]">
                       Uniqueness: {candidate.uniquenessScore}%
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-mono font-semibold">
+                    <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-mono font-semibold">
                       Risk: {candidate.riskScore}/100
                     </span>
                   </div>
 
                   <p className="text-xs text-[#44403C]">
-                    <span className="text-[#75634B] font-semibold">Concept Meaning:</span> {candidate.meaning}
+                    <span className="text-[#78716C] font-bold">Concept Meaning:</span> {candidate.meaning}
                   </p>
-                  <p className="text-[11px] text-[#75634B]">
-                    <strong className="text-amber-900">Verification Evidence:</strong> {candidate.rationale}
+                  <p className="text-xs text-[#57534E]">
+                    <strong className="text-[#1C1917]">Verification Evidence:</strong> {candidate.rationale}
                   </p>
                 </div>
 
@@ -529,7 +523,7 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => copyTitle(candidate.title, candidate.id)}
-                    className="p-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F0EBE0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] transition-colors cursor-pointer"
+                    className="p-2.5 rounded-xl bg-[#FAF9F6] hover:bg-[#F5F2EA] text-[#57534E] hover:text-[#1C1917] border border-[#E7E5E4] transition-colors cursor-pointer"
                     title="Copy title to clipboard"
                   >
                     {copiedId === candidate.id ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}

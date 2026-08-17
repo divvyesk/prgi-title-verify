@@ -93,7 +93,6 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
   const currentStageIdx = getStageIndex(stage);
   const isComplete = stage === 'done' || (!isRunning && Boolean(stageTimings));
 
-  // Calculate total execution time from individual stage timings or prop
   const computedTotalMs = totalTimeMs ?? (
     stageTimings 
       ? Object.values(stageTimings).reduce((sum, val) => sum + val, 0)
@@ -102,15 +101,15 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
 
   return (
     <div className="w-full space-y-3">
-      {/* Header bar with Real Timing telemetry */}
+      {/* Header bar with Real Timing Telemetry */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-amber-600 motion-safe:animate-pulse" />
-          <span className="text-xs font-bold font-poppins uppercase tracking-wider text-[#1C1917]">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#1C1917]">
             5-Stage Pipeline Telemetry
           </span>
           {isRunning && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-semibold motion-safe:animate-pulse">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300 font-bold motion-safe:animate-pulse">
               Processing...
             </span>
           )}
@@ -118,55 +117,53 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
 
         {/* Real Measured Latency Summary Pill */}
         <div className="flex items-center gap-2 text-xs font-mono">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-[#DDD1BF] shadow-2xs">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#FAF9F6] border border-[#E7E5E4] shadow-2xs">
             <Clock className="w-3.5 h-3.5 text-amber-700" />
-            <span className="text-[#75634B]">Total Pipeline Latency:</span>
+            <span className="text-[#78716C]">Total Latency:</span>
             <span className="font-bold text-[#1C1917]">
               {isRunning ? 'Measuring...' : `${computedTotalMs} ms`}
             </span>
           </div>
 
           {engine && (
-            <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-lg border ${
+            <span className={`text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg border ${
               engine === 'LIVE' 
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-300' 
-                : 'bg-[#F0EBE0] text-[#75634B] border-[#DDD1BF]'
+                : 'bg-[#F5F2EA] text-[#57534E] border-[#E7E5E4]'
             }`}>
-              {engine === 'LIVE' ? 'Live PGVector' : 'Offline Heuristics'}
+              {engine === 'LIVE' ? 'Live PGVector' : 'Offline Engine'}
             </span>
           )}
         </div>
       </div>
 
-      {/* 5-Stage Stepper Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+      {/* 5-Stage Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5">
         {STAGES.map((s) => {
           const isActive = isRunning && currentStageIdx === s.num;
           const isFinished = currentStageIdx > s.num || isComplete;
 
-          // Real measured millisecond duration from stageTimings, or fallback to default
           const measuredMs = stageTimings ? (stageTimings[s.id] ?? stageTimings[s.name.toLowerCase()] ?? s.defaultMs) : s.defaultMs;
           const Icon = s.icon;
 
           return (
             <div
               key={s.id}
-              className={`p-3 rounded-xl border transition-all relative overflow-hidden ${
+              className={`p-3.5 rounded-xl border transition-all relative overflow-hidden ${
                 isActive
-                  ? 'bg-amber-50/90 border-amber-400 text-amber-950 shadow-xs ring-1 ring-amber-300/60'
+                  ? 'bg-amber-50 border-amber-400 text-amber-950 shadow-xs ring-1 ring-amber-300'
                   : isFinished
-                  ? 'bg-white border-[#E2D7C5] text-[#1C1917] hover:border-amber-300'
-                  : 'bg-[#FAF7F2]/60 border-[#EFE8DC] text-[#A8A29E]'
+                  ? 'bg-white border-[#E7E5E4] text-[#1C1917]'
+                  : 'bg-[#FAF9F6] border-[#E7E5E4] text-[#A8A29E]'
               }`}
             >
-              {/* Progress active glow indicator */}
               {isActive && (
                 <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-600 motion-safe:animate-pulse" />
               )}
 
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono font-bold text-[#75634B]">
+                  <span className="text-xs font-mono font-bold text-[#78716C]">
                     0{s.num}
                   </span>
                   <Icon 
@@ -178,18 +175,18 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
                   />
                 </div>
 
-                {/* Real Measured Execution Time Badge */}
+                {/* Real Execution Time Badge */}
                 <div className="text-right">
                   {isFinished ? (
-                    <span className="text-[11px] font-mono font-extrabold text-[#1C1917] bg-[#F4EFE6] px-1.5 py-0.5 rounded border border-[#E2D7C5]">
+                    <span className="text-xs font-mono font-extrabold text-[#1C1917] bg-[#F5F2EA] px-1.5 py-0.5 rounded border border-[#E7E5E4]">
                       {measuredMs} ms
                     </span>
                   ) : isActive ? (
-                    <span className="text-[10px] font-mono font-bold text-amber-800 motion-safe:animate-pulse">
+                    <span className="text-xs font-mono font-bold text-amber-800 motion-safe:animate-pulse">
                       Running...
                     </span>
                   ) : (
-                    <span className="text-[10px] font-mono text-[#A8A29E]">
+                    <span className="text-xs font-mono text-[#A8A29E]">
                       ~{s.defaultMs} ms
                     </span>
                   )}
@@ -197,13 +194,13 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
               </div>
 
               {/* Stage Name */}
-              <div className="font-poppins font-bold text-xs truncate flex items-center justify-between">
+              <div className="font-bold text-xs truncate flex items-center justify-between">
                 <span>{s.name}</span>
-                {isFinished && <CheckCircle2 className="w-3 h-3 text-emerald-700 shrink-0 ml-1" />}
+                {isFinished && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0 ml-1" />}
               </div>
 
               {/* Stage Short Description */}
-              <p className="text-[10px] text-[#75634B] leading-tight mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-[#78716C] leading-tight mt-0.5 line-clamp-1 font-medium">
                 {s.shortDesc}
               </p>
             </div>
@@ -211,9 +208,9 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
         })}
       </div>
 
-      {/* Prominent Textual Real Timings Banner (Evaluator View) */}
+      {/* Prominent Real Measured Timings Banner */}
       {isComplete && stageTimings && (
-        <div className="py-2 px-3.5 rounded-xl bg-white border border-[#DDD1BF] flex items-center justify-between gap-3 text-xs font-mono text-[#564735] shadow-2xs">
+        <div className="py-2.5 px-4 rounded-xl bg-white border border-[#E7E5E4] flex items-center justify-between gap-3 text-xs font-mono text-[#57534E] shadow-2xs">
           <div className="flex items-center gap-2 flex-wrap">
             <Zap className="w-3.5 h-3.5 text-amber-700 shrink-0" />
             <span className="font-bold text-[#1C1917]">Measured Stage Latencies:</span>
@@ -226,7 +223,7 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({
             </span>
           </div>
 
-          <div className="shrink-0 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+          <div className="shrink-0 text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
             &lt; 2.0s SLA Passed
           </div>
         </div>
