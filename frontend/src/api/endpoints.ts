@@ -64,7 +64,7 @@ export async function checkRules(request: RuleCheckRequest): Promise<RuleCheckRe
  * POST /v1/alternatives — Agentic Title Studio Generation
  */
 export async function generateAlternatives(request: AlternativesRequest): Promise<AlternativesResponse> {
-  return post<AlternativesResponse>('/v1/alternatives', request, AlternativesResponseSchema);
+  return post<AlternativesResponse>('/v1/alternatives', request, AlternativesResponseSchema, { timeoutMs: 45000 });
 }
 
 /**

@@ -79,12 +79,22 @@ async function toApiError(res: Response): Promise<ApiError> {
   );
 }
 
+export interface RequestOptions {
+  timeoutMs?: number;
+}
+
 /**
- * Standard POST request with 2.5s AbortController and Zod schema parsing
+ * Standard POST request with AbortController and Zod schema parsing
  */
-export async function post<T>(path: string, body: unknown, schema: ZodSchema<T>): Promise<T> {
+export async function post<T>(
+  path: string, 
+  body: unknown, 
+  schema: ZodSchema<T>,
+  options?: RequestOptions
+): Promise<T> {
+  const timeout = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeout);
 
   try {
     const res = await fetch(`${BASE}${path}`, {
@@ -116,7 +126,7 @@ export async function post<T>(path: string, body: unknown, schema: ZodSchema<T>)
       throw err;
     }
     if (err instanceof Error && err.name === 'AbortError') {
-      throw new ApiError('TIMEOUT', `Request to ${path} exceeded the ${REQUEST_TIMEOUT_MS}ms budget.`);
+      throw new ApiError('TIMEOUT', `Request to ${path} exceeded the ${timeout}ms budget.`);
     }
     if (err instanceof TypeError) {
       throw new ApiError('SERVICE_UNAVAILABLE', `Unable to connect to backend at ${BASE}${path}.`);
@@ -128,11 +138,16 @@ export async function post<T>(path: string, body: unknown, schema: ZodSchema<T>)
 }
 
 /**
- * Standard GET request with 2.5s AbortController and Zod schema parsing
+ * Standard GET request with AbortController and Zod schema parsing
  */
-export async function get<T>(path: string, schema: ZodSchema<T>): Promise<T> {
+export async function get<T>(
+  path: string, 
+  schema: ZodSchema<T>,
+  options?: RequestOptions
+): Promise<T> {
+  const timeout = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeout);
 
   try {
     const res = await fetch(`${BASE}${path}`, {
