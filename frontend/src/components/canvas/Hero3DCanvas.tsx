@@ -30,13 +30,13 @@ function createButterflyWingCurve(isRightWing = false, scale = 1): THREE.Catmull
   return new THREE.CatmullRomCurve3(points, true);
 }
 
-// 3D Pure Warm Beige Neon Butterfly (Seamless & Perfectly Scaled to Fit)
+// 3D Pure Warm Beige Neon Butterfly (Soft Mellow Glow & Seamless Fit)
 function PureNeonButterfly({
   position,
   rotation = [0, 0, 0],
   scale = 1,
-  color = '#D4AF37',
-  glowColor = '#F59E0B',
+  color = '#C27830',
+  glowColor = '#D97706',
   wingAngleOffset = 0,
   flutterSpeed = 2.4
 }: {
@@ -79,7 +79,7 @@ function PureNeonButterfly({
       </mesh>
       <mesh position={[0, 0, 0.01]}>
         <capsuleGeometry args={[0.018 * scale, 0.36 * scale, 12, 16]} />
-        <meshBasicMaterial color="#FFFDF7" toneMapped={false} />
+        <meshBasicMaterial color="#FFF7ED" toneMapped={false} />
       </mesh>
 
       {/* 2. Left Wing Neon Tubes */}
@@ -87,25 +87,25 @@ function PureNeonButterfly({
         {/* Deep Contrast Drop Outline */}
         <mesh position={[0, -0.01, -0.015]}>
           <tubeGeometry args={[leftCurve, 48, 0.040 * scale, 8, true]} />
-          <meshBasicMaterial color="#1C1917" transparent opacity={0.35} />
+          <meshBasicMaterial color="#1C1917" transparent opacity={0.3} />
         </mesh>
 
-        {/* Outer Radiant Warm Beige/Amber Neon Tube */}
+        {/* Outer Radiant Warm Caramel/Amber Neon Tube (Soft Mellow Glow) */}
         <mesh>
           <tubeGeometry args={[leftCurve, 48, 0.034 * scale, 12, true]} />
           <meshStandardMaterial
             color={color}
             emissive={glowColor}
-            emissiveIntensity={6.0}
-            roughness={0.05}
+            emissiveIntensity={2.8}
+            roughness={0.1}
             toneMapped={false}
           />
         </mesh>
 
-        {/* Inner White-Hot Warm Gas Core Filament */}
+        {/* Inner Soft Warm Gas Core Filament */}
         <mesh position={[0, 0, 0.008]}>
           <tubeGeometry args={[leftCurve, 48, 0.014 * scale, 8, true]} />
-          <meshBasicMaterial color="#FFFDF7" toneMapped={false} />
+          <meshBasicMaterial color="#FFF7ED" toneMapped={false} />
         </mesh>
       </group>
 
@@ -114,35 +114,35 @@ function PureNeonButterfly({
         {/* Deep Contrast Drop Outline */}
         <mesh position={[0, -0.01, -0.015]}>
           <tubeGeometry args={[rightCurve, 48, 0.040 * scale, 8, true]} />
-          <meshBasicMaterial color="#1C1917" transparent opacity={0.35} />
+          <meshBasicMaterial color="#1C1917" transparent opacity={0.3} />
         </mesh>
 
-        {/* Outer Radiant Warm Beige/Amber Neon Tube */}
+        {/* Outer Radiant Warm Caramel/Amber Neon Tube */}
         <mesh>
           <tubeGeometry args={[rightCurve, 48, 0.034 * scale, 12, true]} />
           <meshStandardMaterial
             color={color}
             emissive={glowColor}
-            emissiveIntensity={6.0}
-            roughness={0.05}
+            emissiveIntensity={2.8}
+            roughness={0.1}
             toneMapped={false}
           />
         </mesh>
 
-        {/* Inner White-Hot Warm Gas Core Filament */}
+        {/* Inner Soft Warm Gas Core Filament */}
         <mesh position={[0, 0, 0.008]}>
           <tubeGeometry args={[rightCurve, 48, 0.014 * scale, 8, true]} />
-          <meshBasicMaterial color="#FFFDF7" toneMapped={false} />
+          <meshBasicMaterial color="#FFF7ED" toneMapped={false} />
         </mesh>
       </group>
 
-      {/* Local Specular Point Light */}
-      <pointLight color={glowColor} intensity={2.5} distance={2.0} />
+      {/* Subtle Specular Point Light */}
+      <pointLight color={glowColor} intensity={1.2} distance={2.0} />
     </group>
   );
 }
 
-// 3D Pure Warm Beige Neon Title Text (Ultra-Crisp Warm Gold & Amber)
+// 3D Pure Warm Ochre & Caramel Neon Title Text (Mellow Organic Warmth)
 function PureNeonTitle({
   title,
   verdict,
@@ -154,30 +154,30 @@ function PureNeonTitle({
 }) {
   const signRef = useRef<THREE.Group>(null);
 
-  // Warm Beige, Golden Amber & Honey Palette
+  // Warmer Shades: Roasted Caramel, Warm Ochre, Terracotta Amber, Deep Honey
   const { primaryColor, glowColor, secondaryColor, secondaryGlow } = useMemo(() => {
     if (verdict === 'APPROVED') {
       return { 
-        primaryColor: '#84CC16', // Olive Gold / Emerald Warmth
-        glowColor: '#A3E635', 
-        secondaryColor: '#D4AF37', 
-        secondaryGlow: '#F59E0B' 
+        primaryColor: '#4D7C0F', // Warm Olive / Sage Gold
+        glowColor: '#65A30D', 
+        secondaryColor: '#B45309', 
+        secondaryGlow: '#D97706' 
       };
     }
     if (verdict === 'REJECTED') {
       return { 
-        primaryColor: '#E11D48', // Warm Terracotta / Rose
-        glowColor: '#FB7185', 
-        secondaryColor: '#D4AF37', 
-        secondaryGlow: '#F59E0B' 
+        primaryColor: '#9F1239', // Deep Terracotta Wine
+        glowColor: '#BE123C', 
+        secondaryColor: '#B45309', 
+        secondaryGlow: '#D97706' 
       };
     }
-    // Default & Manual Review: Pure Warm Golden Beige & Honey Amber
+    // Default & Manual Review: Warm Roasted Caramel & Terracotta Honey
     return { 
-      primaryColor: '#D4AF37', // Warm Rich Gold Beige
-      glowColor: '#F59E0B',    // Amber Radiant Glow
-      secondaryColor: '#B45309', // Warm Deep Ochre
-      secondaryGlow: '#D97706'  // Golden Glow
+      primaryColor: '#B45309', // Warm Deep Amber Ochre
+      glowColor: '#D97706',    // Warm Honey Amber
+      secondaryColor: '#92400E', // Roasted Cinnamon Gold
+      secondaryGlow: '#B45309'  // Mellow Warm Glow
     };
   }, [verdict]);
 
@@ -197,7 +197,7 @@ function PureNeonTitle({
     <group ref={signRef}>
       {/* Line 1: Primary Glowing 3D Neon Text */}
       <group position={[0, line2 ? 0.28 : 0, 0]}>
-        {/* Layer 0: Dark Contrast Shadow Base (Gives 3D pop on Light Beige) */}
+        {/* Layer 0: Dark Contrast Shadow Base (Provides Crisp Legibility on Light Beige) */}
         <Text
           position={[0, -0.015, -0.03]}
           fontSize={fontSize}
@@ -210,10 +210,10 @@ function PureNeonTitle({
           letterSpacing={0.06}
         >
           {line1}
-          <meshBasicMaterial color="#1C1917" transparent opacity={0.3} />
+          <meshBasicMaterial color="#1C1917" transparent opacity={0.25} />
         </Text>
 
-        {/* Layer 1: Saturated Radiant Warm Gold Tube */}
+        {/* Layer 1: Saturated Radiant Warm Caramel/Ochre Tube (Soft Mellow Emissive) */}
         <Text
           position={[0, 0, 0]}
           fontSize={fontSize}
@@ -229,13 +229,13 @@ function PureNeonTitle({
           <meshStandardMaterial
             color={primaryColor}
             emissive={glowColor}
-            emissiveIntensity={6.0}
-            roughness={0.05}
+            emissiveIntensity={2.8}
+            roughness={0.1}
             toneMapped={false}
           />
         </Text>
 
-        {/* Layer 2: White-Hot Warm Gas Core Center Filament */}
+        {/* Layer 2: Soft Warm Cream Gas Core Filament */}
         <Text
           position={[0, 0, 0.02]}
           fontSize={fontSize}
@@ -244,15 +244,15 @@ function PureNeonTitle({
           anchorX="center"
           anchorY="middle"
           outlineWidth={0.014}
-          outlineColor="#FFFDF7"
+          outlineColor="#FFF7ED"
           letterSpacing={0.06}
         >
           {line1}
-          <meshBasicMaterial color="#FFFDF7" toneMapped={false} />
+          <meshBasicMaterial color="#FFF7ED" toneMapped={false} />
         </Text>
       </group>
 
-      {/* Line 2: Secondary Warm Amber/Honey Glowing 3D Neon Text */}
+      {/* Line 2: Secondary Warm Cinnamon/Amber Glowing 3D Neon Text */}
       {line2 && (
         <group position={[0, -0.28, 0]}>
           {/* Layer 0: Dark Contrast Shadow Base */}
@@ -268,10 +268,10 @@ function PureNeonTitle({
             letterSpacing={0.06}
           >
             {line2}
-            <meshBasicMaterial color="#1C1917" transparent opacity={0.3} />
+            <meshBasicMaterial color="#1C1917" transparent opacity={0.25} />
           </Text>
 
-          {/* Layer 1: Saturated Radiant Warm Gold Tube */}
+          {/* Layer 1: Saturated Radiant Warm Ochre Tube */}
           <Text
             position={[0, 0, 0]}
             fontSize={fontSize * 0.94}
@@ -287,13 +287,13 @@ function PureNeonTitle({
             <meshStandardMaterial
               color={secondaryColor}
               emissive={secondaryGlow}
-              emissiveIntensity={6.0}
-              roughness={0.05}
+              emissiveIntensity={2.8}
+              roughness={0.1}
               toneMapped={false}
             />
           </Text>
 
-          {/* Layer 2: White-Hot Warm Gas Core Center Filament */}
+          {/* Layer 2: Soft Warm Cream Gas Core Filament */}
           <Text
             position={[0, 0, 0.02]}
             fontSize={fontSize * 0.94}
@@ -302,16 +302,16 @@ function PureNeonTitle({
             anchorX="center"
             anchorY="middle"
             outlineWidth={0.014}
-            outlineColor="#FFFDF7"
+            outlineColor="#FFF7ED"
             letterSpacing={0.06}
           >
             {line2}
-            <meshBasicMaterial color="#FFFDF7" toneMapped={false} />
+            <meshBasicMaterial color="#FFF7ED" toneMapped={false} />
           </Text>
         </group>
       )}
 
-      {/* Subtitle Minimal Neon Caption */}
+      {/* Subtitle Minimal Warm Caption */}
       <Text
         position={[0, line2 ? -0.74 : -0.54, 0.01]}
         fontSize={0.11}
@@ -326,23 +326,23 @@ function PureNeonTitle({
         <meshStandardMaterial
           color="#1C1917"
           emissive={primaryColor}
-          emissiveIntensity={4.0}
+          emissiveIntensity={2.2}
           toneMapped={false}
         />
       </Text>
 
-      {/* Front & Ambient Warm Glow Lights */}
-      <pointLight position={[0, 0.15, 0.7]} color={glowColor} intensity={3.5} distance={4.5} />
-      <pointLight position={[0, -0.25, 0.7]} color={secondaryGlow} intensity={3.0} distance={4.5} />
+      {/* Soft Ambient Warm Glow Lights */}
+      <pointLight position={[0, 0.15, 0.7]} color={glowColor} intensity={1.8} distance={4.0} />
+      <pointLight position={[0, -0.25, 0.7]} color={secondaryGlow} intensity={1.5} distance={4.0} />
 
       {/* Laser Scanning Line during verification */}
       {isScanning && (
         <group position={[0, 0, 0.14]}>
           <mesh>
             <planeGeometry args={[3.4, 0.035]} />
-            <meshBasicMaterial color="#F59E0B" transparent opacity={0.95} toneMapped={false} />
+            <meshBasicMaterial color="#D97706" transparent opacity={0.9} toneMapped={false} />
           </mesh>
-          <pointLight color="#F59E0B" intensity={4} distance={2.5} />
+          <pointLight color="#D97706" intensity={2.5} distance={2.5} />
         </group>
       )}
     </group>
@@ -388,8 +388,8 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
         gl={{ antialias: true, alpha: true, toneMapping: THREE.NoToneMapping }}
       >
         {/* Soft Natural Ambient Light */}
-        <ambientLight intensity={1.3} />
-        <directionalLight position={[4, 6, 5]} intensity={1.5} color="#FFFDF7" />
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[4, 6, 5]} intensity={1.3} color="#FFFDF7" />
 
         {/* Orbit Controls: Rotatable by Mouse, Constrained to Viewport */}
         <OrbitControls
@@ -404,65 +404,65 @@ export const Hero3DCanvas: React.FC<SceneProps> = ({ title, verdict, isScanning 
 
         <Suspense fallback={null}>
           <group position={[0, 0.05, 0]}>
-            {/* Center Pure 3D Warm Beige Neon Title */}
+            {/* Center Pure 3D Warm Ochre & Caramel Neon Title */}
             <PureNeonTitle
               title={title || 'Times India'}
               verdict={verdict}
               isScanning={isScanning}
             />
 
-            {/* Surrounding Warm Golden Beige & Amber Butterflies (Safely Fitted Inside Viewport Bounds) */}
-            {/* 1. Top-Right Warm Gold Butterfly */}
+            {/* Surrounding Warm Caramel, Amber & Bronze Butterflies (Safely Fitted Inside Viewport Bounds) */}
+            {/* 1. Top-Right Warm Caramel Butterfly */}
             <PureNeonButterfly
               position={[1.25, 0.58, 0.2]}
               rotation={[0.10, -0.22, 0.18]}
               scale={0.52}
-              color="#D4AF37"
-              glowColor="#F59E0B"
+              color="#C27830"
+              glowColor="#D97706"
               wingAngleOffset={0}
               flutterSpeed={2.2}
             />
 
-            {/* 2. Top-Left Champagne Honey Butterfly */}
+            {/* 2. Top-Left Warm Ochre Honey Butterfly */}
             <PureNeonButterfly
               position={[-1.25, 0.54, 0.2]}
               rotation={[0.12, 0.25, -0.20]}
               scale={0.48}
-              color="#E5C158"
-              glowColor="#FBBF24"
+              color="#B45309"
+              glowColor="#D97706"
               wingAngleOffset={1.2}
               flutterSpeed={2.6}
             />
 
-            {/* 3. Bottom-Left Warm Ochre/Amber Butterfly */}
+            {/* 3. Bottom-Left Warm Bronze Gold Butterfly */}
             <PureNeonButterfly
               position={[-1.20, -0.52, 0.22]}
               rotation={[-0.08, 0.18, 0.14]}
               scale={0.46}
-              color="#B45309"
-              glowColor="#D97706"
+              color="#A16207"
+              glowColor="#CA8A04"
               wingAngleOffset={2.4}
               flutterSpeed={2.0}
             />
 
-            {/* 4. Bottom-Right Radiant Golden Butterfly */}
+            {/* 4. Bottom-Right Warm Amber Sand Butterfly */}
             <PureNeonButterfly
               position={[1.22, -0.48, 0.2]}
               rotation={[-0.10, -0.20, -0.15]}
               scale={0.45}
-              color="#D4AF37"
-              glowColor="#F59E0B"
+              color="#C27830"
+              glowColor="#D97706"
               wingAngleOffset={3.6}
               flutterSpeed={2.4}
             />
 
-            {/* 5. Center-Top Floating Mini Champagne Butterfly */}
+            {/* 5. Center-Top Floating Mini Cinnamon Butterfly */}
             <PureNeonButterfly
               position={[0.0, 0.76, 0.15]}
               rotation={[0.04, 0.08, -0.06]}
               scale={0.38}
-              color="#E5C158"
-              glowColor="#FBBF24"
+              color="#B45309"
+              glowColor="#D97706"
               wingAngleOffset={4.8}
               flutterSpeed={2.8}
             />
