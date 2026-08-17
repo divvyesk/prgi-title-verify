@@ -61,7 +61,7 @@ REGISTRY: dict[str, RuleFn] = {}
 # ---------------------------------------------------------------------------
 # Internal: load rules.json once at import time
 # ---------------------------------------------------------------------------
-_RULES_JSON_PATH = Path(__file__).parent.parent.parent / "rules" / "rules.json"
+_RULES_JSON_PATH = Path(__file__).parent.parent.parent / "data" / "rules" / "rules.json"
 _RULE_META: dict[str, dict] = {}
 
 

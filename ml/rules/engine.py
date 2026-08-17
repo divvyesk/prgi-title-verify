@@ -179,3 +179,24 @@ def check_all(title: str, ctx: RuleContext) -> list[RuleViolation]:
         len(violations), len(failed), title[:40],
     )
     return violations
+
+
+# ---------------------------------------------------------------------------
+# check — public alias expected by backend/app/services/pipeline.py
+# ---------------------------------------------------------------------------
+def check(title: str) -> list[RuleViolation]:
+    """
+    Thin wrapper around check_all() with a default empty RuleContext.
+
+    backend/app/services/pipeline.py calls:
+        from ml.rules.engine import check
+        check(title) -> list[RuleViolation]
+
+    This alias keeps pipeline.py working without needing a RuleContext
+    at the call site.  All rule violations are returned (both passed=True
+    and passed=False) so the pipeline can decide what to surface.
+    """
+    import re
+    normalized = re.sub(r"\s+", " ", title.strip().lower())
+    tokens = normalized.split()
+    return check_all(title, RuleContext(normalized=normalized, tokens=tokens))

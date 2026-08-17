@@ -18,7 +18,7 @@ from pathlib import Path
 from ml.rules.registry import rule
 from ml.rules.types import RuleContext, RuleOutcome
 
-_WL_DIR = Path(__file__).parent.parent.parent.parent / "rules" / "wordlists"
+_WL_DIR = Path(__file__).parent.parent.parent.parent / "data" / "rules" / "wordlists"
 
 _EMBLEM_WORDS = [
     line.strip().lower()
