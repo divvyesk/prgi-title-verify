@@ -24,3 +24,20 @@ yarn-error.log*
 .env
 .env**
 .env.**
+.env.local
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Model weights / ML artifacts
+*.npy
+*.pt
+*.bin
+models/
+
+# Tooling caches
+.playwright/
+.antigravity/
+agents/cache/

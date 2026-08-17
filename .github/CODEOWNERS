@@ -1,0 +1,58 @@
+# CODEOWNERS for PRGI TitleGuard
+# Mirrors the "TEAM AND FILE OWNERSHIP" section of AGENTS.md.
+# Usernames are placeholders except @divvyesk (confirmed GitHub login) —
+# fill in the real handles for @jai, @pruthviraj, @suhani, @gurpreet, @darsh.
+# Last matching pattern wins, so shared-file overrides are listed last.
+
+# Divvye — contracts/, backend/, ml/fusion/, ml/similarity/semantic.py,
+# ml/registry.py, contracts/fixtures/, ml/config/, docs/
+/contracts/                          @divvyesk
+/backend/                            @divvyesk
+/ml/fusion/                          @divvyesk
+/ml/similarity/semantic.py           @divvyesk
+/ml/registry.py                      @divvyesk
+/ml/config/                          @divvyesk
+/docs/                               @divvyesk
+
+# Jai — ml/similarity/lexical.py, phonetic.py, core_word.py, ml/scoring.py, search/
+/ml/similarity/lexical.py            @jai
+/ml/similarity/phonetic.py           @jai
+/ml/similarity/core_word.py          @jai
+/ml/scoring.py                       @jai
+/search/                             @jai
+
+# Pruthviraj — data/rules/, ml/rules/, ml/embeddings/, data/eval/, data/datasets/
+/data/rules/                         @pruthviraj
+/ml/rules/                           @pruthviraj
+/ml/embeddings/                      @pruthviraj
+/data/eval/                          @pruthviraj
+/data/datasets/                      @pruthviraj
+
+# Suhani — agents/, ml/rag/, presentation/
+/agents/                             @suhani
+/ml/rag/                             @suhani
+/presentation/                       @suhani
+
+# Gurpreet — frontend/src/api/, hooks/, utils/, App.tsx,
+# components/verifier/, components/agents/, infra/
+/frontend/src/api/                   @gurpreet
+/frontend/src/hooks/                 @gurpreet
+/frontend/src/utils/                 @gurpreet
+/frontend/src/App.tsx                @gurpreet
+/frontend/src/components/verifier/   @gurpreet
+/frontend/src/components/agents/     @gurpreet
+/infra/                              @gurpreet
+
+# Darsh — frontend/src/components/officer/, components/registry/,
+# frontend/src/export/, frontend/tests/
+/frontend/src/components/officer/    @darsh
+/frontend/src/components/registry/   @darsh
+/frontend/src/export/                @darsh
+/frontend/tests/                     @darsh
+
+# Shared files — require the listed owner's sign-off before editing (see AGENTS.md)
+/ml/config/weights.yaml              @jai @divvyesk
+/ml/config/stopwords.txt             @jai @divvyesk
+/frontend/src/types/index.ts         @gurpreet @divvyesk
+/infra/docker-compose.yml            @gurpreet @divvyesk
+/README.md                           @divvyesk
