@@ -1,0 +1,167 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { TitleRecord } from '../../types';
+import sampleTitlesRaw from '../../data/titleMasterSample.json';
+
+const sampleTitles = sampleTitlesRaw as TitleRecord[];
+
+export interface RegistrySearchParams {
+  query: string;
+  state: string;
+  language: string;
+  periodicity: string;
+  page: number;
+  size: number;
+}
+
+export interface UseRegistrySearchResult {
+  records: TitleRecord[];
+  total: number;
+  totalPages: number;
+  isLoading: boolean;
+  error: string | null;
+  mode: 'LIVE' | 'OFFLINE';
+  languages: string[];
+  states: string[];
+  periodicities: string[];
+  refetch: () => void;
+}
+
+export const useRegistrySearch = (params: RegistrySearchParams): UseRegistrySearchResult => {
+  const { query, state, language, periodicity, page, size } = params;
+
+  const [records, setRecords] = useState<TitleRecord[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'LIVE' | 'OFFLINE'>('OFFLINE');
+
+  // Debounced query ref to track active request
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Extract unique filter choices from base sample
+  const languages = useRef<string[]>(
+    Array.from(new Set(sampleTitles.map((t) => (t.language ? t.language.split(',')[0].trim() : ''))))
+      .filter(Boolean)
+      .sort()
+  ).current;
+
+  const states = useRef<string[]>(
+    Array.from(new Set(sampleTitles.map((t) => (t.state ? t.state.trim() : ''))))
+      .filter(Boolean)
+      .sort()
+  ).current;
+
+  const periodicities = useRef<string[]>(
+    Array.from(new Set(sampleTitles.map((t) => (t.periodicity ? t.periodicity.trim() : ''))))
+      .filter(Boolean)
+      .sort()
+  ).current;
+
+  // Offline client-side search fallback
+  const performOfflineSearch = useCallback(() => {
+    const q = query.toLowerCase().trim();
+    const filtered = sampleTitles.filter((item) => {
+      const matchesSearch =
+        !q ||
+        (item.title && item.title.toLowerCase().includes(q)) ||
+        (item.regNo && item.regNo.toLowerCase().includes(q)) ||
+        (item.publisher && item.publisher.toLowerCase().includes(q));
+
+      const matchesLang =
+        language === 'ALL' || (item.language && item.language.includes(language));
+
+      const matchesState =
+        state === 'ALL' || item.state === state;
+
+      const matchesPeriodicity =
+        periodicity === 'ALL' || item.periodicity === periodicity;
+
+      return matchesSearch && matchesLang && matchesState && matchesPeriodicity;
+    });
+
+    const start = (page - 1) * size;
+    const paginated = filtered.slice(start, start + size);
+
+    setRecords(paginated);
+    setTotal(filtered.length);
+    setMode('OFFLINE');
+    setIsLoading(false);
+  }, [query, state, language, periodicity, page, size]);
+
+  const fetchRegistry = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    // Cancel in-flight requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    try {
+      // Build search query parameters
+      const urlParams = new URLSearchParams();
+      if (query.trim()) urlParams.set('q', query.trim());
+      if (state !== 'ALL') urlParams.set('state', state);
+      if (language !== 'ALL') urlParams.set('language', language);
+      if (periodicity !== 'ALL') urlParams.set('periodicity', periodicity);
+      urlParams.set('page', String(page));
+      urlParams.set('size', String(size));
+
+      const response = await fetch(`/v1/registry/search?${urlParams.toString()}`, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data && Array.isArray(data.results)) {
+        setRecords(data.results);
+        setTotal(typeof data.total === 'number' ? data.total : data.results.length);
+        setMode('LIVE');
+        setIsLoading(false);
+      } else {
+        performOfflineSearch();
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        return; // Request was aborted due to new input
+      }
+      // Silently fall back to offline client-side search
+      const msg = err instanceof Error ? err.message : 'Server unreachable';
+      setError(msg);
+      performOfflineSearch();
+    }
+  }, [query, state, language, periodicity, page, size, performOfflineSearch]);
+
+  useEffect(() => {
+    fetchRegistry();
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [fetchRegistry]);
+
+  const totalPages = Math.ceil(total / size) || 1;
+
+  return {
+    records,
+    total,
+    totalPages,
+    isLoading,
+    error,
+    mode,
+    languages,
+    states,
+    periodicities,
+    refetch: fetchRegistry
+  };
+};
