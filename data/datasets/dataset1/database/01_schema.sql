@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TABLE IF NOT EXISTS titles (
     title_id BIGINT PRIMARY KEY,
 
@@ -26,5 +28,10 @@ CREATE TABLE IF NOT EXISTS titles (
 
     title_transliterated TEXT,
     transliteration_status TEXT,
-    title_core TEXT
+    title_core TEXT,
+
+    embedding VECTOR(1024)
 );
+
+ALTER TABLE titles
+ADD COLUMN IF NOT EXISTS embedding VECTOR(1024);
