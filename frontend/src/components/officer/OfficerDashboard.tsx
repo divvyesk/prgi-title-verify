@@ -47,7 +47,7 @@ export const OfficerDashboard: React.FC = () => {
   // Selected case & Drawer state
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [editableNote, setEditableNote] = useState<string>('');
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true); // Initialized open on first amber case
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [activeTriggerElement, setActiveTriggerElement] = useState<HTMLElement | null>(null);
 
   // Extract unique filter dropdown values

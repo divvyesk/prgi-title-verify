@@ -39,7 +39,7 @@ const PRESET_TEST_CASES = [
   { label: 'Dainik Samachar vs Daily News', value: 'Dainik Samachar', desc: 'Cross-language translation test' },
   { label: 'The Vidarbha Daily Express', value: 'The Vidarbha Daily Express', desc: 'Core-word root extraction test' },
   { label: 'Royal Matrimonial Classifieds', value: 'The Royal Matrimonial Classifieds', desc: 'Rule 4.1a commercial ban test' },
-  { label: 'Clear Approved Title', value: 'Aditi National Strategy Review', desc: 'Distinctive verified pass' }
+  { label: 'Clear Approved Title', value: 'Zeta Orbital Quarterly', desc: 'Distinctive verified pass' }
 ];
 
 export const VerificationView: React.FC<VerificationViewProps> = ({
