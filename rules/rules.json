@@ -1,0 +1,781 @@
+[
+  {
+    "rule_id": "R-GEN-01",
+    "section": "Guideline 1",
+    "name": "Generic or root word titles",
+    "description": "Generic, or root word titles shall not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Generic, or root word titles shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "length/word count = 1 and in generic word list",
+    "examples_fail": [
+      "Manthan",
+      "Success"
+    ],
+    "examples_pass": [
+      "Daily Manthan",
+      "Success Times"
+    ],
+    "retrieval_chunk": "The proposed titles should preferably contain more than one word formed by combining distinct and meaningful terms. Generic, or root word titles shall not be registered."
+  },
+  {
+    "rule_id": "R-GEN-02",
+    "section": "Guideline 1",
+    "name": "Single word distinct terms",
+    "description": "Titles must preferably contain more than one word.",
+    "severity": "WARNING",
+    "source_clause": "The proposed titles should preferably contain more than one word formed by combining distinct and meaningful terms.",
+    "source_clause_verified": true,
+    "detection_hint": "word count == 1",
+    "examples_fail": [
+      "Katha",
+      "Herald"
+    ],
+    "examples_pass": [
+      "Morning Katha",
+      "National Herald News"
+    ],
+    "retrieval_chunk": "The proposed titles should preferably contain more than one word formed by combining distinct and meaningful terms."
+  },
+  {
+    "rule_id": "R-DUP-01",
+    "section": "Guideline 2",
+    "name": "Phonetic similarity",
+    "description": "Titles must not be phonetically similar to existing registered titles.",
+    "severity": "CRITICAL",
+    "source_clause": "The proposed titles must be unique and shall not be phonetically or visually similar to any existing registered title",
+    "source_clause_verified": true,
+    "detection_hint": "phonetic similarity score > threshold",
+    "examples_fail": [
+      "Times of Indya"
+    ],
+    "examples_pass": [
+      "Mumbai Tribune"
+    ],
+    "retrieval_chunk": "The proposed titles must be unique and shall not be phonetically or visually similar to any existing registered title whether in the same language across India or any other language within the same State."
+  },
+  {
+    "rule_id": "R-DUP-02",
+    "section": "Guideline 2",
+    "name": "Visual similarity",
+    "description": "Titles must not be visually similar to existing registered titles.",
+    "severity": "CRITICAL",
+    "source_clause": "The proposed titles must be unique and shall not be phonetically or visually similar to any existing registered title",
+    "source_clause_verified": true,
+    "detection_hint": "visual/edit distance similarity > threshold",
+    "examples_fail": [
+      "Timess of India"
+    ],
+    "examples_pass": [
+      "Mumbai Tribune"
+    ],
+    "retrieval_chunk": "The proposed titles must be unique and shall not be phonetically or visually similar to any existing registered title whether in the same language across India or any other language within the same State."
+  },
+  {
+    "rule_id": "R-DEC-01",
+    "section": "Guideline 3",
+    "name": "Negative religious connotations",
+    "description": "Titles with negative connotations with religious sentiments will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles with negative connotations with religious sentiments... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "religious dictionary + negative sentiment",
+    "examples_fail": [
+      "Anti-Faith News"
+    ],
+    "examples_pass": [
+      "Religious Harmony Review"
+    ],
+    "retrieval_chunk": "Titles should be meaningful and clear. Titles with negative connotations with religious sentiments, obscene, absurd or offensive to public sentiments or those that could be misused with words like \u201ccrime\u201d, \u201ccorruption\u201d etc. will not be registered."
+  },
+  {
+    "rule_id": "R-DEC-02",
+    "section": "Guideline 3",
+    "name": "Obscene titles",
+    "description": "Obscene titles will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles with negative connotations... obscene, absurd or offensive to public sentiments... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "obscenity dictionary matching",
+    "examples_fail": [
+      "Adult XXx Magazine"
+    ],
+    "examples_pass": [
+      "Healthy Living"
+    ],
+    "retrieval_chunk": "Titles should be meaningful and clear. Titles with negative connotations with religious sentiments, obscene, absurd or offensive to public sentiments or those that could be misused with words like \u201ccrime\u201d, \u201ccorruption\u201d etc. will not be registered."
+  },
+  {
+    "rule_id": "R-DEC-03",
+    "section": "Guideline 3",
+    "name": "Absurd or offensive titles",
+    "description": "Absurd or offensive titles to public sentiments will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles with negative connotations... obscene, absurd or offensive to public sentiments... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "offensive keywords",
+    "examples_fail": [
+      "Stupid People News"
+    ],
+    "examples_pass": [
+      "Smart People Daily"
+    ],
+    "retrieval_chunk": "Titles should be meaningful and clear. Titles with negative connotations with religious sentiments, obscene, absurd or offensive to public sentiments or those that could be misused with words like \u201ccrime\u201d, \u201ccorruption\u201d etc. will not be registered."
+  },
+  {
+    "rule_id": "R-DEC-04",
+    "section": "Guideline 3",
+    "name": "Misuse of crime words",
+    "description": "Titles that could be misused with words like \u201ccrime\u201d, \u201ccorruption\u201d etc. will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles... that could be misused with words like \u201ccrime\u201d, \u201ccorruption\u201d etc. will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "crime/corruption keywords",
+    "examples_fail": [
+      "Corruption Daily",
+      "Crime Times"
+    ],
+    "examples_pass": [
+      "Law and Order Review"
+    ],
+    "retrieval_chunk": "Titles should be meaningful and clear. Titles with negative connotations with religious sentiments, obscene, absurd or offensive to public sentiments or those that could be misused with words like \u201ccrime\u201d, \u201ccorruption\u201d etc. will not be registered."
+  },
+  {
+    "rule_id": "R-LEN-01",
+    "section": "Guideline 4",
+    "name": "Abbreviations and acronyms",
+    "description": "Abbreviations, acronyms or numerals will be considered only if meaningfully attached with other words.",
+    "severity": "WARNING",
+    "source_clause": "Abbreviations, acronyms or numerals will be considered only if they are meaningfully and appropriately attached with other words.",
+    "source_clause_verified": true,
+    "detection_hint": "title is only abbreviations",
+    "examples_fail": [
+      "IBM",
+      "ABC"
+    ],
+    "examples_pass": [
+      "ABC Technology Review"
+    ],
+    "retrieval_chunk": "Abbreviations, acronyms or numerals will be considered only if they are meaningfully and appropriately attached with other words."
+  },
+  {
+    "rule_id": "R-NUM-01",
+    "section": "Guideline 4",
+    "name": "Numerals",
+    "description": "Numerals will be considered only if they are meaningfully attached with other words.",
+    "severity": "CRITICAL",
+    "source_clause": "Abbreviations, acronyms or numerals will be considered only if they are meaningfully and appropriately attached with other words.",
+    "source_clause_verified": true,
+    "detection_hint": "title is purely numeric",
+    "examples_fail": [
+      "12345",
+      "2026"
+    ],
+    "examples_pass": [
+      "2026 Sports Review"
+    ],
+    "retrieval_chunk": "Abbreviations, acronyms or numerals will be considered only if they are meaningfully and appropriately attached with other words."
+  },
+  {
+    "rule_id": "R-DUP-03",
+    "section": "Guideline 5",
+    "name": "Combining full existing titles",
+    "description": "Titles combining existing registered titles in full will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles that combine existing registered titles whether in full, in part or by rearranging words... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "full inclusion of existing title",
+    "examples_fail": [
+      "The Hindu Times"
+    ],
+    "examples_pass": [
+      "New Global Horizon"
+    ],
+    "retrieval_chunk": "Titles that combine existing registered titles whether in full, in part or by rearranging words or inserting non-distinctive terms that do not create a significantly different title will not be registered."
+  },
+  {
+    "rule_id": "R-DUP-04",
+    "section": "Guideline 5",
+    "name": "Rearranging existing titles",
+    "description": "Titles combining existing registered titles by rearranging words will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles that combine existing registered titles whether in full, in part or by rearranging words... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "bag of words match with existing",
+    "examples_fail": [
+      "Times The"
+    ],
+    "examples_pass": [
+      "Global Tech View"
+    ],
+    "retrieval_chunk": "Titles that combine existing registered titles whether in full, in part or by rearranging words or inserting non-distinctive terms that do not create a significantly different title will not be registered."
+  },
+  {
+    "rule_id": "R-DUP-05",
+    "section": "Guideline 5",
+    "name": "Inserting non-distinctive terms",
+    "description": "Titles combining existing registered titles by inserting non-distinctive terms will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles that combine existing registered titles... by inserting non-distinctive terms that do not create a significantly different title will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "stopword removal match",
+    "examples_fail": [
+      "The Real Times"
+    ],
+    "examples_pass": [
+      "Real Estate Today"
+    ],
+    "retrieval_chunk": "Titles that combine existing registered titles whether in full, in part or by rearranging words or inserting non-distinctive terms that do not create a significantly different title will not be registered."
+  },
+  {
+    "rule_id": "R-PER-01",
+    "section": "Guideline 6",
+    "name": "Owner/Publisher name",
+    "description": "Titles denoting the name of an individual should not be the names of the owner or publisher.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles denoting the name of an individual should not be the names of the owner or publisher of the proposed periodical.",
+    "source_clause_verified": true,
+    "detection_hint": "name match with applicant",
+    "examples_fail": [
+      "Rajan Times"
+    ],
+    "examples_pass": [
+      "National Times"
+    ],
+    "retrieval_chunk": "Titles denoting the name of an individual should not be the names of the owner or publisher of the proposed periodical. (Example: \"Rajan Times\", \"Deepak Samachar\", \"Jitendra News\", etc.)."
+  },
+  {
+    "rule_id": "R-SYM-01",
+    "section": "Guideline 7",
+    "name": "Non-text characters",
+    "description": "Titles containing non-text characters, signs, symbols, emojis, etc. will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles containing non-text characters, or any form of signs, symbols including mathematical symbols... emojis, etc.",
+    "source_clause_verified": true,
+    "detection_hint": "regex non-alphanumeric",
+    "examples_fail": [
+      "@#*! News",
+      "Tech+Review"
+    ],
+    "examples_pass": [
+      "Tech Review"
+    ],
+    "retrieval_chunk": "Titles containing non-text characters, or any form of signs, symbols including mathematical symbols(like \"+\", \"*\", etc.), pictographs, photographs, hallmarks, logos, monograms, phonograms, emojis, etc."
+  },
+  {
+    "rule_id": "R-SYM-02",
+    "section": "Guideline 7",
+    "name": "Mathematical symbols",
+    "description": "Titles containing mathematical symbols will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles containing non-text characters, or any form of signs, symbols including mathematical symbols...",
+    "source_clause_verified": true,
+    "detection_hint": "regex math symbols",
+    "examples_fail": [
+      "A+ Grade News"
+    ],
+    "examples_pass": [
+      "A Grade News"
+    ],
+    "retrieval_chunk": "Titles containing non-text characters, or any form of signs, symbols including mathematical symbols(like \"+\", \"*\", etc.), pictographs, photographs, hallmarks, logos, monograms, phonograms, emojis, etc."
+  },
+  {
+    "rule_id": "R-GEN-03",
+    "section": "Guideline 8",
+    "name": "Prefixing generic terms",
+    "description": "Titles formed by insignificantly prefixing generic or repetitive terms to an existing title will not be approved.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles formed by insignificantly prefixing or suffixing generic or repetitive terms to an existing title... will not be approved.",
+    "source_clause_verified": true,
+    "detection_hint": "existing title + generic prefix",
+    "examples_fail": [
+      "Daily Times"
+    ],
+    "examples_pass": [
+      "Daily Independent Voice"
+    ],
+    "retrieval_chunk": "Titles formed by insignificantly prefixing or suffixing generic or repetitive terms to an existing title... will not be approved."
+  },
+  {
+    "rule_id": "R-GEN-04",
+    "section": "Guideline 8",
+    "name": "Suffixing generic terms",
+    "description": "Titles formed by insignificantly suffixing generic or repetitive terms to an existing title will not be approved.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles formed by insignificantly prefixing or suffixing generic or repetitive terms to an existing title... will not be approved.",
+    "source_clause_verified": true,
+    "detection_hint": "existing title + generic suffix",
+    "examples_fail": [
+      "Times Daily"
+    ],
+    "examples_pass": [
+      "Independent Voice Daily"
+    ],
+    "retrieval_chunk": "Titles formed by insignificantly prefixing or suffixing generic or repetitive terms to an existing title... will not be approved."
+  },
+  {
+    "rule_id": "R-GEN-05",
+    "section": "Guideline 8",
+    "name": "Addition of cities/states",
+    "description": "Titles formed by adding names of cities or states to an existing title will not be approved.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles formed by insignificantly prefixing or suffixing... such as addition names of cities or states... will not be approved.",
+    "source_clause_verified": true,
+    "detection_hint": "existing title + city/state",
+    "examples_fail": [
+      "Delhi Times"
+    ],
+    "examples_pass": [
+      "Delhi Heritage Magazine"
+    ],
+    "retrieval_chunk": "Titles formed by insignificantly prefixing or suffixing generic or repetitive terms to an existing title- such as addition names of cities or states... will not be approved."
+  },
+  {
+    "rule_id": "R-LEG-01",
+    "section": "Guideline 9",
+    "name": "Copyright infringement",
+    "description": "Titles in violation of copyright will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "The proposed title shall not be registered if it is found to be in violation of any judicial pronouncement including matters involving copyright...",
+    "source_clause_verified": true,
+    "detection_hint": "copyright db check",
+    "examples_fail": [
+      "Disney News"
+    ],
+    "examples_pass": [
+      "Local Kids News"
+    ],
+    "retrieval_chunk": "The proposed title shall not be registered if it is found to be in violation of any judicial pronouncement including matters involving copyright, trademark infringement, contempt of court and defamation."
+  },
+  {
+    "rule_id": "R-LEG-02",
+    "section": "Guideline 9",
+    "name": "Trademark infringement",
+    "description": "Titles in violation of trademark infringement will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "The proposed title shall not be registered if it is found to be in violation of any judicial pronouncement including matters involving... trademark infringement...",
+    "source_clause_verified": true,
+    "detection_hint": "trademark db check",
+    "examples_fail": [
+      "Nike Daily"
+    ],
+    "examples_pass": [
+      "Shoe Market Review"
+    ],
+    "retrieval_chunk": "The proposed title shall not be registered if it is found to be in violation of any judicial pronouncement including matters involving copyright, trademark infringement, contempt of court and defamation."
+  },
+  {
+    "rule_id": "R-LEG-03",
+    "section": "Guideline 9",
+    "name": "Defamation",
+    "description": "Titles in violation of judicial pronouncement involving defamation will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "The proposed title shall not be registered if it is found to be in violation of any judicial pronouncement including matters involving... defamation.",
+    "source_clause_verified": true,
+    "detection_hint": "defamatory keyword check",
+    "examples_fail": [
+      "Fraudster John News"
+    ],
+    "examples_pass": [
+      "Honest Civic News"
+    ],
+    "retrieval_chunk": "The proposed title shall not be registered if it is found to be in violation of any judicial pronouncement including matters involving copyright, trademark infringement, contempt of court and defamation."
+  },
+  {
+    "rule_id": "R-GOV-02",
+    "section": "Guideline 10",
+    "name": "Affecting sovereignty",
+    "description": "Titles containing words affecting the sovereignty and integrity of India will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles containing words which can be construed as affecting the sovereignty and integrity of India... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "sovereignty keywords",
+    "examples_fail": [
+      "Break India News"
+    ],
+    "examples_pass": [
+      "United India Review"
+    ],
+    "retrieval_chunk": "Titles containing words which can be construed as affecting the sovereignty and integrity of India, Security of the State, International Relations, Public order, Morality and public decency, incite unrest or disorder etc.will not be registered."
+  },
+  {
+    "rule_id": "R-GOV-03",
+    "section": "Guideline 10",
+    "name": "Security of the State",
+    "description": "Titles containing words affecting the Security of the State will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles containing words which can be construed as affecting the... Security of the State... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "security risk keywords",
+    "examples_fail": [
+      "State Attack Daily"
+    ],
+    "examples_pass": [
+      "State Defense Review"
+    ],
+    "retrieval_chunk": "Titles containing words which can be construed as affecting the sovereignty and integrity of India, Security of the State, International Relations, Public order, Morality and public decency, incite unrest or disorder etc.will not be registered."
+  },
+  {
+    "rule_id": "R-GOV-04",
+    "section": "Guideline 10",
+    "name": "Incite unrest",
+    "description": "Titles containing words that incite unrest or disorder will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles containing words which can be construed as affecting... incite unrest or disorder etc.will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "unrest/riot keywords",
+    "examples_fail": [
+      "Riot News"
+    ],
+    "examples_pass": [
+      "Peace Chronicle"
+    ],
+    "retrieval_chunk": "Titles containing words which can be construed as affecting the sovereignty and integrity of India, Security of the State, International Relations, Public order, Morality and public decency, incite unrest or disorder etc.will not be registered."
+  },
+  {
+    "rule_id": "R-EMB-01",
+    "section": "Guideline 11",
+    "name": "National symbols",
+    "description": "Titles similar to any national symbol will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles similar to any national symbol... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "national symbol dictionary",
+    "examples_fail": [
+      "Ashoka Chakra News"
+    ],
+    "examples_pass": [
+      "Indian Heritage Review"
+    ],
+    "retrieval_chunk": "Titles similar to any national symbol, national motto, or suggesting misleading association with Central Government... will not be registered."
+  },
+  {
+    "rule_id": "R-EMB-02",
+    "section": "Guideline 11",
+    "name": "National motto",
+    "description": "Titles similar to any national motto will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles similar to any... national motto... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "motto check",
+    "examples_fail": [
+      "Satyameva Jayate Times"
+    ],
+    "examples_pass": [
+      "Truthful Times"
+    ],
+    "retrieval_chunk": "Titles similar to any national symbol, national motto, or suggesting misleading association with Central Government... will not be registered."
+  },
+  {
+    "rule_id": "R-EMB-03",
+    "section": "Guideline 11",
+    "name": "Emblems Act violation",
+    "description": "Titles violative of The Emblems and Names (Prevention of Improper Use) Act, 1950 will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles... violative of \"The Emblems and Names (Prevention of Improper Use) Act, 1950\u201d or any other law in force will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "Emblems act wordlist",
+    "examples_fail": [
+      "President of India News"
+    ],
+    "examples_pass": [
+      "National Civic News"
+    ],
+    "retrieval_chunk": "Titles similar to any national symbol, national motto, or suggesting misleading association with Central Government/State Governments/Local bodies/Constitutional bodies/Statutory bodies or are violative of \"The Emblems and Names (Prevention of Improper Use) Act, 1950\u201d or any other law in force will not be registered."
+  },
+  {
+    "rule_id": "R-GOV-05",
+    "section": "Guideline 12",
+    "name": "Government Organizations",
+    "description": "Titles containing names of Government Organizations/Departments will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles containing names of Government Organizations/Departments... shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "government dept dictionary",
+    "examples_fail": [
+      "Police Times",
+      "CBI News"
+    ],
+    "examples_pass": [
+      "Civic Guardian"
+    ],
+    "retrieval_chunk": "Titles containing names of Government Organizations/Departments, Regulatory/Enforcement Agencies (such as \"Police\", \"Bureau\"... shall not be registered."
+  },
+  {
+    "rule_id": "R-GOV-06",
+    "section": "Guideline 12",
+    "name": "International Organizations",
+    "description": "Titles containing names of International Organizations will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles containing names of... International Organizations (e.g., UN, WHO, ILO) in any language... shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "international org dictionary",
+    "examples_fail": [
+      "UN Daily",
+      "WHO Medical Review"
+    ],
+    "examples_pass": [
+      "Global Medical Review"
+    ],
+    "retrieval_chunk": "Titles containing names of... International Organizations (e.g., UN, WHO, ILO) in any language... shall not be registered."
+  },
+  {
+    "rule_id": "R-GOV-07",
+    "section": "Guideline 12",
+    "name": "Public welfare schemes",
+    "description": "Titles containing names of public welfare schemes of Central/State Governments will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "title containing the names of public welfare schemes of Central/State Governments... shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "welfare scheme dictionary",
+    "examples_fail": [
+      "PM Kisan News"
+    ],
+    "examples_pass": [
+      "Farming Today"
+    ],
+    "retrieval_chunk": "title containing the names of public welfare schemes of Central/State Governments or its organizations or local bodies which suggest a misleading association with them shall not be registered."
+  },
+  {
+    "rule_id": "R-LOC-01",
+    "section": "Guideline 13",
+    "name": "Foreign country/city",
+    "description": "Titles suggesting association with a foreign country, city, or place not corresponding to publication place shall not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles suggesting any association with a foreign country, city, or place which does not correspond to the State or place of publication of the periodical shall not be registered",
+    "source_clause_verified": true,
+    "detection_hint": "foreign location dict",
+    "examples_fail": [
+      "New York Mirror"
+    ],
+    "examples_pass": [
+      "Mumbai Mirror"
+    ],
+    "retrieval_chunk": "Titles suggesting any association with a foreign country, city, or place which does not correspond to the State or place of publication of the periodical shall not be registered (Example: \u201cSouth Africa Times\", \"Canada Times\", or \"New York Mirror\")."
+  },
+  {
+    "rule_id": "R-GOV-08",
+    "section": "Guideline 14",
+    "name": "National leaders",
+    "description": "Titles with the names of national leaders will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles with the names of national leaders or those resembling the names of prominent national leaders... will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "national leader dict",
+    "examples_fail": [
+      "Mahatma Gandhi News"
+    ],
+    "examples_pass": [
+      "National Freedom Review"
+    ],
+    "retrieval_chunk": "Titles with the names of national leaders or those resembling the names of prominent national leaders, Heads of Government, and functionaries of Central and State governments will not be registered."
+  },
+  {
+    "rule_id": "R-GOV-09",
+    "section": "Guideline 14",
+    "name": "Heads of Government",
+    "description": "Titles with names resembling Heads of Government will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles with the names of... Heads of Government, and functionaries of Central and State governments will not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "heads of gov dict",
+    "examples_fail": [
+      "Prime Minister News"
+    ],
+    "examples_pass": [
+      "Governance Today"
+    ],
+    "retrieval_chunk": "Titles with the names of national leaders or those resembling the names of prominent national leaders, Heads of Government, and functionaries of Central and State governments will not be registered."
+  },
+  {
+    "rule_id": "R-MED-01",
+    "section": "Guideline 15",
+    "name": "TV/Radio Channels",
+    "description": "Title registered as a Satellite TV Channel/FM Radio... shall not be registered unless by owner.",
+    "severity": "CRITICAL",
+    "source_clause": "Title registered as a Satellite TV Channel/FM Radio/Community Radio Station... shall not be registered unless the application is made by their owner",
+    "source_clause_verified": true,
+    "detection_hint": "broadcast registry check",
+    "examples_fail": [
+      "Aajtak News"
+    ],
+    "examples_pass": [
+      "Local Suburb News"
+    ],
+    "retrieval_chunk": "Title registered as a Satellite TV Channel/FM Radio/Community Radio Station with the Ministry of Information and Broadcasting shall not be registered unless the application is made by their owner or by their representative on his behalf"
+  },
+  {
+    "rule_id": "R-DUP-06",
+    "section": "Guideline 16",
+    "name": "Well-known periodicals",
+    "description": "Titles resembling the titles of well-known periodicals applied by non-owners shall not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles resembling the titles of well-known periodicals if applied by anyone other than the existing owner of the well-known title shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "well-known trademark check",
+    "examples_fail": [
+      "The Hindu Weekly"
+    ],
+    "examples_pass": [
+      "Local Hindu Community News"
+    ],
+    "retrieval_chunk": "Titles resembling the titles of well-known periodicals if applied by anyone other than the existing owner of the well-known title shall not be registered."
+  },
+  {
+    "rule_id": "R-COM-01",
+    "section": "Guideline 17",
+    "name": "Advertisement/Classifieds",
+    "description": "Titles using words like Ad, Advertisement, Classifieds will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles using words like Ad or Advertisement, Classifieds... shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "classifieds keywords",
+    "examples_fail": [
+      "Delhi Classifieds"
+    ],
+    "examples_pass": [
+      "Delhi Daily"
+    ],
+    "retrieval_chunk": "Titles using words like Ad or Advertisement, Classifieds, Tender, Calendar, Panchang, Matrimonial, Yellow pages (generally prefixed with white, pink, etc.), pamphlet, brochure, directory, or any such publication which cannot be treated as a periodical shall not be registered."
+  },
+  {
+    "rule_id": "R-COM-02",
+    "section": "Guideline 17",
+    "name": "Matrimonial/Panchang",
+    "description": "Titles using words like Matrimonial or Panchang will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles using words like... Calendar, Panchang, Matrimonial... shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "matrimonial keywords",
+    "examples_fail": [
+      "Royal Matrimonial"
+    ],
+    "examples_pass": [
+      "Royal Heritage"
+    ],
+    "retrieval_chunk": "Titles using words like Ad or Advertisement, Classifieds, Tender, Calendar, Panchang, Matrimonial, Yellow pages (generally prefixed with white, pink, etc.), pamphlet, brochure, directory, or any such publication which cannot be treated as a periodical shall not be registered."
+  },
+  {
+    "rule_id": "R-COM-03",
+    "section": "Guideline 17",
+    "name": "Yellow pages/Directory",
+    "description": "Titles using words like Yellow pages, directory, brochure will not be registered.",
+    "severity": "CRITICAL",
+    "source_clause": "Titles using words like... Yellow pages... pamphlet, brochure, directory... shall not be registered.",
+    "source_clause_verified": true,
+    "detection_hint": "directory keywords",
+    "examples_fail": [
+      "City Yellow Pages"
+    ],
+    "examples_pass": [
+      "City Business News"
+    ],
+    "retrieval_chunk": "Titles using words like Ad or Advertisement, Classifieds, Tender, Calendar, Panchang, Matrimonial, Yellow pages (generally prefixed with white, pink, etc.), pamphlet, brochure, directory, or any such publication which cannot be treated as a periodical shall not be registered."
+  },
+  {
+    "rule_id": "R-URL-01",
+    "section": "Unverified/Missing",
+    "name": "URL and domain-style patterns",
+    "description": "Titles containing URL or domain-style patterns (e.g. .com, .in) are not allowed.",
+    "severity": "CRITICAL",
+    "source_clause": "Missing from source document 'Guidelines for Admissibility of Titles' in repository.",
+    "source_clause_verified": false,
+    "detection_hint": "regex for URLs/domains",
+    "examples_fail": [
+      "news.com",
+      "daily.in"
+    ],
+    "examples_pass": [
+      "Daily News"
+    ],
+    "retrieval_chunk": "N/A"
+  },
+  {
+    "rule_id": "R-URL-02",
+    "section": "Unverified/Missing",
+    "name": "Internet slang",
+    "description": "Titles containing internet slang are not allowed.",
+    "severity": "WARNING",
+    "source_clause": "Missing from source document 'Guidelines for Admissibility of Titles' in repository.",
+    "source_clause_verified": false,
+    "detection_hint": "internet slang dictionary",
+    "examples_fail": [
+      "LOL News",
+      "BRB Times"
+    ],
+    "examples_pass": [
+      "Laugh Out Loud News"
+    ],
+    "retrieval_chunk": "N/A"
+  },
+  {
+    "rule_id": "R-LEN-02",
+    "section": "Unverified/Missing",
+    "name": "Minimum character length",
+    "description": "Titles must meet a minimum character length requirement.",
+    "severity": "CRITICAL",
+    "source_clause": "Missing from source document 'Guidelines for Admissibility of Titles' in repository.",
+    "source_clause_verified": false,
+    "detection_hint": "length check",
+    "examples_fail": [
+      "A",
+      "Of"
+    ],
+    "examples_pass": [
+      "The Age"
+    ],
+    "retrieval_chunk": "N/A"
+  },
+  {
+    "rule_id": "R-LEN-03",
+    "section": "Unverified/Missing",
+    "name": "Maximum character length",
+    "description": "Titles must not exceed a maximum character length requirement.",
+    "severity": "CRITICAL",
+    "source_clause": "Missing from source document 'Guidelines for Admissibility of Titles' in repository.",
+    "source_clause_verified": false,
+    "detection_hint": "length check",
+    "examples_fail": [
+      "This is a ridiculously long title that goes on forever and ever and ever and ever and ever and ever"
+    ],
+    "examples_pass": [
+      "Normal Length Title"
+    ],
+    "retrieval_chunk": "N/A"
+  },
+  {
+    "rule_id": "R-DUP-07",
+    "section": "Unverified/Missing",
+    "name": "Repeated words",
+    "description": "Titles must not contain the same word repeated consecutively or unnecessarily.",
+    "severity": "CRITICAL",
+    "source_clause": "Missing from source document 'Guidelines for Admissibility of Titles' in repository.",
+    "source_clause_verified": false,
+    "detection_hint": "consecutive word check",
+    "examples_fail": [
+      "News News News",
+      "Daily Daily"
+    ],
+    "examples_pass": [
+      "Daily News"
+    ],
+    "retrieval_chunk": "N/A"
+  },
+  {
+    "rule_id": "R-REL-01",
+    "section": "Unverified/Missing",
+    "name": "Communal sensitivity",
+    "description": "Titles must not promote communal disharmony.",
+    "severity": "CRITICAL",
+    "source_clause": "Missing from source document 'Guidelines for Admissibility of Titles' in repository.",
+    "source_clause_verified": false,
+    "detection_hint": "hate speech dictionary",
+    "examples_fail": [
+      "Anti-Community News"
+    ],
+    "examples_pass": [
+      "Community Harmony Review"
+    ],
+    "retrieval_chunk": "N/A"
+  }
+]
