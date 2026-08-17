@@ -26,7 +26,16 @@ import { CaseDetailDrawer } from './CaseDetailDrawer';
 import { sound } from '../../utils/audio';
 
 export const OfficerDashboard: React.FC = () => {
-  const { cases, isLoading, error, source, updateCaseStatus, updateCaseNote, reloadCases } = useCases();
+  const { 
+    cases, 
+    isLoading, 
+    error, 
+    source, 
+    updateCaseNote, 
+    recordDecision,
+    fetchDraftMemo,
+    reloadCases 
+  } = useCases();
 
   // Filters state
   const [verdictFilter, setVerdictFilter] = useState<'ALL' | VerdictStatus>('ALL');
@@ -148,12 +157,6 @@ export const OfficerDashboard: React.FC = () => {
     if (openDrawer) {
       setIsDrawerOpen(true);
     }
-  };
-
-  const handleStatusUpdate = (newStatus: OfficerCase['status']) => {
-    if (!selectedCase) return;
-    sound.playClick();
-    updateCaseStatus(selectedCase.id, newStatus, editableNote);
   };
 
   const handleNoteChange = (newNote: string) => {
@@ -486,6 +489,11 @@ export const OfficerDashboard: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {selectedCase.decisionToken && (
+                    <span className="text-xs font-mono font-extrabold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-950 border border-emerald-300">
+                      Token: {selectedCase.decisionToken}
+                    </span>
+                  )}
                   <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
                     selectedCase.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
                     selectedCase.status === 'REJECTED' ? 'bg-rose-100 text-rose-900 border-rose-300' :
@@ -540,7 +548,7 @@ export const OfficerDashboard: React.FC = () => {
                     }}
                     className="text-xs font-bold text-amber-900 hover:text-[#1C1917] flex items-center gap-1 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-amber-300 shadow-sm hover:bg-amber-100 transition-colors focus:ring-2 focus:ring-amber-600 focus:outline-none"
                   >
-                    <span>View Complete 4D Evidence Dossier</span>
+                    <span>Inspect Evidence &amp; Issue Endorsement</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -575,19 +583,27 @@ export const OfficerDashboard: React.FC = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#E8E0D2]">
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleStatusUpdate('APPROVED')}
+                    onClick={(e) => {
+                      sound.playClick();
+                      setActiveTriggerElement(e.currentTarget);
+                      setIsDrawerOpen(true);
+                    }}
                     className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Endorse &amp; Approve</span>
+                    <span>Review &amp; Endorse</span>
                   </button>
 
                   <button
-                    onClick={() => handleStatusUpdate('REJECTED')}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-700 hover:bg-rose-800 text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                    onClick={(e) => {
+                      sound.playClick();
+                      setActiveTriggerElement(e.currentTarget);
+                      setIsDrawerOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-rose-50 text-rose-700 border-2 border-rose-600 flex items-center gap-1.5 shadow-sm transition-all cursor-pointer focus:ring-2 focus:ring-rose-500 focus:outline-none"
                   >
                     <XCircle className="w-4 h-4" />
-                    <span>Issue Rejection Order</span>
+                    <span>Review &amp; Reject</span>
                   </button>
                 </div>
 
@@ -611,6 +627,8 @@ export const OfficerDashboard: React.FC = () => {
         onClose={() => setIsDrawerOpen(false)}
         caseData={selectedCase}
         triggerElement={activeTriggerElement}
+        onRecordDecision={recordDecision}
+        fetchDraftMemo={fetchDraftMemo}
       />
     </div>
   );
