@@ -232,14 +232,15 @@ export const Memorandum: React.FC<MemorandumProps> = ({ result, isOpen, onClose 
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse border border-stone-300">
+              <table className="w-full text-left text-xs border-collapse border border-stone-300" aria-label="Top Clashing Registered Titles">
+                <caption className="sr-only">Top Clashing Registered Titles Breakdown</caption>
                 <thead>
                   <tr className="bg-stone-100 text-stone-800 font-bold border-b border-stone-300 font-mono">
-                    <th className="p-2 border-r border-stone-300">Registered Title</th>
-                    <th className="p-2 border-r border-stone-300">Reg No</th>
-                    <th className="p-2 border-r border-stone-300">State / Language</th>
-                    <th className="p-2 border-r border-stone-300">Match Type</th>
-                    <th className="p-2 text-right">Clash %</th>
+                    <th scope="col" className="p-2 border-r border-stone-300">Registered Title</th>
+                    <th scope="col" className="p-2 border-r border-stone-300">Reg No</th>
+                    <th scope="col" className="p-2 border-r border-stone-300">State / Language</th>
+                    <th scope="col" className="p-2 border-r border-stone-300">Match Type</th>
+                    <th scope="col" className="p-2 text-right">Clash %</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -264,13 +265,14 @@ export const Memorandum: React.FC<MemorandumProps> = ({ result, isOpen, onClose 
             Statutory Rulebook Checklist &amp; Clause Citations
           </h4>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse border border-stone-300">
+            <table className="w-full text-left text-xs border-collapse border border-stone-300" aria-label="Statutory Guidelines Rules Audit Checklist">
+              <caption className="sr-only">Statutory Rulebook Audit Checklist and Citations</caption>
               <thead>
                 <tr className="bg-stone-100 text-stone-800 font-bold border-b border-stone-300 font-mono">
-                  <th className="p-2 border-r border-stone-300">Rule ID</th>
-                  <th className="p-2 border-r border-stone-300">Rule Name</th>
-                  <th className="p-2 border-r border-stone-300">Status</th>
-                  <th className="p-2">Statutory Clause Citation</th>
+                  <th scope="col" className="p-2 border-r border-stone-300">Rule ID</th>
+                  <th scope="col" className="p-2 border-r border-stone-300">Rule Name</th>
+                  <th scope="col" className="p-2 border-r border-stone-300">Status</th>
+                  <th scope="col" className="p-2">Statutory Clause Citation</th>
                 </tr>
               </thead>
               <tbody>

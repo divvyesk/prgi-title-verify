@@ -198,7 +198,12 @@ export const RegistryExplorer: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between text-xs text-[#75634B] pt-2 border-t border-[#E8E0D2] gap-2">
+        {/* Filter Results Status Bar */}
+        <div 
+          role="status"
+          aria-live="polite"
+          className="flex flex-wrap items-center justify-between text-xs text-[#564735] pt-2 border-t border-[#E8E0D2] gap-2"
+        >
           <div className="flex items-center gap-2">
             <span>
               {total > 0 ? (
@@ -211,7 +216,7 @@ export const RegistryExplorer: React.FC = () => {
               )}
             </span>
             {debouncedQuery && (
-              <span className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-mono text-[11px] font-semibold">
+              <span className="bg-amber-100 text-amber-950 px-2 py-0.5 rounded font-mono text-[11px] font-semibold border border-amber-300">
                 Query: "{debouncedQuery}"
               </span>
             )}
@@ -221,13 +226,14 @@ export const RegistryExplorer: React.FC = () => {
             {(debouncedQuery || selectedLanguage !== 'ALL' || selectedState !== 'ALL' || selectedPeriodicity !== 'ALL') && (
               <button
                 onClick={handleResetFilters}
-                className="text-xs font-semibold text-rose-700 hover:text-rose-900 flex items-center gap-1 cursor-pointer"
+                aria-label="Reset all search filters"
+                className="text-xs font-semibold text-rose-800 hover:text-rose-950 flex items-center gap-1 cursor-pointer focus:ring-2 focus:ring-amber-700"
               >
-                <FilterX className="w-3.5 h-3.5" />
+                <FilterX className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Reset Filters</span>
               </button>
             )}
-            <span className="font-mono font-semibold">
+            <span className="font-mono font-semibold text-[#564735]">
               Page {currentPage} of {totalPages} (50 / page)
             </span>
           </div>
@@ -324,8 +330,11 @@ export const RegistryExplorer: React.FC = () => {
 
       {/* 3. Pagination Controls (50 rows per page) */}
       {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#E8E0D2]">
-          <div className="text-xs text-[#75634B] font-mono">
+        <nav 
+          aria-label="Registry Pagination Navigation"
+          className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#E8E0D2]"
+        >
+          <div className="text-xs text-[#564735] font-mono">
             Showing page {currentPage} of {totalPages} ({total.toLocaleString()} total entries)
           </div>
 
@@ -333,26 +342,31 @@ export const RegistryExplorer: React.FC = () => {
             <button
               onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1 || isLoading}
-              className="px-3.5 py-1.5 rounded-lg bg-white text-[#564735] hover:text-[#1C1917] disabled:opacity-40 text-xs font-semibold border border-[#DDD1BF] transition-colors cursor-pointer shadow-sm flex items-center gap-1"
+              aria-label="Previous Page"
+              className="px-3.5 py-1.5 rounded-lg bg-white text-[#564735] hover:text-[#1C1917] disabled:opacity-40 text-xs font-semibold border border-[#DDD1BF] transition-colors cursor-pointer shadow-sm flex items-center gap-1 focus:ring-2 focus:ring-amber-700"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Previous</span>
             </button>
 
-            <span className="text-xs font-mono text-[#1C1917] px-3 font-bold bg-white py-1.5 rounded-lg border border-[#DDD1BF] shadow-sm">
+            <span 
+              aria-current="page"
+              className="text-xs font-mono text-[#1C1917] px-3 font-bold bg-white py-1.5 rounded-lg border border-[#DDD1BF] shadow-sm"
+            >
               {currentPage} / {totalPages}
             </span>
 
             <button
               onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages || isLoading}
-              className="px-3.5 py-1.5 rounded-lg bg-white text-[#564735] hover:text-[#1C1917] disabled:opacity-40 text-xs font-semibold border border-[#DDD1BF] transition-colors cursor-pointer shadow-sm flex items-center gap-1"
+              aria-label="Next Page"
+              className="px-3.5 py-1.5 rounded-lg bg-white text-[#564735] hover:text-[#1C1917] disabled:opacity-40 text-xs font-semibold border border-[#DDD1BF] transition-colors cursor-pointer shadow-sm flex items-center gap-1 focus:ring-2 focus:ring-amber-700"
             >
               <span>Next</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           </div>
-        </div>
+        </nav>
       )}
     </div>
   );

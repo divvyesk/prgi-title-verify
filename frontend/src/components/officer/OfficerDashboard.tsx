@@ -197,66 +197,75 @@ export const OfficerDashboard: React.FC = () => {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DDD1BF] shadow-sm text-xs"
             title={error ? `Note: ${error} (using fixture fallback)` : undefined}
           >
-            <span className={`w-2 h-2 rounded-full ${source === 'LIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
-            <span className="font-mono text-[#75634B]">Source:</span>
+            <span 
+              aria-hidden="true" 
+              className={`w-2 h-2 rounded-full ${source === 'LIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}
+            />
+            <span className="font-mono text-[#564735]">Source:</span>
             <span className="font-bold text-[#1C1917]">{source === 'LIVE' ? 'Live API' : 'Fixture Data'}</span>
-            {error && <span className="text-[10px] text-amber-700 font-mono">(Fallback)</span>}
+            {error && <span className="text-[10px] text-amber-900 font-mono">(Fallback)</span>}
           </div>
           <button
             onClick={() => {
               sound.playClick();
               reloadCases();
             }}
+            aria-label="Reload case docket from data source"
             title="Reload cases from source"
-            className="p-2 rounded-xl bg-white hover:bg-[#F8F6F0] text-[#75634B] hover:text-[#1C1917] border border-[#DDD1BF] shadow-sm cursor-pointer transition-colors"
+            className="p-2 rounded-xl bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] shadow-sm cursor-pointer transition-colors focus:ring-2 focus:ring-amber-700"
           >
-            <RotateCcw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-700' : ''}`} />
+            <RotateCcw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-800' : ''}`} aria-hidden="true" />
           </button>
         </div>
       </div>
 
       {/* 3. Summary Strip at the Top */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <section 
+        role="region" 
+        aria-label="Docket Summary Metrics" 
+        aria-live="polite"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+      >
         <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
-          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-800">
+          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-950" aria-hidden="true">
             <Layers className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] font-semibold text-[#75634B] uppercase tracking-wider font-mono">Total Docket</div>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Total Docket</div>
             <div className="text-xl sm:text-2xl font-bold font-mono text-[#1C1917]">{totalCasesCount} Cases</div>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
-          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-800">
-            <AlertTriangle className="w-5 h-5 text-amber-700" />
+          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-950" aria-hidden="true">
+            <AlertTriangle className="w-5 h-5 text-amber-800" />
           </div>
           <div>
-            <div className="text-[11px] font-semibold text-[#75634B] uppercase tracking-wider font-mono">Awaiting Review</div>
-            <div className="text-xl sm:text-2xl font-bold font-mono text-amber-800">{awaitingReviewCount} Pending</div>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Awaiting Review</div>
+            <div className="text-xl sm:text-2xl font-bold font-mono text-amber-900">{awaitingReviewCount} Pending</div>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
-          <div className="p-2.5 rounded-xl bg-amber-50 text-amber-800">
-            <Flame className="w-5 h-5 text-amber-600" />
+          <div className="p-2.5 rounded-xl bg-amber-50 text-amber-950" aria-hidden="true">
+            <Flame className="w-5 h-5 text-amber-800" />
           </div>
           <div>
-            <div className="text-[11px] font-semibold text-[#75634B] uppercase tracking-wider font-mono">Borderline Amber</div>
-            <div className="text-xl sm:text-2xl font-bold font-mono text-amber-700">{amberCasesCount} High-Touch</div>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Borderline Amber</div>
+            <div className="text-xl sm:text-2xl font-bold font-mono text-amber-900">{amberCasesCount} High-Touch</div>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-[#DDD1BF] shadow-sm flex items-center gap-3.5">
-          <div className="p-2.5 rounded-xl bg-purple-100 text-purple-800">
-            <Activity className="w-5 h-5 text-purple-700" />
+          <div className="p-2.5 rounded-xl bg-purple-100 text-purple-950" aria-hidden="true">
+            <Activity className="w-5 h-5 text-purple-800" />
           </div>
           <div>
-            <div className="text-[11px] font-semibold text-[#75634B] uppercase tracking-wider font-mono">Median Risk Score</div>
-            <div className="text-xl sm:text-2xl font-bold font-mono text-purple-900">{medianRiskScore}%</div>
+            <div className="text-[11px] font-semibold text-[#564735] uppercase tracking-wider font-mono">Median Risk Score</div>
+            <div className="text-xl sm:text-2xl font-bold font-mono text-purple-950">{medianRiskScore}%</div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* 2. Comprehensive Filter Toolbar */}
       <div className="beige-card rounded-2xl p-4 sm:p-5 space-y-3.5">
@@ -410,6 +419,7 @@ export const OfficerDashboard: React.FC = () => {
                     key={c.id}
                     role="button"
                     tabIndex={0}
+                    aria-label={`Case ${c.id}: ${c.proposedTitle}. Verdict: ${c.verdict}, Risk Score: ${c.riskScore} percent`}
                     onClick={(e) => handleSelectCase(c, e.currentTarget, true)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
@@ -417,7 +427,7 @@ export const OfficerDashboard: React.FC = () => {
                         handleSelectCase(c, e.currentTarget, true);
                       }
                     }}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-600 ${
+                    className={`p-4 rounded-xl border transition-all cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-700 ${
                       isSelected
                         ? 'bg-amber-50/90 border-amber-500 shadow-md ring-1 ring-amber-400/40'
                         : 'bg-white border-[#DDD1BF] hover:border-[#CFC0A8]'
@@ -425,19 +435,22 @@ export const OfficerDashboard: React.FC = () => {
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-mono font-bold text-[#75634B]">
+                        <span className="text-[11px] font-mono font-bold text-[#564735]">
                           {c.id}
                         </span>
-                        <span className="text-[10px] text-[#75634B] font-mono">
+                        <span className="text-[10px] text-[#564735] font-mono">
                           {c.submissionDate}
                         </span>
                       </div>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-                        c.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-                        c.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
-                        'bg-amber-100 text-amber-900 border border-amber-300'
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 border ${
+                        c.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-950 border-emerald-400' :
+                        c.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-950 border-rose-400' :
+                        'bg-amber-100 text-amber-950 border-amber-400'
                       }`}>
-                        {c.verdict === 'MANUAL_REVIEW' ? 'Borderline Amber' : c.verdict}
+                        {c.verdict === 'APPROVED' && <CheckCircle2 className="w-3 h-3 text-emerald-800" aria-hidden="true" />}
+                        {c.verdict === 'REJECTED' && <XCircle className="w-3 h-3 text-rose-800" aria-hidden="true" />}
+                        {c.verdict === 'MANUAL_REVIEW' && <AlertTriangle className="w-3 h-3 text-amber-800" aria-hidden="true" />}
+                        <span>{c.verdict === 'MANUAL_REVIEW' ? 'MANUAL REVIEW' : c.verdict}</span>
                       </span>
                     </div>
 
@@ -445,22 +458,22 @@ export const OfficerDashboard: React.FC = () => {
                       <div className="font-bold text-[#1C1917] text-sm mb-1 font-display group-hover:text-amber-900 transition-colors">
                         {c.proposedTitle}
                       </div>
-                      <ChevronRight className="w-4 h-4 text-[#A8A29E] group-hover:text-amber-700 transition-transform group-hover:translate-x-0.5" />
+                      <ChevronRight className="w-4 h-4 text-[#78716C] group-hover:text-amber-800 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                     </div>
 
-                    <div className="text-[11px] text-[#75634B] flex items-center gap-2">
+                    <div className="text-[11px] text-[#564735] flex items-center gap-2">
                       <span>{c.applicantName}</span>
-                      <span>•</span>
+                      <span aria-hidden="true">•</span>
                       <span>{c.state}</span>
-                      <span>•</span>
+                      <span aria-hidden="true">•</span>
                       <span>{c.language}</span>
                     </div>
 
                     <div className="mt-2 pt-2 border-t border-[#F0EBE0] text-[11px] text-[#564735] flex items-center justify-between">
-                      <span className="truncate max-w-[200px] text-[#75634B] font-medium">{c.primaryConflict || 'No registered conflict'}</span>
+                      <span className="truncate max-w-[200px] text-[#564735] font-medium">{c.primaryConflict || 'No registered conflict'}</span>
                       <span className={`font-mono font-bold ${
-                        c.riskScore >= 75 ? 'text-rose-700' :
-                        c.riskScore >= 45 ? 'text-amber-800' : 'text-emerald-700'
+                        c.riskScore >= 75 ? 'text-rose-800' :
+                        c.riskScore >= 45 ? 'text-amber-900' : 'text-emerald-800'
                       }`}>
                         Risk: {c.riskScore}%
                       </span>

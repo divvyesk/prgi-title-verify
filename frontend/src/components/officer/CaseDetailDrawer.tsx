@@ -237,15 +237,15 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
         {/* Drawer Sticky Header */}
         <div className="sticky top-0 z-20 bg-[#F0EBE0]/95 backdrop-blur-md px-6 py-4 border-b border-[#E5DDD0] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-purple-100 border border-purple-300 text-purple-900">
-              <UserCheck className="w-5 h-5 text-purple-700" />
+            <div className="p-2 rounded-xl bg-purple-100 border border-purple-300 text-purple-950" aria-hidden="true">
+              <UserCheck className="w-5 h-5 text-purple-800" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-[#75634B] bg-white px-2 py-0.5 rounded border border-[#DDD1BF]">
+                <span className="text-xs font-mono font-bold text-[#564735] bg-white px-2 py-0.5 rounded border border-[#DDD1BF]">
                   {caseData.id}
                 </span>
-                <span className="text-xs text-[#75634B] font-mono">
+                <span className="text-xs text-[#564735] font-mono">
                   Dossier Evidence &amp; Endorsement
                 </span>
               </div>
@@ -262,9 +262,9 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
               onClose();
             }}
             aria-label="Close Case Evidence Dossier"
-            className="p-2.5 rounded-xl bg-white hover:bg-[#E8E0D2] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] shadow-sm transition-all cursor-pointer focus:ring-2 focus:ring-amber-600 focus:outline-none"
+            className="p-2.5 rounded-xl bg-white hover:bg-[#E8E0D2] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] shadow-sm transition-all cursor-pointer focus:ring-2 focus:ring-amber-700 focus:outline-none"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -272,16 +272,20 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
         <div className="p-6 sm:p-8 space-y-6 flex-1">
           {/* 2. Recorded Decision Artifact Panel (Displayed after Action) */}
           {recordedDecision && (
-            <div className={`p-6 rounded-2xl border ${
-              recordedDecision.action === 'APPROVED' ? 'beige-card-success' : 'beige-card-danger'
-            } space-y-4 animate-in fade-in slide-in-from-top-4 duration-300 shadow-md`}>
+            <div 
+              role="status" 
+              aria-live="polite"
+              className={`p-6 rounded-2xl border ${
+                recordedDecision.action === 'APPROVED' ? 'beige-card-success' : 'beige-card-danger'
+              } space-y-4 animate-in fade-in slide-in-from-top-4 duration-300 shadow-md`}
+            >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8E0D2] pb-3">
                 <div className="flex items-center gap-2.5">
                   <Award className={`w-6 h-6 ${
-                    recordedDecision.action === 'APPROVED' ? 'text-emerald-700' : 'text-rose-700'
-                  }`} />
+                    recordedDecision.action === 'APPROVED' ? 'text-emerald-800' : 'text-rose-800'
+                  }`} aria-hidden="true" />
                   <div>
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#75634B]">Official Recorded Decision Artifact</span>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#564735]">Official Recorded Decision Artifact</span>
                     <h3 className="text-base sm:text-lg font-bold font-editorial text-[#1C1917]">
                       {recordedDecision.action === 'APPROVED' ? 'Certificate of Title Verification Approved' : 'Statutory Title Rejection Order Issued'}
                     </h3>
@@ -289,12 +293,13 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${
                     recordedDecision.action === 'APPROVED' 
                       ? 'bg-emerald-200 text-emerald-950 border-emerald-400 font-mono'
                       : 'bg-rose-200 text-rose-950 border-rose-400 font-mono'
                   }`}>
-                    Status: {recordedDecision.action}
+                    {recordedDecision.action === 'APPROVED' ? <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" /> : <XCircle className="w-3.5 h-3.5" aria-hidden="true" />}
+                    <span>Status: {recordedDecision.action}</span>
                   </span>
                 </div>
               </div>
@@ -303,17 +308,18 @@ export const CaseDetailDrawer: React.FC<CaseDetailDrawerProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div className="p-3 bg-white rounded-xl border border-[#DDD1BF] flex items-center justify-between shadow-sm">
                   <div>
-                    <div className="text-[10px] text-[#75634B] font-mono">Decision Reference Token</div>
+                    <div className="text-[10px] text-[#564735] font-mono">Decision Reference Token</div>
                     <div className="font-mono font-extrabold text-sm text-[#1C1917] mt-0.5">
                       {recordedDecision.token}
                     </div>
                   </div>
                   <button
                     onClick={copyToken}
-                    className="p-1.5 rounded bg-[#F8F6F0] hover:bg-[#EFE8DC] border border-[#DDD1BF] text-[#564735] hover:text-[#1C1917] cursor-pointer flex items-center gap-1 font-medium"
+                    aria-label="Copy decision reference token"
+                    className="p-1.5 rounded bg-[#F8F6F0] hover:bg-[#EFE8DC] border border-[#DDD1BF] text-[#564735] hover:text-[#1C1917] cursor-pointer flex items-center gap-1 font-medium focus:ring-2 focus:ring-amber-700"
                     title="Copy token to clipboard"
                   >
-                    {copiedToken ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedToken ? <Check className="w-3.5 h-3.5 text-emerald-800" aria-hidden="true" /> : <Copy className="w-3.5 h-3.5" aria-hidden="true" />}
                     <span className="text-[10px]">{copiedToken ? 'Copied' : 'Copy'}</span>
                   </button>
                 </div>
