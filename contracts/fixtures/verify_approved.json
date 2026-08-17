@@ -1,0 +1,39 @@
+{
+  "inputTitle": "Aditi National Strategy Review",
+  "normalizedTitle": "aditi national strategy review",
+  "detectedLanguage": "English",
+  "transliteratedTitle": "aditi national strategy review",
+  "coreWords": [
+    "aditi",
+    "national",
+    "strategy",
+    "review"
+  ],
+  "verdict": "APPROVED",
+  "verdictScore": 8.0,
+  "similarityBreakdown": {
+    "lexicalScore": 12.0,
+    "phoneticScore": 6.0,
+    "semanticScore": 9.0,
+    "coreWordScore": 5.0,
+    "blendedScore": 8.0
+  },
+  "clashingTitles": [],
+  "ruleViolations": [],
+  "explanation": "Title \"Aditi National Strategy Review\" is distinct and fully compliant. No conflicting registered titles found within the similarity threshold, and all PRGI statutory rules passed.",
+  "recommendedAction": "Proceed with Aadhaar e-Sign filing on the Press Sewa Portal.",
+  "guidelineCitations": [
+    "PRGI Title Verification Guidelines, Clear Status Clause 1.4"
+  ],
+  "stageTimings": {
+    "normalize": 2.4,
+    "shortlist": 38.1,
+    "score": 214.7,
+    "check": 6.3,
+    "explain": 41.2
+  },
+  "engine": "LIVE",
+  "cached": false,
+  "processingTimeMs": 303,
+  "timestamp": "2026-08-17T09:12:04Z"
+}

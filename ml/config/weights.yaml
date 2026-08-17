@@ -1,0 +1,10 @@
+version: 1
+weights:
+  lexical: 0.30
+  phonetic: 0.25
+  semantic: 0.30
+  core_word: 0.15
+thresholds:
+  reject: 75
+  review: 45
+max_signal_override: 90
