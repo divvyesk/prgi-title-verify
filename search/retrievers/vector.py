@@ -18,8 +18,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from app.db import get_pool
 from ml.similarity.semantic import get_model
+from search.db import connection
 
 if TYPE_CHECKING:
     from contracts.contracts import Candidate
@@ -51,8 +51,7 @@ class VectorRetriever:
             model = get_model()
             query_vector = model.encode(query, normalize_embeddings=True).tolist()
 
-            pool = get_pool()
-            with pool.connection() as conn, conn.cursor() as cur:
+            with connection() as conn, conn.cursor() as cur:
                 cur.execute(_QUERY, (query_vector, query_vector, limit))
                 rows = cur.fetchall()
 

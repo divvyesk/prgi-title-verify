@@ -1,1 +1,6 @@
 langgraph>=1.2,<1.3
+# agents/llm.py talks to Groq; agents/clients.py calls the backend over HTTP.
+# Both were previously undeclared and only worked because they happened to be
+# installed in the shared venv — declared here so a fresh clone actually runs.
+groq>=1.6,<2.0
+httpx>=0.28,<0.29

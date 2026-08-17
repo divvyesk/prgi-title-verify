@@ -1,37 +1,21 @@
-import os
 import sys
+from pathlib import Path
 
-import psycopg2
-from psycopg2.extras import execute_values
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from ml.similarity.phonetic import _QueryRep
+from search.db import connection, database_url
 
 
 def main():
-    # Follow repository convention: use .env / environment variables
-    db_name = os.getenv("DB_NAME", "dataset1")
-    db_user = os.getenv("DB_USER", "pruthv")
-    db_host = os.getenv("DB_HOST", "localhost")
-    db_port = os.getenv("DB_PORT", "5432")
-    db_password = os.getenv("DB_PASSWORD", "")
+    # Connection resolved via search/db.py so this writes to the same
+    # database the backend reads from, on psycopg3 (the project driver).
+    print(f"database: {database_url()}")
+    with connection() as conn, conn.cursor() as cur:
+        _backfill(conn, cur)
 
-    conn_args = {
-        "dbname": db_name,
-        "user": db_user,
-        "host": db_host,
-        "port": db_port,
-    }
-    if db_password:
-        conn_args["password"] = db_password
 
-    try:
-        conn = psycopg2.connect(**conn_args)
-    except Exception as e:
-        print(f"Failed to connect to database: {e}")
-        sys.exit(1)
-
-    cur = conn.cursor()
-
+def _backfill(conn, cur):
     print("Fetching rows that need backfill...")
     cur.execute(
         "SELECT title_id, title_normalized FROM titles WHERE title_phonetic IS NULL"
@@ -43,8 +27,6 @@ def main():
 
     if total_rows == 0:
         print("Nothing to do.")
-        cur.close()
-        conn.close()
         return
 
     batch_size = 2000
@@ -53,10 +35,9 @@ def main():
     # Prepare update statement. We use Postgres' VALUES functionality via execute_values.
     update_query = """
         UPDATE titles
-        SET title_phonetic = data.phonetic,
-            title_skeleton = data.skeleton
-        FROM (VALUES %s) AS data(phonetic, skeleton, id)
-        WHERE titles.title_id = data.id
+        SET title_phonetic = %s,
+            title_skeleton = %s
+        WHERE title_id = %s
     """
 
     for i, (title_id, title_normalized) in enumerate(rows, 1):
@@ -78,18 +59,16 @@ def main():
         updates.append((title_phonetic, title_skeleton, title_id))
 
         if len(updates) >= batch_size:
-            execute_values(cur, update_query, updates)
+            cur.executemany(update_query, updates)
             conn.commit()
             print(f"Processed {i} / {total_rows}")
             updates = []
 
     if updates:
-        execute_values(cur, update_query, updates)
+        cur.executemany(update_query, updates)
         conn.commit()
         print(f"Processed {total_rows} / {total_rows}")
 
-    cur.close()
-    conn.close()
     print("Backfill complete.")
 
 

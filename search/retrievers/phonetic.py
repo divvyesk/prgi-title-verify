@@ -1,12 +1,10 @@
 import logging
-import os
 from typing import Sequence
-
-import psycopg2
 
 from contracts.algo import CandidateRetriever
 from contracts.contracts import Candidate
 from ml.similarity.phonetic import _QueryRep
+from search.db import connection
 
 logger = logging.getLogger(__name__)
 
@@ -46,95 +44,26 @@ class PhoneticRetriever:
         query_phonetic = " ".join(tokens_str)
         query_skeleton = qr.skel
 
-        db_name = os.getenv("DB_NAME", "dataset1")
-        db_user = os.getenv("DB_USER", "pruthv")
-        db_host = os.getenv("DB_HOST", "localhost")
-        db_port = os.getenv("DB_PORT", "5432")
-        db_password = os.getenv("DB_PASSWORD", "")
+        # Routed through search/db.py: shared psycopg3 pool inside the
+        # server, standalone connection to the same DATABASE_URL outside
+        # it. Previously opened its own psycopg2 connection to a
+        # hardcoded personal database.
+        with connection() as conn, conn.cursor() as cur:
+            candidates: list[Candidate] = []
+            seen_ids: set[int] = set()
 
-        conn_args = {
-            "dbname": db_name,
-            "user": db_user,
-            "host": db_host,
-            "port": db_port,
-        }
-        if db_password:
-            conn_args["password"] = db_password
-
-        conn = psycopg2.connect(**conn_args)
-        cur = conn.cursor()
-
-        candidates: list[Candidate] = []
-        seen_ids: set[int] = set()
-
-        # Pass 1: Exact skeleton match (cheap, very high precision)
-        cur.execute(
-            """
-            SELECT title_id, title, registration_number, language, publication_state
-            FROM titles
-            WHERE title_skeleton = %s
-            LIMIT %s
-            """,
-            (query_skeleton, limit),
-        )
-        for row in cur.fetchall():
-            title_id, title, reg_no, lang, state = row
-            candidates.append(
-                Candidate(
-                    title_id=title_id,
-                    title=title,
-                    reg_no=reg_no if reg_no else "",
-                    language=lang if lang else "",
-                    state=state if state else "",
-                    raw_score=1.0,
-                    source="phonetic",
-                )
+            # Pass 1: Exact skeleton match (cheap, very high precision)
+            cur.execute(
+                """
+                SELECT title_id, title, registration_number, language, publication_state
+                FROM titles
+                WHERE title_skeleton = %s
+                LIMIT %s
+                """,
+                (query_skeleton, limit),
             )
-            seen_ids.add(title_id)
-
-        remaining_limit = limit - len(candidates)
-
-        # Pass 2: Trigram similarity on phonetic codes
-        if remaining_limit > 0 and query_phonetic:
-            if seen_ids:
-                cur.execute(
-                    """
-                    SELECT title_id, title, registration_number, language, publication_state,
-                           similarity(title_phonetic, %s) as raw_score
-                    FROM titles
-                    WHERE title_id != ALL(%s)
-                      AND title_phonetic %% %s
-                    ORDER BY similarity(title_phonetic, %s) DESC
-                    LIMIT %s
-                    """,
-                    (
-                        query_phonetic,
-                        list(seen_ids),
-                        query_phonetic,
-                        query_phonetic,
-                        remaining_limit,
-                    ),
-                )
-            else:
-                cur.execute(
-                    """
-                    SELECT title_id, title, registration_number, language, publication_state,
-                           similarity(title_phonetic, %s) as raw_score
-                    FROM titles
-                    WHERE title_phonetic %% %s
-                    ORDER BY similarity(title_phonetic, %s) DESC
-                    LIMIT %s
-                    """,
-                    (
-                        query_phonetic,
-                        query_phonetic,
-                        query_phonetic,
-                        remaining_limit,
-                    ),
-                )
-
             for row in cur.fetchall():
-                title_id, title, reg_no, lang, state, raw_score = row
+                title_id, title, reg_no, lang, state = row
                 candidates.append(
                     Candidate(
                         title_id=title_id,
@@ -142,13 +71,72 @@ class PhoneticRetriever:
                         reg_no=reg_no if reg_no else "",
                         language=lang if lang else "",
                         state=state if state else "",
-                        raw_score=float(raw_score),
+                        raw_score=1.0,
                         source="phonetic",
                     )
                 )
                 seen_ids.add(title_id)
 
-        cur.close()
-        conn.close()
+            remaining_limit = limit - len(candidates)
+
+            # Pass 2: Trigram similarity on phonetic codes
+            if remaining_limit > 0 and query_phonetic:
+                if seen_ids:
+                    cur.execute(
+                        """
+                        SELECT title_id, title, registration_number, language, publication_state,
+                               similarity(title_phonetic, %s) as raw_score
+                        FROM titles
+                        WHERE title_id != ALL(%s)
+                          AND title_phonetic %% %s
+                        ORDER BY similarity(title_phonetic, %s) DESC
+                        LIMIT %s
+                        """,
+                        (
+                            query_phonetic,
+                            list(seen_ids),
+                            query_phonetic,
+                            query_phonetic,
+                            remaining_limit,
+                        ),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT title_id, title, registration_number, language, publication_state,
+                               similarity(title_phonetic, %s) as raw_score
+                        FROM titles
+                        WHERE title_phonetic %% %s
+                        ORDER BY similarity(title_phonetic, %s) DESC
+                        LIMIT %s
+                        """,
+                        (
+                            query_phonetic,
+                            query_phonetic,
+                            query_phonetic,
+                            remaining_limit,
+                        ),
+                    )
+
+                for row in cur.fetchall():
+                    title_id, title, reg_no, lang, state, raw_score = row
+                    candidates.append(
+                        Candidate(
+                            title_id=title_id,
+                            title=title,
+                            reg_no=reg_no if reg_no else "",
+                            language=lang if lang else "",
+                            state=state if state else "",
+                            raw_score=float(raw_score),
+                            source="phonetic",
+                        )
+                    )
+                    seen_ids.add(title_id)
 
         return candidates
+
+
+# ml/registry.py imports this module-level instance by name and never
+# instantiates the class itself (contracts/algo.py). Without it the retriever
+# silently never registers, which is exactly what was happening.
+RETRIEVER = PhoneticRetriever()
