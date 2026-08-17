@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Search, 
   Sparkles, 
@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Hero3DCanvas } from '../canvas/Hero3DCanvas';
-import { runTitleVerification } from '../../utils/verificationEngine';
+import { useVerification } from '../../hooks/useVerification';
 import { detectScriptAndLanguage, transliterateToRoman } from '../../utils/transliteration';
 import type { VerificationResult } from '../../types';
 import { sound } from '../../utils/audio';
@@ -45,6 +45,57 @@ const PIPELINE_STAGES = [
   { num: 5, name: 'Verdict' }
 ];
 
+const INITIAL_DEMO_RESULT: VerificationResult = {
+  inputTitle: 'Times India',
+  normalizedTitle: 'times india',
+  detectedLanguage: 'English',
+  transliteratedTitle: 'Times India',
+  coreWords: ['times', 'india'],
+  verdict: 'REJECTED',
+  verdictScore: 92,
+  similarityBreakdown: {
+    lexicalScore: 88,
+    phoneticScore: 92,
+    semanticScore: 78,
+    coreWordScore: 95,
+    blendedScore: 92
+  },
+  clashingTitles: [
+    {
+      title: 'India Times',
+      regNo: 'DELENG/2012/48192',
+      language: 'English',
+      state: 'Delhi',
+      similarity: 92,
+      matchType: 'LEXICAL',
+      reason: 'Anagrammatic word order permutation'
+    }
+  ],
+  ruleViolations: [
+    {
+      ruleId: 'R-GEN-01',
+      ruleName: 'Single Generic Word Protection',
+      passed: true,
+      clause: 'PRGI Section 1.1',
+      description: 'Multi-token publication title.',
+      severity: 'INFO'
+    },
+    {
+      ruleId: 'R-DEC-02',
+      ruleName: 'Deceptive Similarity Protection',
+      passed: false,
+      clause: 'PRGI Section 2.3',
+      description: 'Permutation conflict with registered title "India Times".',
+      severity: 'CRITICAL'
+    }
+  ],
+  explanation: 'Proposed title conflicts with registered publication "India Times" under PRGI Anagram & Deceptive Similarity Protection.',
+  recommendedAction: 'Use the AI Studio to generate distinctive, pre-cleared alternatives.',
+  guidelineCitations: ['PRGI Title Verification Guidelines 2025, Section 2.3'],
+  processingTimeMs: 42,
+  timestamp: new Date().toISOString()
+};
+
 export const VerificationView: React.FC<VerificationViewProps> = ({
   onNavigateToAgents,
   useLiveApi,
@@ -53,66 +104,22 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
   const [inputTitle, setInputTitle] = useState(initialTitle);
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [selectedState, setSelectedState] = useState('Maharashtra');
-  const [isScanning, setIsScanning] = useState(false);
-  const [result, setResult] = useState<VerificationResult | null>(() => {
-    try {
-      const rawClean = initialTitle.trim();
-      return {
-        inputTitle: rawClean,
-        normalizedTitle: rawClean.toLowerCase(),
-        detectedLanguage: 'English',
-        transliteratedTitle: rawClean,
-        coreWords: ['times', 'india'],
-        verdict: 'REJECTED',
-        verdictScore: 92,
-        similarityBreakdown: {
-          lexicalScore: 88,
-          phoneticScore: 92,
-          semanticScore: 78,
-          coreWordScore: 95,
-          blendedScore: 92
-        },
-        clashingTitles: [
-          {
-            title: 'India Times',
-            regNo: 'DELENG/2012/48192',
-            language: 'English',
-            state: 'Delhi',
-            similarity: 92,
-            matchType: 'LEXICAL',
-            reason: 'Anagrammatic word order permutation'
-          }
-        ],
-        ruleViolations: [
-          {
-            ruleId: 'R-GEN-01',
-            ruleName: 'Single Generic Word Protection',
-            passed: true,
-            clause: 'PRGI Section 1.1',
-            description: 'Multi-token publication title.',
-            severity: 'INFO'
-          },
-          {
-            ruleId: 'R-DEC-02',
-            ruleName: 'Deceptive Similarity Protection',
-            passed: false,
-            clause: 'PRGI Section 2.3',
-            description: 'Permutation conflict with registered title "India Times".',
-            severity: 'CRITICAL'
-          }
-        ],
-        explanation: 'Proposed title conflicts with registered publication "India Times" under PRGI Anagram & Deceptive Similarity Protection.',
-        recommendedAction: 'Use the AI Studio to generate distinctive, pre-cleared alternatives.',
-        guidelineCitations: ['PRGI Title Verification Guidelines 2025, Section 2.3'],
-        processingTimeMs: 42,
-        timestamp: new Date().toISOString()
-      };
-    } catch {
-      return null;
-    }
-  });
-  const [activeStage, setActiveStage] = useState(5);
   const [copiedReport, setCopiedReport] = useState(false);
+
+  // Single unified verification hook
+  const { run, stage, result, engine, isRunning } = useVerification(INITIAL_DEMO_RESULT);
+
+  const activeStageNum = useMemo(() => {
+    switch (stage) {
+      case 'normalize': return 1;
+      case 'shortlist': return 2;
+      case 'score': return 3;
+      case 'check': return 4;
+      case 'explain':
+      case 'done': return 5;
+      default: return 5;
+    }
+  }, [stage]);
 
   const detected = detectScriptAndLanguage(inputTitle);
   const transliteratedPreview = transliterateToRoman(inputTitle);
@@ -122,43 +129,29 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
     if (!target) return;
 
     sound.playScan();
-    setIsScanning(true);
-    setActiveStage(1);
+    try {
+      const res = await run(target, {
+        language: selectedLanguage,
+        state: selectedState,
+        useLiveApi
+      });
 
-    setTimeout(() => setActiveStage(2), 70);
-    setTimeout(() => setActiveStage(3), 140);
-    setTimeout(() => setActiveStage(4), 210);
-
-    setTimeout(async () => {
-      try {
-        const res = await runTitleVerification(target, {
-          targetLanguage: selectedLanguage,
-          targetState: selectedState,
-          useLiveApi
+      if (res.verdict === 'APPROVED') {
+        sound.playSuccess();
+        confetti({
+          particleCount: 60,
+          spread: 55,
+          origin: { y: 0.6 },
+          colors: ['#059669', '#D97706', '#B45309']
         });
-        setResult(res);
-        setIsScanning(false);
-        setActiveStage(5);
-
-        if (res.verdict === 'APPROVED') {
-          sound.playSuccess();
-          confetti({
-            particleCount: 60,
-            spread: 55,
-            origin: { y: 0.6 },
-            colors: ['#059669', '#D97706', '#B45309']
-          });
-        } else if (res.verdict === 'REJECTED') {
-          sound.playAlert();
-        } else {
-          sound.playClick();
-        }
-      } catch (err) {
-        console.error('Verification error:', err);
-        setIsScanning(false);
-        setActiveStage(5);
+      } else if (res.verdict === 'REJECTED') {
+        sound.playAlert();
+      } else {
+        sound.playClick();
       }
-    }, 280);
+    } catch (err) {
+      console.error('Verification error:', err);
+    }
   };
 
   useEffect(() => {
@@ -173,6 +166,7 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
     sound.playClick();
     const text = `--- PRGI Title Verification Report ---
 Title: ${result.inputTitle}
+Engine: ${engine === 'LIVE' ? 'LIVE (Full 82k Registry)' : 'OFFLINE (Sample 2.5k Registry)'}
 Verdict: ${result.verdict} (Risk: ${result.verdictScore}/100)
 Language: ${result.detectedLanguage} | State: ${selectedState}
 4D Similarity: Lexical ${result.similarityBreakdown.lexicalScore}%, Phonetic ${result.similarityBreakdown.phoneticScore}%, Semantic ${result.similarityBreakdown.semanticScore}%, Core-Word ${result.similarityBreakdown.coreWordScore}%
@@ -185,7 +179,7 @@ Explanation: ${result.explanation}`;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-8 py-4 sm:py-6">
-      {/* Hero Section (Clean Poppins Typography + 3D Text & Background Shapes) */}
+      {/* Hero Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center min-h-[400px]">
         {/* Left Copy Column */}
         <div className="lg:col-span-6 space-y-5">
@@ -208,10 +202,10 @@ Explanation: ${result.explanation}`;
           <div className="flex flex-wrap items-center gap-3.5 pt-1">
             <button
               onClick={() => handleVerify()}
-              disabled={isScanning || !inputTitle.trim()}
+              disabled={isRunning || !inputTitle.trim()}
               className="px-7 py-3 rounded-full font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] text-white shadow-md flex items-center gap-2 transition-all cursor-pointer"
             >
-              {isScanning ? (
+              {isRunning ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
                   <span>Verifying...</span>
@@ -264,9 +258,9 @@ Explanation: ${result.explanation}`;
           </div>
         </div>
 
-        {/* Right 3D Spatial Canvas (Prominent 3D Text + Aesthetic Shapes in Background) */}
+        {/* Right 3D Spatial Canvas */}
         <div className="lg:col-span-6 h-[340px] sm:h-[420px] relative rounded-3xl bg-white/60 border border-[#E2D7C5] p-2 overflow-hidden shadow-xs flex items-center justify-center mouse-spotlight">
-          <Hero3DCanvas title={inputTitle} verdict={result?.verdict} isScanning={isScanning} />
+          <Hero3DCanvas title={inputTitle} verdict={result?.verdict} isScanning={isRunning} />
         </div>
       </div>
 
@@ -342,10 +336,10 @@ Explanation: ${result.explanation}`;
 
             <button
               onClick={() => handleVerify()}
-              disabled={isScanning || !inputTitle.trim()}
+              disabled={isRunning || !inputTitle.trim()}
               className="px-7 py-3.5 rounded-2xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
-              {isScanning ? (
+              {isRunning ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-amber-200" />
                   <span>Verifying...</span>
@@ -373,12 +367,12 @@ Explanation: ${result.explanation}`;
         {/* 5-Stage Stepper Ribbon */}
         <div className="pt-2 border-t border-[#E8E0D2]">
           <div className="grid grid-cols-5 gap-2 text-xs">
-            {PIPELINE_STAGES.map((stage) => {
-              const isCurrent = activeStage === stage.num;
-              const isDone = activeStage >= stage.num;
+            {PIPELINE_STAGES.map((stageItem) => {
+              const isCurrent = activeStageNum === stageItem.num;
+              const isDone = activeStageNum >= stageItem.num;
               return (
                 <div
-                  key={stage.num}
+                  key={stageItem.num}
                   className={`py-2 px-2.5 rounded-xl border text-center transition-all ${
                     isCurrent
                       ? 'bg-amber-100 border-amber-400 text-amber-950 font-bold'
@@ -387,8 +381,8 @@ Explanation: ${result.explanation}`;
                       : 'bg-[#F0EBE0]/50 border-transparent text-[#A8A29E]'
                   }`}
                 >
-                  <div className="text-[10px] font-mono text-[#75634B]">0{stage.num}</div>
-                  <div className="text-xs truncate">{stage.name}</div>
+                  <div className="text-[10px] font-mono text-[#75634B]">0{stageItem.num}</div>
+                  <div className="text-xs truncate">{stageItem.name}</div>
                 </div>
               );
             })}
@@ -416,15 +410,30 @@ Explanation: ${result.explanation}`;
                 </div>
 
                 <div>
-                  <span className={`text-[11px] font-bold uppercase px-2.5 py-0.5 rounded tracking-wide ${
-                    result.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-                    result.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
-                    'bg-amber-100 text-amber-900 border border-amber-300'
-                  }`}>
-                    {result.verdict === 'APPROVED' && 'Approved • Clear for Registration'}
-                    {result.verdict === 'REJECTED' && 'Rejected • High Conflict / Statutory Clash'}
-                    {result.verdict === 'MANUAL_REVIEW' && 'Manual Review Required'}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`text-[11px] font-bold uppercase px-2.5 py-0.5 rounded tracking-wide ${
+                      result.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                      result.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
+                      'bg-amber-100 text-amber-900 border border-amber-300'
+                    }`}>
+                      {result.verdict === 'APPROVED' && 'Approved • Clear for Registration'}
+                      {result.verdict === 'REJECTED' && 'Rejected • High Conflict / Statutory Clash'}
+                      {result.verdict === 'MANUAL_REVIEW' && 'Manual Review Required'}
+                    </span>
+
+                    {/* Visible Engine Chip */}
+                    {engine === 'LIVE' ? (
+                      <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                        LIVE ENGINE · full 82,713-title registry
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-[#EFE8DC] text-[#75634B] border border-[#DDD1BF] flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                        OFFLINE ENGINE · 2,500-title sample
+                      </span>
+                    )}
+                  </div>
 
                   <h3 className="text-2xl sm:text-3xl font-poppins font-bold text-[#1C1917] mt-2">
                     "{result.inputTitle}"
