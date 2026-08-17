@@ -57,6 +57,29 @@ once at import/startup time; on failure, a warning is logged and that piece stay
 on stub/fixture data. Per-call failures (a module imports fine but raises when
 actually invoked) fall back the same way, per-request, without crashing the pipeline.
 
+### The cost of that resilience, and what it means for you
+
+This design keeps a broken teammate module from taking down the server. It also
+hides the breakage, and during integration it hid four separate faults at once —
+each of which returned HTTP 200 with plausible output:
+
+- all four retrievers failed to register (wrong DB driver, an import that only
+  resolves inside the server, a missing module-level `RETRIEVER`), so
+  shortlisting silently ran on nothing;
+- `run_rules()` raised `ValidationError` on every title from a field-name
+  mismatch, so all 36 rules were evaluated and discarded, and every response
+  reported zero rule violations;
+- `/v1/alternatives` called `run_studio()` with the wrong signature and served
+  fixtures instead — returning Maharashtra titles for a Tamil Nadu request;
+- the frontend rejected a valid response over a `null` vs `undefined` schema
+  detail and quietly dropped to its offline engine while still displaying a
+  "Live API" badge.
+
+So: **treat the fallbacks as alarms, not as safety.** On boot, check the
+registry line in the logs actually reads `4/4 scorers, 4/4 retrievers`, and
+grep the log for `falling back` after exercising an endpoint. A green response
+is not evidence that the real path ran.
+
 ## Layer ownership
 
 Matches `.github/CODEOWNERS` — the map below is the same thing, read top-down as a
@@ -99,21 +122,32 @@ contracts/                    Divvye — frozen Pydantic + Zod models, the one t
 
 ## Known performance characteristics (measured, not estimated)
 
-A full real `/v1/verify` (uncached, `STUB_MODE=0`) currently takes **2.2-4.3 seconds**
-— over the 2-second target. Breakdown from real `stageTimings` measurements:
+Measured after integration, against the full 82,713-title corpus with all four
+scorers and all four retrievers registered (`STUB_MODE=0`):
+
+- cached demo titles: **~1ms** (median over the pre-warmed set)
+- cold, never-seen titles: **3.4-5.3s**, median 3.8s
+
+Per-stage, on a cold title:
 
 - `normalize`: <1ms
-- `shortlist`: 60-140ms (one DB round trip via the vector retriever + RRF)
-- `score`: **2.1-2.6s** — the dominant cost. A single `SentenceTransformer.encode()`
-  batch call over ~200 shortlisted candidates, the only scoring dimension currently
-  registered. This is expected to fall once Jai's fast, C++-backed RapidFuzz-based
-  scorers (lexical/phonetic/core_word) also register — the pipeline doesn't get
-  slower as more scorers are added (each runs independently), but today's number
-  reflects the whole scoring burden sitting on the one slowest dimension.
-- `check`: <3ms (stub keyword match; real rule engine not wired yet)
-- `explain`: <1ms (fixed in Prompt 7 — this used to cost ~630ms by redundantly
-  re-running the model per clashing title; now reuses scores already computed in
-  stage 3)
+- `shortlist`: ~1.7s — four retrievers (trigram, bm25, phonetic, vector) fused
+  with RRF, returning 200 candidates
+- `score`: ~2.2s — still the dominant cost, and still dominated by the semantic
+  dimension's `SentenceTransformer.encode()` over the shortlist. Jai's RapidFuzz
+  scorers did land and now run alongside it; they are close to free, so the
+  earlier prediction that adding them would reduce total time was wrong. The
+  cost was never spread across dimensions — it is one model call, and it stays.
+- `check`: ~3-10ms — the real 36-rule engine, not the stub
+- `explain`: ~1.1s — a real Groq call plus RAG retrieval
 
-The cache (see `docs/API_SPEC.md`) is what actually gets the six demo titles under
-budget for judges — pre-warmed at startup, they answer in 0-2ms.
+The cache (see `docs/API_SPEC.md`) is what gets the six demo titles under budget
+for judges — pre-warmed at startup, they answer in about a millisecond.
+
+Two operational notes worth knowing before a demo:
+
+- **Never run `scripts/embed_titles.py` while demoing.** It competes with the
+  backend for the GPU. A verification that normally takes 5s was measured at
+  **194s** while the embedding pass was running.
+- The frontend's "sub-2 seconds" headline describes the cached path. A cold
+  title takes ~4s.

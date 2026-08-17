@@ -64,7 +64,15 @@ export async function checkRules(request: RuleCheckRequest): Promise<RuleCheckRe
  * POST /v1/alternatives — Agentic Title Studio Generation
  */
 export async function generateAlternatives(request: AlternativesRequest): Promise<AlternativesResponse> {
-  return post<AlternativesResponse>('/v1/alternatives', request, AlternativesResponseSchema, { timeoutMs: 45000 });
+  // 45s was not enough for a genuinely uncached brief. Measured end-to-end on
+  // the live graph: a warm run finishes in ~5s, but a run where the primary
+  // Groq model fails and the chain falls back to a slower one took 59s — the
+  // agent interviews, generates ~18 candidates, verifies each through the
+  // real pipeline, retries, then ranks. That run would have been cut off at
+  // 45s and shown an error for work the backend went on to complete
+  // successfully. The cached demo briefs return in well under a second, so
+  // this ceiling only ever applies to an unseen scenario.
+  return post<AlternativesResponse>('/v1/alternatives', request, AlternativesResponseSchema, { timeoutMs: 120000 });
 }
 
 /**
