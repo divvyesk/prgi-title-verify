@@ -9,9 +9,7 @@ import {
   Check, 
   RefreshCw, 
   ShieldCheck, 
-  Flame,
-  Zap,
-  Info
+  Flame 
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { GeneratedCandidate } from '../../types';
@@ -213,148 +211,138 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="space-y-10 max-w-7xl mx-auto px-6 sm:px-12 py-8">
       {/* Header Info */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E7E5E4] pb-6">
-        <div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-[#1C1917] tracking-tight">
-            Autonomous Title Generation &amp; Pre-Verification
+      <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 border-b border-[#EDE8DF] pb-6">
+        <div className="space-y-2">
+          <h1 className="font-editorial text-3xl sm:text-5xl text-[#1C1917]">
+            Autonomous Title Studio
           </h1>
-          <p className="text-sm text-[#57534E] mt-1 max-w-3xl leading-relaxed font-medium">
-            When a proposed title clashes, our 4-Agent collaborative loop generates 15–20 distinctive candidates, immediately verifies them against the PRGI statutory rulebook &amp; 82,713 registry, prunes collisions, and delivers 100% pre-cleared alternatives.
+          <p className="text-sm sm:text-base text-[#57534E] max-w-3xl leading-relaxed">
+            When a title clashes, our 4-agent collaborative loop generates 15–20 candidates, verifies them against 82,713 registered titles, prunes collisions, and delivers 100% pre-cleared alternatives.
           </p>
         </div>
 
         {generationTimeMs && (
-          <div className="flex items-center gap-2 text-xs font-mono bg-white px-3.5 py-2 rounded-xl border border-[#E7E5E4] shadow-2xs self-start md:self-auto">
-            <Zap className="w-4 h-4 text-amber-700" />
-            <span className="text-[#78716C]">Generation Latency:</span>
-            <span className="font-bold text-[#1C1917]">{generationTimeMs} ms</span>
+          <div className="text-xs font-mono text-[#78716C]">
+            Latency: <span className="font-bold text-[#1C1917]">{generationTimeMs} ms</span>
           </div>
         )}
       </div>
 
-      {/* 4-Agent Pipeline Progression Visualization */}
-      <div className="beige-card rounded-2xl p-6 sm:p-7 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="text-xs font-bold text-[#78716C] uppercase tracking-wider font-mono">
-            4-Agent Multi-Cycle Workflow
-          </div>
+      {/* 4-Agent Pipeline Progression Stream (Linear Whitespace, No Card Grid) */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-bold text-[#1C1917] uppercase tracking-wider">
+            Multi-Cycle Autonomous Workflow
+          </span>
           {isGenerating && (
-            <span className="text-xs font-mono text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-md font-bold motion-safe:animate-pulse">
-              Workflow Active (LLM + 4-D Screening)
+            <span className="font-mono text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded font-bold motion-safe:animate-pulse">
+              Workflow Active
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
-              role: '1. Interviewer Agent',
-              desc: 'Analyzes user brief, domain constraints, state jurisdiction, and audience intent.',
+              num: '01',
+              role: 'Interviewer Agent',
+              desc: 'Analyzes brief, domain constraints, jurisdiction, and target tone.',
               icon: Bot,
-              color: 'text-amber-800',
-              bgColor: 'bg-amber-100 border-amber-300'
             },
             {
-              role: '2. Generator Agent',
-              desc: 'Proposes 15-20 linguistically rich & culturally resonant names across roots.',
+              num: '02',
+              role: 'Generator Agent',
+              desc: 'Proposes 15–20 linguistically rich names across root tokens.',
               icon: Sparkles,
-              color: 'text-amber-700',
-              bgColor: 'bg-amber-100 border-amber-300'
             },
             {
-              role: '3. Verifier Agent',
-              desc: 'Pipes candidates through 82k registry & PRGI rules, aggressively pruning clashes.',
+              num: '03',
+              role: 'Verifier Agent',
+              desc: 'Pipes candidates through 82k registry & rules, pruning clashes.',
               icon: ShieldCheck,
-              color: 'text-emerald-800',
-              bgColor: 'bg-emerald-100 border-emerald-300'
             },
             {
-              role: '4. Ranker Agent',
-              desc: 'Scores and ranks surviving clean titles by distinctiveness and semantic clarity.',
+              num: '04',
+              role: 'Ranker Agent',
+              desc: 'Scores and ranks clean survivors by distinctiveness and clarity.',
               icon: Cpu,
-              color: 'text-stone-900',
-              bgColor: 'bg-stone-100 border-stone-300'
             }
           ].map((agent, idx) => {
             const isAgentActive = activeAgentIndex === idx;
             const isAgentPassed = activeAgentIndex !== null && activeAgentIndex > idx;
-            const Icon = agent.icon;
             return (
               <div
                 key={agent.role}
-                className={`p-4 rounded-xl border transition-all relative ${
-                  isAgentActive
-                    ? 'bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-300'
-                    : isAgentPassed
-                    ? 'bg-white border-[#E7E5E4]'
-                    : 'bg-[#FAF9F6] border-[#E7E5E4]'
+                className={`space-y-1.5 transition-all ${
+                  isAgentActive ? 'opacity-100' : isAgentPassed ? 'opacity-100' : 'opacity-40'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className={`p-2 rounded-lg border ${agent.bgColor} ${agent.color}`}>
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <span className="font-bold text-xs text-[#1C1917]">{agent.role}</span>
-                  </div>
-                  {isAgentPassed && <CheckCircle2 className="w-4 h-4 text-emerald-700" />}
+                <div className="w-full h-1 rounded-full bg-[#EAE6DF] overflow-hidden mb-2">
+                  <div 
+                    className={`h-full transition-all duration-300 ${
+                      isAgentActive ? 'bg-amber-600 w-full motion-safe:animate-pulse' :
+                      isAgentPassed ? 'bg-[#1C1917] w-full' : 'w-0'
+                    }`}
+                  />
                 </div>
-                <p className="text-[11px] text-[#57534E] leading-relaxed font-medium">{agent.desc}</p>
-                {isAgentActive && (
-                  <div className="mt-2 text-xs text-amber-900 font-mono flex items-center gap-1.5 font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-600 motion-safe:animate-pulse"></span>
-                    <span>Processing Agent Step...</span>
-                  </div>
-                )}
+
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#78716C]">{agent.num}</span>
+                  {isAgentPassed && <CheckCircle2 className="w-3.5 h-3.5 text-[#137333]" />}
+                </div>
+
+                <div className="font-bold text-xs text-[#1C1917]">
+                  {agent.role}
+                </div>
+                <p className="text-xs text-[#57534E] leading-relaxed">
+                  {agent.desc}
+                </p>
               </div>
             );
           })}
         </div>
 
-        {/* Visible Pruning & Collision Retry Telemetry */}
+        {/* Collision & Self-Regeneration Notice */}
         {retryInfo && (
-          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-[#E7E5E4] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="p-4 bg-[#FAF9F6] rounded-xl border border-[#EDE8DF] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-[#EFE8DC] text-amber-900 shrink-0">
-                <Flame className="w-4 h-4 text-amber-800" />
-              </div>
+              <Flame className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
-                <div className="font-bold text-[#1C1917] flex items-center gap-2">
-                  <span>Automated Collision Pruning &amp; Self-Regeneration Cycle</span>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#EAE6DF] text-[#44403C] border border-[#DDD6CE]">
-                    Cycle {retryInfo.cycle}
-                  </span>
+                <div className="font-bold text-[#1C1917]">
+                  Automated Collision Pruning (Cycle {retryInfo.cycle})
                 </div>
-                <p className="text-[#57534E] text-xs mt-0.5 font-medium">
-                  <strong className="text-[#1C1917]">{retryInfo.collidedCount} of {retryInfo.totalGenerated}</strong> candidate proposals collided with registered titles during 4-D testing and were pruned.
+                <p className="text-[#57534E] mt-0.5">
+                  <strong>{retryInfo.collidedCount} of {retryInfo.totalGenerated}</strong> proposals collided during 4-D testing and were pruned before reaching you.
                 </p>
-                <p className="text-xs text-[#78716C] font-mono mt-0.5">
-                  Example collision pruned: <em>"{retryInfo.collisionSample}"</em>
+                <p className="text-[11px] text-[#78716C] font-mono mt-0.5">
+                  Pruned sample: <em>"{retryInfo.collisionSample}"</em>
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-              <span className="font-mono text-emerald-800 font-bold bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-lg text-xs">
-                {retryInfo.survivingCount} Surviving Clean Titles
-              </span>
+            <div className="text-xs font-mono font-bold text-[#137333] shrink-0 self-end sm:self-center">
+              {retryInfo.survivingCount} Verified Clean Titles
             </div>
           </div>
         )}
       </div>
 
       {/* Main Workspace Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left: Input Brief & Parameters Card */}
-        <div className="lg:col-span-4 beige-card rounded-2xl p-6 space-y-4">
-          <div className="flex items-center gap-2 text-sm font-bold text-[#1C1917] border-b border-[#E7E5E4] pb-3">
-            <Bot className="w-4 h-4 text-amber-700" />
-            <span>Title Brief &amp; Context</span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start pt-4">
+        {/* Left: Input Parameters */}
+        <div className="lg:col-span-4 space-y-4">
+          <div className="space-y-1 border-b border-[#EDE8DF] pb-3">
+            <h2 className="font-bold text-sm text-[#1C1917]">
+              Title Brief &amp; Context
+            </h2>
+            <p className="text-xs text-[#78716C]">
+              Configure intent for the autonomous agents.
+            </p>
           </div>
 
-          <div className="space-y-3.5 text-xs">
+          <div className="space-y-4 text-xs">
             <div>
               <label className="block text-[#57534E] font-semibold mb-1">Publication Theme / Domain</label>
               <input
@@ -362,18 +350,18 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g. Daily National Defense & Geopolitics"
-                className="w-full bg-white border border-[#D6D3D1] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
+                className="w-full bg-white border border-[#DDD6CE] rounded-xl px-3.5 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
               />
             </div>
 
             <div>
-              <label className="block text-[#57534E] font-semibold mb-1">Root Keywords &amp; Seed Tokens</label>
+              <label className="block text-[#57534E] font-semibold mb-1">Root Keywords</label>
               <input
                 type="text"
                 value={keywords}
                 onChange={(e) => setKeywords(e.target.value)}
-                placeholder="e.g. Defence, Raksha, Rashtra, Strategy"
-                className="w-full bg-white border border-[#D6D3D1] rounded-xl px-3 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
+                placeholder="e.g. Defence, Raksha, Rashtra"
+                className="w-full bg-white border border-[#DDD6CE] rounded-xl px-3.5 py-2.5 text-[#1C1917] font-semibold focus:outline-none shadow-2xs"
               />
             </div>
 
@@ -383,15 +371,15 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
+                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
-                  <option value="Hindi">Hindi (हिंदी)</option>
+                  <option value="Hindi">Hindi</option>
                   <option value="English">English</option>
-                  <option value="Marathi">Marathi (मराठी)</option>
-                  <option value="Bengali">Bengali (বাংলা)</option>
-                  <option value="Tamil">Tamil (தமிழ்)</option>
-                  <option value="Telugu">Telugu (తెలుగు)</option>
-                  <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+                  <option value="Marathi">Marathi</option>
+                  <option value="Bengali">Bengali</option>
+                  <option value="Tamil">Tamil</option>
+                  <option value="Telugu">Telugu</option>
+                  <option value="Gujarati">Gujarati</option>
                 </select>
               </div>
 
@@ -400,61 +388,50 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
                 <select
                   value={periodicity}
                   onChange={(e) => setPeriodicity(e.target.value)}
-                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
+                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
                   <option value="Daily">Daily</option>
                   <option value="Weekly">Weekly</option>
                   <option value="Fortnightly">Fortnightly</option>
                   <option value="Monthly">Monthly</option>
-                  <option value="Quarterly">Quarterly</option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[#57534E] font-semibold mb-1">Target State</label>
+                <label className="block text-[#57534E] font-semibold mb-1">State</label>
                 <select
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
+                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
                   <option value="Uttar Pradesh">Uttar Pradesh</option>
                   <option value="Maharashtra">Maharashtra</option>
                   <option value="Delhi">Delhi</option>
                   <option value="Madhya Pradesh">Madhya Pradesh</option>
                   <option value="Rajasthan">Rajasthan</option>
-                  <option value="West Bengal">West Bengal</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[#57534E] font-semibold mb-1">Editorial Tone</label>
+                <label className="block text-[#57534E] font-semibold mb-1">Tone</label>
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="w-full bg-white border border-[#D6D3D1] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
+                  className="w-full bg-white border border-[#DDD6CE] rounded-xl px-2.5 py-2 text-[#1C1917] font-semibold focus:outline-none"
                 >
                   <option value="Authoritative & Progressive">Authoritative</option>
                   <option value="Modern & Analytical">Analytical</option>
                   <option value="Grassroots & People-Centric">Grassroots</option>
-                  <option value="Scholarly & Investigative">Investigative</option>
                 </select>
               </div>
-            </div>
-
-            {/* In-Flight Notice */}
-            <div className="p-3 rounded-xl bg-[#FAF9F6] border border-[#E7E5E4] flex items-start gap-2 text-xs text-[#57534E]">
-              <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-              <span>
-                Runs end-to-end statutory verification. Full generation can take up to 45 seconds.
-              </span>
             </div>
 
             <button
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="w-full mt-3 py-3.5 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full mt-2 py-3 rounded-xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               {isGenerating ? (
                 <>
@@ -464,82 +441,71 @@ export const AgenticStudio: React.FC<AgenticStudioProps> = ({
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Run Autonomous Title Studio</span>
+                  <span>Generate Pre-Cleared Titles</span>
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* Right: Pre-Verified Generated Titles List */}
-        <div className="lg:col-span-8 beige-card rounded-2xl p-6 sm:p-7 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E7E5E4] pb-3">
-            <div>
-              <h2 className="text-base font-bold text-[#1C1917] flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-700" />
-                <span>Pre-Verified Conflict-Free Titles</span>
-              </h2>
-              <p className="text-xs text-[#78716C] font-medium">
-                Every suggestion has cleared our 82k registry lookup &amp; PRGI statutory rules.
-              </p>
-            </div>
-            <span className="text-xs font-mono text-emerald-800 bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-md font-bold self-start sm:self-auto">
-              100% Clearance Rate
-            </span>
+        {/* Right: Generated Titles Stream */}
+        <div className="lg:col-span-8 space-y-4">
+          <div className="space-y-1 border-b border-[#EDE8DF] pb-3">
+            <h2 className="font-bold text-sm text-[#1C1917]">
+              Pre-Verified Recommendations ({candidates.length})
+            </h2>
+            <p className="text-xs text-[#78716C]">
+              Every suggestion has cleared the 82k registry lookup &amp; PRGI statutory rules.
+            </p>
           </div>
 
-          <div className="space-y-3">
-            {candidates.map((candidate) => (
+          <div className="divide-y divide-[#EDE8DF]">
+            {candidates.map((candidate: GeneratedCandidate) => (
               <div
                 key={candidate.id}
-                className="p-5 rounded-xl bg-white border border-[#E7E5E4] hover:border-[#D6D3D1] transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs"
+                className="py-5 flex flex-col md:flex-row md:items-baseline justify-between gap-4"
               >
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-base font-bold text-[#1C1917]">
+                <div className="space-y-1.5 max-w-xl">
+                  <div className="flex items-baseline gap-3 flex-wrap">
+                    <span className="font-bold text-lg text-[#1C1917]">
                       {candidate.title}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 font-bold border border-emerald-300 flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-                      <span>Verified Clear</span>
+                    <span className="text-xs font-mono text-[#137333] font-bold">
+                      Verified Clear
                     </span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-md bg-[#FAF9F6] text-[#57534E] font-mono border border-[#E7E5E4]">
+                    <span className="text-xs font-mono text-[#78716C]">
                       Uniqueness: {candidate.uniquenessScore}%
-                    </span>
-                    <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-mono font-semibold">
-                      Risk: {candidate.riskScore}/100
                     </span>
                   </div>
 
-                  <p className="text-xs text-[#44403C]">
-                    <span className="text-[#78716C] font-bold">Concept Meaning:</span> {candidate.meaning}
-                  </p>
                   <p className="text-xs text-[#57534E]">
-                    <strong className="text-[#1C1917]">Verification Evidence:</strong> {candidate.rationale}
+                    <strong className="text-[#1C1917]">Meaning:</strong> {candidate.meaning}
+                  </p>
+                  <p className="text-xs text-[#78716C]">
+                    {candidate.rationale}
                   </p>
                 </div>
 
-                {/* One-Click Transfer & Actions */}
-                <div className="flex items-center gap-2 shrink-0">
+                {/* Actions */}
+                <div className="flex items-center gap-3 shrink-0">
                   <button
                     onClick={() => copyTitle(candidate.title, candidate.id)}
-                    className="p-2.5 rounded-xl bg-[#FAF9F6] hover:bg-[#F5F2EA] text-[#57534E] hover:text-[#1C1917] border border-[#E7E5E4] transition-colors cursor-pointer"
-                    title="Copy title to clipboard"
+                    className="hover:text-[#1C1917] text-xs font-semibold text-[#57534E] flex items-center gap-1 cursor-pointer"
+                    title="Copy title"
                   >
-                    {copiedId === candidate.id ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}
+                    {copiedId === candidate.id ? <Check className="w-3.5 h-3.5 text-[#137333]" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedId === candidate.id ? 'Copied' : 'Copy'}</span>
                   </button>
 
-                  {/* One-Click Transfer Button */}
                   <button
                     onClick={() => {
                       sound.playClick();
                       onSelectTitleForVerification(candidate.title);
                     }}
-                    className="px-4 py-2.5 rounded-xl bg-[#1C1917] hover:bg-[#382E22] text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                    title="Transfer title to Verifier Console and run verification"
+                    className="px-3.5 py-1.5 rounded-lg bg-[#1C1917] hover:bg-[#382E22] text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                   >
                     <span>Inspect in Verifier</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                    <ArrowRight className="w-3 h-3 text-amber-300" />
                   </button>
                 </div>
               </div>
