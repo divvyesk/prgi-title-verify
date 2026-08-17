@@ -1,0 +1,147 @@
+query,expected_match_title_id,relation,note
+AAJ KA ANNADATA,292,lexical,token_sort_ratio=81.4814814814815; registered: 'AAJ KA ANAND'
+Kokaan Kinara,34239,phonetic,substitution=an→aan; registered='KOKAN KINARA' (id=34239)
+Times Mataji Jay,29582,reorder,words shuffled from registered 'JAY MATAJI TIMES' (id=29582)
+Vishwa Darpan Sanchalit Parishad Lad Lad,79829,reorder,words shuffled from registered 'VISHWA LAD PARISHAD SANCHALIT LAD DARPAN' (id=79829)
+aadhunik sanvaad,139,lexical,token_sort_ratio=80.0; registered: 'aadhunik manak'
+Haridwaar Nayan,23831,phonetic,substitution=ar→aar; registered='Haridwar Nayan' (id=23831)
+Jyoti Samaj Kalal Sarve,62451,reorder,words shuffled from registered 'SARVE KALAL SAMAJ JYOTI' (id=62451)
+Pradesh Ki Baat,82644,semantic,UNCERTAIN: 'pradesh ki baat'=state talk; checking DAINIK JAGRAN
+Vindhyavasini Samachar Saptahik Maa Patrika,37307,reorder,words shuffled from registered 'MAA VINDHYAVASINI SAPTAHIK SAMACHAR PATRIKA' (id=37307)
+Gujarat Media Dakshin,15336,reorder,words shuffled from registered 'DAKSHIN GUJARAT MEDIA' (id=15336)
+AAJ KA ANNADATA,291,lexical,token_sort_ratio=81.4814814814815; registered: 'AAJ KA ANAND'
+Rajasthan Parivaar,54965,phonetic,substitution=ar→aar; registered='RAJASTHAN PARIVAR' (id=54965)
+Sunday Express The New,73142,reorder,words shuffled from registered 'THE NEW SUNDAY EXPRESS' (id=73142)
+AAJ KA AATANK,278,lexical,token_sort_ratio=84.61538461538461; registered: 'AAJ KA AAKLAN'
+Ki Tapan Khabar Bharat,70700,reorder,words shuffled from registered 'TAPAN BHARAT KI KHABAR' (id=70700)
+AAJ KA AKOLA,282,lexical,token_sort_ratio=83.33333333333334; registered: 'AAJ KA AALAP'
+Tribhuvaan Times,74904,phonetic,substitution=an→aan; registered='TRIBHUVAN TIMES' (id=74904)
+AAGAZ TIMES,197,lexical,token_sort_ratio=95.65217391304348; registered: 'AAGAAZ TIMES'
+AADARSHA NIRNAY,103,lexical,token_sort_ratio=80.0; registered: 'AADARSHA CHIRAG'
+AAJ KA ANAND,285,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AATANK'
+AAJ KA ANAND,281,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+Mahiti Adhikaar Mitra,38452,phonetic,substitution=ar→aar; registered='MAHITI ADHIKAR MITRA' (id=38452)
+City Nawada The Times Of,73756,reorder,words shuffled from registered 'THE TIMES OF NAWADA CITY' (id=73756)
+Times Samrat Bharat Amar,3563,reorder,words shuffled from registered 'AMAR BHARAT SAMRAT TIMES' (id=3563)
+AAJ KA AALAP,278,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Times India,47004,benchmark,Spec: word-order conflict; registered='NORTH INDIA TIMES'(id=47004)
+AADARSHA BHARATHI,83,lexical,token_sort_ratio=90.32258064516128; registered: 'AADARSH BHARAT'
+AAJ KA AALAP,279,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Kisan Jagran,82644,semantic,'kisan jagran'=farmer awakening; checking DAINIK JAGRAN(id=82644)
+Gramin Awaaz,78411,semantic,UNCERTAIN: 'gramin awaaz'=rural voice; checking VIDARBHA KI AWAZ(id=78411)
+India Times,47004,benchmark,Spec: word-order conflict; registered='NORTH INDIA TIMES'(id=47004)
+AAJ EXPRESS,241,lexical,token_sort_ratio=83.33333333333334; registered: 'AAINA EXPRESS'
+AAJ KA ANAND,280,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+AAJ KA AALAP,281,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Review The Middle Contemporary Of East,14211,reorder,words shuffled from registered 'CONTEMPORARY REVIEW OF THE MIDDLE EAST' (id=14211)
+AAJ KA AALAP,281,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Khabro Ki Raftaar,33367,phonetic,substitution=ar→aar; registered='KHABRO KI RAFTAR' (id=33367)
+Swaar Abhishek,69742,phonetic,substitution=ar→aar; registered='SWAR ABHISHEK' (id=69742)
+AAJ KA ADHYAYAN,284,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AARADHYA'
+aaj ka gaurav,295,lexical,token_sort_ratio=81.4814814814815; registered: 'AAJ KA ANUBHAV'
+AAJ KA AATANK,280,lexical,token_sort_ratio=84.61538461538461; registered: 'AAJ KA AAKLAN'
+AAJ KA AALAP,278,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Bal Jagran,82644,semantic,UNCERTAIN: 'bal jagran'=children's awakening; checking DAINIK JAGRAN
+Gazette Engineers Appointment,19323,reorder,words shuffled from registered 'ENGINEERS APPOINTMENT GAZETTE' (id=19323)
+Banglaar Sakti,8317,phonetic,substitution=ar→aar; registered='BANGLAR SAKTI' (id=8317)
+Satta Jan Today,28338,reorder,words shuffled from registered 'JAN SATTA TODAY' (id=28338)
+AADARSH SWARAJYA,98,lexical,token_sort_ratio=80.0; registered: 'AADARSH SAMRAT'
+AADHARSHA RATHNA,104,lexical,token_sort_ratio=81.25; registered: 'AADARSHA KIRANAM'
+AAJ KA BHOPAL,305,lexical,token_sort_ratio=81.4814814814815; registered: 'AAJ KA BHAROSA'
+AAJ KA APRADH,284,lexical,token_sort_ratio=85.71428571428572; registered: 'AAJ KA AARADHYA'
+Akhil Samarpaan,2788,phonetic,substitution=an→aan; registered='AKHIL SAMARPAN' (id=2788)
+AAJ KA ANAND,281,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+Desh Samachar,46604,semantic,UNCERTAIN: 'desh samachar'=national news; checking NISARGA SAARATHYA THE DAILY NEWS
+AAJ KA ANAND,278,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+Fatehpur News Of,45722,reorder,words shuffled from registered 'NEWS OF FATEHPUR' (id=45722)
+Swadesh Samachar,82644,semantic,UNCERTAIN: 'swadesh samachar'=homeland news; checking DAINIK JAGRAN
+Wealth Consultme Express,14193,reorder,words shuffled from registered 'CONSULTME WEALTH EXPRESS' (id=14193)
+Samachaar Zone,59665,phonetic,substitution=ar→aar; registered='SAMACHAR ZONE' (id=59665)
+Jaunsar Global Shilalekh,21501,reorder,words shuffled from registered 'Global Jaunsar Shilalekh' (id=21501)
+AAJ KA AATANK,283,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AALAP'
+AAJ EXPRESS,240,lexical,token_sort_ratio=83.33333333333334; registered: 'AAINA EXPRESS'
+AACHRAN,68,lexical,token_sort_ratio=93.33333333333333; registered: 'AACHARAN'
+AADARSH SAMRAT,83,lexical,token_sort_ratio=85.71428571428572; registered: 'AADARSH BHARAT'
+AAJ KA AALAP,280,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+AAJ KA ANAND,285,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AATANK'
+AADHUNIK MEDIA,133,lexical,token_sort_ratio=85.71428571428572; registered: 'AADHUNIK INDIA'
+AADARSHA NIRNAY,104,lexical,token_sort_ratio=83.87096774193549; registered: 'AADARSHA KIRANAM'
+AAJ KA AKOLA,279,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+AAJ KA CHAUPAL,307,lexical,token_sort_ratio=81.4814814814815; registered: 'AAJ KA BHOPAL'
+Nutaan Satta Pravah,47118,phonetic,substitution=an→aan; registered='NUTAN SATTA PRAVAH' (id=47118)
+Naya Zamana,47004,semantic,UNCERTAIN: 'naya zamana'≈new era(Hindi); checking against NORTH INDIA TIMES
+Look India News,37058,reorder,words shuffled from registered 'LOOK NEWS INDIA' (id=37058)
+AAJ KA AATANK,281,lexical,token_sort_ratio=84.61538461538461; registered: 'AAJ KA AAKLAN'
+Baar Waqt,8403,phonetic,substitution=ar→aar; registered='BAR WAQT' (id=8403)
+Khoj Ki Sach,58251,reorder,words shuffled from registered 'Sach Ki Khoj' (id=58251)
+AAJ KA ANAND,279,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+AAGAZ TIMES,198,lexical,token_sort_ratio=95.65217391304348; registered: 'AAGAAZ TIMES'
+Nabaz Ki Janmat,29055,reorder,words shuffled from registered 'JANMAT KI NABAZ' (id=29055)
+Chokaar Sitara,13492,phonetic,substitution=ar→aar; registered='CHOKAR SITARA' (id=13492)
+Vikas Ki Baat,78413,semantic,UNCERTAIN: 'vikas ki baat'=talk of progress; checking VIDARBHA KI BAAT(id=78413)
+Vartha Sangham Chathada Vaishnava Sri,12798,reorder,words shuffled from registered 'CHATHADA SRI VAISHNAVA SANGHAM VARTHA' (id=12798)
+Nagrik Suraksha,78390,semantic,UNCERTAIN: 'nagrik suraksha'=citizen safety; checking VIDARBHA BULLETIN(id=78390)
+AADHUNIK SANSAR,137,lexical,token_sort_ratio=80.0; registered: 'AADHUNIK KESARI'
+Ki Awaz Insaf,26593,reorder,words shuffled from registered 'INSAF KI AWAZ' (id=26593)
+The Vidarbha Daily Express,78464,benchmark,Spec: regional conflict; registered='VIDARBHA TIMES'(id=78464)
+Baratha Malaar,8454,phonetic,substitution=ar→aar; registered='BARATHA MALAR' (id=8454)
+Jaagran,82644,benchmark,Spec: phonetic conflict; registered='DAINIK JAGRAN'(id=82644)
+News Kalai Chennai,12964,reorder,words shuffled from registered 'CHENNAI KALAI NEWS' (id=12964)
+Business Four Twenty,11855,reorder,words shuffled from registered 'Business Twenty Four' (id=11855)
+Congress Darshaan,14155,phonetic,substitution=an→aan; registered='CONGRESS DARSHAN' (id=14155)
+New Inspiration The,73128,reorder,words shuffled from registered 'THE NEW INSPIRATION' (id=73128)
+Dainik Samachar,46604,benchmark,Spec: cross-language conflict; registered='NISARGA SAARATHYA THE DAILY NEWS'(id=46604)
+AAJ KA APRADH,291,lexical,token_sort_ratio=80.0; registered: 'AAJ KA ANAND'
+Jan Sandesh,60704,semantic,UNCERTAIN: 'jan sandesh'=people's message; checking against SAMPURNA JAGRAN(id=60704)
+AAJ KA AALAP,280,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Rashtra Deepika,82644,semantic,UNCERTAIN: 'rashtra deepika'=national lamp; checking DAINIK JAGRAN
+AAJ KA AATANK,279,lexical,token_sort_ratio=84.61538461538461; registered: 'AAJ KA AAKLAN'
+AADHAR SATYA,118,lexical,token_sort_ratio=84.61538461538461; registered: 'AADHAR SANHITA'
+AAJ KA AKOLA,281,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Sahkaar Sindhu,59016,phonetic,substitution=ar→aar; registered='SAHKAR SINDHU' (id=59016)
+Samachar,46604,semantic,UNCERTAIN: 'samachar'=news(Hindi); registered='NISARGA SAARATHYA THE DAILY NEWS'
+AAJ KA DAUR,314,lexical,token_sort_ratio=80.0; registered: 'AAJ KA DARSHAN'
+AAJ KA ANAND,278,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+Jagran Daily,82644,benchmark,Spec: prefix conflict; registered='DAINIK JAGRAN'(id=82644)
+Khabaar Samrat,33197,phonetic,substitution=ar→aar; registered='KHABAR SAMRAT' (id=33197)
+Nagrik Awaaz,78411,semantic,UNCERTAIN: 'nagrik awaaz'=citizen voice; checking VIDARBHA KI AWAZ(id=78411)
+Naujawan E Akhar,2739,reorder,words shuffled from registered 'AKHAR E NAUJAWAN' (id=2739)
+Varsha Paper News Kannada,77548,reorder,words shuffled from registered 'VARSHA KANNADA NEWS PAPER' (id=77548)
+Sandhya Jyoti Darpaan,61217,phonetic,substitution=an→aan; registered='SANDHYA JYOTI DARPAN' (id=61217)
+AACHRAN,69,lexical,token_sort_ratio=93.33333333333333; registered: 'AACHARAN'
+AADHAR STAMBH,119,lexical,token_sort_ratio=80.0; registered: 'AADHAR SATYA'
+Ki Sanskar Maa Janani,37293,reorder,words shuffled from registered 'MAA SANSKAR KI JANANI' (id=37293)
+Mahoro Rajasthaan,38476,phonetic,substitution=an→aan; registered='Mahoro Rajasthan' (id=38476)
+AAJ KA APRADH,292,lexical,token_sort_ratio=80.0; registered: 'AAJ KA ANAND'
+AAJ KA AKOLA,280,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Jharoka Alwar Ka,3416,reorder,words shuffled from registered 'ALWAR KA JHAROKA' (id=3416)
+Kamgaaar Post,31615,phonetic,substitution=ar→aar; registered='KAMGAAR POST' (id=31615)
+aadhunik sanvaad,144,lexical,token_sort_ratio=83.87096774193549; registered: 'AADHUNIK SANSAR'
+AAJ KA AKOLA,283,lexical,token_sort_ratio=83.33333333333334; registered: 'AAJ KA AALAP'
+News Havaan,45585,phonetic,substitution=an→aan; registered='NEWS HAVAN' (id=45585)
+Saptahik Khabar,62023,semantic,'saptahik'=weekly(Hindi); registered='Saptahik Siddhi Jagran'(id=62023)
+Rashtriya Patrika,82644,semantic,UNCERTAIN: 'rashtriya patrika'=national journal; checking DAINIK JAGRAN
+Reporter Sabar Newspaper,58047,reorder,words shuffled from registered 'SABAR REPORTER NEWSPAPER' (id=58047)
+Jurm Tehrir Ki,30474,reorder,words shuffled from registered 'JURM KI TEHRIR' (id=30474)
+AAJ KA AKOLA,278,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+AAJ KA ANAND,279,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+Harf Daar Harf,23765,phonetic,substitution=ar→aar; registered='HARF DAR HARF' (id=23765)
+Ki Bela Sach,58228,reorder,words shuffled from registered 'SACH KI BELA' (id=58228)
+Shiv Lehaar,65388,phonetic,substitution=ar→aar; registered='SHIV LEHAR' (id=65388)
+Janmat,78405,semantic,'janmat'=public opinion; registered='VIDARBHA JANMAT'(id=78405)
+AADHUNIK MEDIA,133,lexical,token_sort_ratio=85.71428571428572; registered: 'AADHUNIK INDIA'
+AAJ KA DAUR,314,lexical,token_sort_ratio=80.0; registered: 'AAJ KA DARSHAN'
+AAJ KA AALAP,279,lexical,token_sort_ratio=88.0; registered: 'AAJ KA AAKLAN'
+Pravasi Jagraan,52677,phonetic,substitution=an→aan; registered='PRAVASI JAGRAN' (id=52677)
+AAJ KA BHAROSA,304,lexical,token_sort_ratio=88.88888888888889; registered: 'AAJ KA BHARAT'
+Nayi Subah,47004,semantic,UNCERTAIN: 'nayi subah'=new morning; checking NORTH INDIA TIMES
+AADINATH NEWS,151,lexical,token_sort_ratio=85.71428571428572; registered: 'Aadi Anant News'
+AAJ KA AATANK,282,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AALAP'
+AAJ EXPRESS,239,lexical,token_sort_ratio=83.33333333333334; registered: 'AAINA EXPRESS'
+Lok Awaz,78411,semantic,UNCERTAIN: 'lok awaz'=people's voice; checking against VIDARBHA KI AWAZ(id=78411)
+AADHUNIK SANSAR,139,lexical,token_sort_ratio=82.75862068965517; registered: 'aadhunik manak'
+AAJ KA ANAND,280,lexical,token_sort_ratio=80.0; registered: 'AAJ KA AAKLAN'
+Prajatantra,50905,semantic,'prajatantra'=democracy(Hindi/Sanskrit); checking PRADESH JAGRAN(id=50905)
+Rashtriya Khabar,82644,semantic,UNCERTAIN: 'rashtriya khabar'=national news(Hindi); checking against DAINIK JAGRAN
+Mitra Niketaan Marg,41379,phonetic,substitution=an→aan; registered='MITRA NIKETAN MARG' (id=41379)
+AADHUNIK SANSAR,136,lexical,token_sort_ratio=80.0; registered: 'AADHUNIK KESARI'

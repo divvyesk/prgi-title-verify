@@ -1,0 +1,36 @@
+# rules/wordlists/generic_roots.txt
+# Single root/generic words that cannot stand alone as a periodical title.
+# Source: PRGI Guideline 1 (examples listed verbatim) + frontend/src/utils/rulesEngine.ts
+# One entry per line. Lowercase.
+manthan
+darpan
+inspire
+success
+khulasa
+rahasya
+katha
+herald
+malar
+mukhi
+nukkad
+news
+times
+today
+express
+patrika
+samachar
+gazette
+bulletin
+magazine
+journal
+reporter
+chronicle
+post
+media
+press
+sandesh
+ujala
+khabar
+daily
+weekly
+monthly

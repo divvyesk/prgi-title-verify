@@ -1,0 +1,23 @@
+# rules/wordlists/national_leaders.txt
+# Names of prominent national leaders, Heads of Government (Guideline 14).
+# One entry per line. Lowercase.
+# NOTE: This list is partial — a full list would require official PRGI data.
+# Entries here are the most recognisable names from the public domain.
+# source_clause_verified: True (Guideline 14 prohibits these)
+gandhi
+mahatma gandhi
+jawaharlal nehru
+nehru
+sardar patel
+ambedkar
+subhas chandra bose
+netaji
+bhagat singh
+indira gandhi
+rajiv gandhi
+narendra modi
+modi
+prime minister
+pradhan mantri
+president of india
+rashtrapati

@@ -1,0 +1,28 @@
+# rules/wordlists/commercial.txt
+# Words/phrases that indicate a title is a commercial catalogue rather than a periodical.
+# Source: PRGI Guideline 17 (verbatim list) + Ported from frontend/src/utils/rulesEngine.ts
+# One entry per line. Lowercase only. Phrases are matched as substrings.
+# To add a word: append it on a new line, no quotes.
+matrimonial
+vivah suchi
+shaadi suchi
+classifieds
+classified
+yellow pages
+white pages
+pink pages
+directory
+tender
+panchang
+calendar
+pamphlet
+brochure
+advertisement
+property bazaar
+shopping mart
+tender bulletin
+loan hub
+brokerage
+deals daily
+rishta
+ad listing
