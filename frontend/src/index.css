@@ -71,6 +71,41 @@
   box-shadow: 0 8px 30px -4px rgba(185, 28, 28, 0.08);
 }
 
+/* Interactive Mouse-Reactive Spotlight Sheen on Cards */
+.mouse-spotlight {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1), border-color 0.25s ease;
+}
+
+.mouse-spotlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(217, 119, 6, 0.09),
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mouse-spotlight:hover::before {
+  opacity: 1;
+}
+
+.mouse-spotlight:hover {
+  transform: translateY(-2px);
+  border-color: #D97706;
+  box-shadow: 0 14px 32px -4px rgba(180, 83, 9, 0.1), 0 4px 12px -2px rgba(45, 38, 28, 0.04);
+}
+
 /* Custom Scrollbar for Beige Theme */
 ::-webkit-scrollbar {
   width: 8px;

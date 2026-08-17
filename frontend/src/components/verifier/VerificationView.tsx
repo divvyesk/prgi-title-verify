@@ -239,7 +239,7 @@ Timestamp: ${result.timestamp}`;
         </div>
 
         {/* 3D Holographic Seal Badge Showcase */}
-        <div className="lg:col-span-5 h-[320px] relative rounded-2xl bg-white border border-[#E2D7C5] p-2 overflow-hidden shadow-lg shadow-stone-900/5 flex flex-col items-center justify-center">
+        <div className="lg:col-span-5 h-[320px] relative rounded-2xl bg-white border border-[#E2D7C5] p-2 overflow-hidden shadow-lg shadow-stone-900/5 flex flex-col items-center justify-center mouse-spotlight">
           <div className="absolute top-3 left-4 z-10 flex items-center gap-2 text-xs font-mono text-[#75634B]">
             <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
             <span className="font-bold">3D Statutory Title Seal</span>
@@ -263,7 +263,7 @@ Timestamp: ${result.timestamp}`;
       </div>
 
       {/* Main Verification Input Console */}
-      <div className="beige-card rounded-2xl p-6 sm:p-8 space-y-6">
+      <div className="beige-card mouse-spotlight rounded-2xl p-6 sm:p-8 space-y-6">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-[#E8E0D2] pb-4">
           <div>
             <h2 className="text-lg font-bold text-[#1C1917] flex items-center gap-2">
@@ -517,7 +517,7 @@ Timestamp: ${result.timestamp}`;
           {/* 4-Dimensional Similarity Matrix & Clashing Records */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* 4-D Similarity Breakdown */}
-            <div className="lg:col-span-5 beige-card rounded-2xl p-6 space-y-4">
+            <div className="lg:col-span-5 beige-card mouse-spotlight rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
                 <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
                   <TrendingUp className="w-4 h-4 text-amber-700" />
@@ -608,7 +608,7 @@ Timestamp: ${result.timestamp}`;
             </div>
 
             {/* Clashing Titles Table */}
-            <div className="lg:col-span-7 beige-card rounded-2xl p-6 space-y-4">
+            <div className="lg:col-span-7 beige-card mouse-spotlight rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
                 <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
                   <ShieldAlert className="w-4 h-4 text-rose-700" />
@@ -669,7 +669,7 @@ Timestamp: ${result.timestamp}`;
           </div>
 
           {/* Deterministic PRGI Government Rules Matrix */}
-          <div className="beige-card rounded-2xl p-6 space-y-4">
+          <div className="beige-card mouse-spotlight rounded-2xl p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
               <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
                 <FileText className="w-4 h-4 text-amber-700" />
