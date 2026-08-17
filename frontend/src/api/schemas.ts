@@ -1,7 +1,7 @@
 /**
- * Shared Request / Response Contracts (Zod Runtime Validation + Inferred Types)
- * Field-for-field identical mirror of contracts/contracts.js and contracts/contracts.py.
- * Every similarity score is validated on a 0-100 float scale.
+ * PRGI TitleGuard — Request & Response Contracts (Zod Runtime Validation + Inferred Types)
+ * Direct runtime mirror of contracts/contracts.js and contracts/contracts.py.
+ * Every similarity score is validated on a float 0-100 scale.
  */
 
 import { z } from 'zod';
@@ -73,7 +73,7 @@ export const ClashingTitleSchema = z.object({
   state: z.string(),
   similarity: score(),
   matchType: z.enum(['LEXICAL', 'PHONETIC', 'SEMANTIC', 'CORE_WORD', 'COMBINATION']),
-  matchedCoreWord: z.string().optional(),
+  matchedCoreWord: z.string().optional().nullable(),
   reason: z.string(),
 });
 
@@ -97,7 +97,7 @@ export const VerificationResultSchema = z.object({
   stageTimings: z.record(z.string(), z.number()),
   engine: z.enum(['LIVE', 'OFFLINE']),
   cached: z.boolean().default(false),
-  processingTimeMs: z.number().int(),
+  processingTimeMs: z.number(),
   timestamp: z.string(),
 });
 
@@ -128,9 +128,9 @@ export const OfficerCaseSchema = z.object({
   submissionDate: z.string(),
   riskScore: score(),
   verdict: z.enum(['APPROVED', 'MANUAL_REVIEW', 'REJECTED']),
-  primaryConflict: z.string().optional(),
+  primaryConflict: z.string().optional().nullable(),
   status: z.enum(['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED']),
-  copilotDecisionNote: z.string().optional(),
+  copilotDecisionNote: z.string().optional().nullable(),
 });
 
 // ---------------------------------------------------------------------------
@@ -143,9 +143,9 @@ export const TitleRecordSchema = z.object({
   state: z.string(),
   regNo: z.string(),
   regDate: z.string(),
-  publisher: z.string().optional(),
-  owner: z.string().optional(),
-  periodicity: z.string().optional(),
+  publisher: z.string().optional().nullable(),
+  owner: z.string().optional().nullable(),
+  periodicity: z.string().optional().nullable(),
 });
 
 // ---------------------------------------------------------------------------
@@ -161,7 +161,7 @@ export const ApiErrorSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// Per-Endpoint Envelopes
+// Endpoint Request & Response Envelopes
 // ---------------------------------------------------------------------------
 export const VerifyRequestSchema = z.object({
   title: z.string(),
@@ -241,7 +241,7 @@ export const HealthResponseSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// Inferred TypeScript Types
+// Inferred Compile-Time TypeScript Types
 // ---------------------------------------------------------------------------
 export type NormalizedTitle = z.infer<typeof NormalizedTitleSchema>;
 export type Candidate = z.infer<typeof CandidateSchema>;
@@ -272,3 +272,41 @@ export type OfficerCasesResponse = z.infer<typeof OfficerCasesResponseSchema>;
 export type DraftMemoRequest = z.infer<typeof DraftMemoRequestSchema>;
 export type DraftMemoResponse = z.infer<typeof DraftMemoResponseSchema>;
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
+
+// ---------------------------------------------------------------------------
+// Safe Runtime Validation Helper (Degrades Gracefully, Never Crashes)
+// ---------------------------------------------------------------------------
+export type SafeParseResult<T> =
+  | { success: true; data: T; error?: never }
+  | { success: false; data?: never; error: z.ZodError; issues: z.ZodIssue[]; formattedError: string };
+
+/**
+ * Validates payload against schema using safeParse.
+ * Logs exact field path failures without throwing exceptions.
+ */
+export function safeValidateContract<T>(
+  schema: z.ZodSchema<T>,
+  data: unknown,
+  context: string = 'Contract'
+): SafeParseResult<T> {
+  const parsed = schema.safeParse(data);
+  if (parsed.success) {
+    return { success: true, data: parsed.data };
+  }
+
+  const formattedError = parsed.error.issues
+    .map((issue) => `[${issue.path.join('.') || 'root'}]: ${issue.message}`)
+    .join('; ');
+
+  console.warn(`[Zod Contract Validation Failed] (${context}): ${formattedError}`, {
+    issues: parsed.error.issues,
+    rawPayload: data,
+  });
+
+  return {
+    success: false,
+    error: parsed.error,
+    issues: parsed.error.issues,
+    formattedError,
+  };
+}

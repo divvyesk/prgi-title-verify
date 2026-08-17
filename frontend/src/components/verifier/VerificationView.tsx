@@ -10,12 +10,11 @@ import {
   ShieldAlert, 
   Copy, 
   Check, 
-  Zap, 
   Globe, 
   RefreshCw, 
   TrendingUp, 
-  Cpu,
-  MapPin
+  MapPin,
+  Play
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Hero3DCanvas } from '../canvas/Hero3DCanvas';
@@ -31,12 +30,19 @@ interface VerificationViewProps {
 }
 
 const PRESET_TEST_CASES = [
-  { label: 'Times India vs India Times', value: 'Times India', desc: 'Anagram & word reordering test' },
-  { label: 'Jaagran vs Jagran', value: 'Jaagran Weekly', desc: 'Phonetic Soundex test' },
-  { label: 'Dainik Samachar vs Daily News', value: 'Dainik Samachar', desc: 'Cross-language translation test' },
-  { label: 'The Vidarbha Daily Express', value: 'The Vidarbha Daily Express', desc: 'Core-word root extraction test' },
-  { label: 'Royal Matrimonial Classifieds', value: 'The Royal Matrimonial Classifieds', desc: 'Rule 4.1a commercial ban test' },
-  { label: 'Clear Approved Title', value: 'Aditi National Strategy Review', desc: 'Distinctive verified pass' }
+  { label: 'Times India', value: 'Times India' },
+  { label: 'Jaagran Weekly', value: 'Jaagran Weekly' },
+  { label: 'Dainik Samachar', value: 'Dainik Samachar' },
+  { label: 'The Vidarbha Daily', value: 'The Vidarbha Daily Express' },
+  { label: 'Aditi National Strategy', value: 'Aditi National Strategy Review' }
+];
+
+const PIPELINE_STAGES = [
+  { num: 1, name: 'Normalize' },
+  { num: 2, name: 'Shortlist' },
+  { num: 3, name: '4-D Score' },
+  { num: 4, name: 'Statutory Rules' },
+  { num: 5, name: 'Verdict' }
 ];
 
 export const VerificationView: React.FC<VerificationViewProps> = ({
@@ -49,7 +55,6 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
   const [selectedState, setSelectedState] = useState('Maharashtra');
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<VerificationResult | null>(() => {
-    // Synchronously compute initial verification so the screen is immediately populated
     try {
       const rawClean = initialTitle.trim();
       return {
@@ -75,32 +80,32 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
             state: 'Delhi',
             similarity: 92,
             matchType: 'LEXICAL',
-            reason: 'High spelling similarity or anagrammatic word permutation'
+            reason: 'Anagrammatic word order permutation'
           }
         ],
         ruleViolations: [
           {
-            ruleId: 'GENERIC_WORD_01',
+            ruleId: 'R-GEN-01',
             ruleName: 'Single Generic Word Protection',
             passed: true,
-            clause: 'PRGI 2025 Section 1.1(a)',
-            description: 'Title contains multiple tokens.',
+            clause: 'PRGI Section 1.1',
+            description: 'Multi-token publication title.',
             severity: 'INFO'
           },
           {
-            ruleId: 'DECEPTIVE_SIM_02',
-            ruleName: 'Deceptive Similarity to Registered Publications',
+            ruleId: 'R-DEC-02',
+            ruleName: 'Deceptive Similarity Protection',
             passed: false,
-            clause: 'PRGI 2025 Section 2.3(a)',
-            description: 'Proposed title is an anagram/reordered variant of existing registered title "India Times".',
+            clause: 'PRGI Section 2.3',
+            description: 'Permutation conflict with registered title "India Times".',
             severity: 'CRITICAL'
           }
         ],
-        explanation: 'The proposed title "Times India" is rejected due to excessive collision (92% similarity) with existing registered publication "India Times" under PRGI Anagram & Word-Reordering Protection.',
-        recommendedAction: 'Use the AI Agentic Studio to generate distinctive, pre-verified alternative name candidates.',
-        guidelineCitations: ['PRGI Verification Guidelines 2025, Section 2.3 (Deceptive Similarity)'],
+        explanation: 'Proposed title conflicts with registered publication "India Times" under PRGI Anagram & Deceptive Similarity Protection.',
+        recommendedAction: 'Use the AI Studio to generate distinctive, pre-cleared alternatives.',
+        guidelineCitations: ['PRGI Title Verification Guidelines 2025, Section 2.3'],
         processingTimeMs: 42,
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toISOString()
       };
     } catch {
       return null;
@@ -109,7 +114,6 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
   const [activeStage, setActiveStage] = useState(5);
   const [copiedReport, setCopiedReport] = useState(false);
 
-  // Live transliteration preview while typing
   const detected = detectScriptAndLanguage(inputTitle);
   const transliteratedPreview = transliterateToRoman(inputTitle);
 
@@ -121,10 +125,9 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
     setIsScanning(true);
     setActiveStage(1);
 
-    // Fast progressive stage animation
-    setTimeout(() => setActiveStage(2), 80);
-    setTimeout(() => setActiveStage(3), 160);
-    setTimeout(() => setActiveStage(4), 240);
+    setTimeout(() => setActiveStage(2), 70);
+    setTimeout(() => setActiveStage(3), 140);
+    setTimeout(() => setActiveStage(4), 210);
 
     setTimeout(async () => {
       try {
@@ -140,8 +143,8 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
         if (res.verdict === 'APPROVED') {
           sound.playSuccess();
           confetti({
-            particleCount: 70,
-            spread: 60,
+            particleCount: 60,
+            spread: 55,
             origin: { y: 0.6 },
             colors: ['#059669', '#D97706', '#B45309']
           });
@@ -155,10 +158,9 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
         setIsScanning(false);
         setActiveStage(5);
       }
-    }, 320);
+    }, 280);
   };
 
-  // Sync if initialTitle changes
   useEffect(() => {
     if (initialTitle && initialTitle !== inputTitle) {
       setInputTitle(initialTitle);
@@ -169,14 +171,12 @@ export const VerificationView: React.FC<VerificationViewProps> = ({
   const copyVerificationReport = () => {
     if (!result) return;
     sound.playClick();
-    const text = `--- PRGI Press Title Verification Report ---
-Proposed Title: ${result.inputTitle}
-Verdict: ${result.verdict} (Risk Score: ${result.verdictScore}/100)
+    const text = `--- PRGI Title Verification Report ---
+Title: ${result.inputTitle}
+Verdict: ${result.verdict} (Risk: ${result.verdictScore}/100)
 Language: ${result.detectedLanguage} | State: ${selectedState}
 4D Similarity: Lexical ${result.similarityBreakdown.lexicalScore}%, Phonetic ${result.similarityBreakdown.phoneticScore}%, Semantic ${result.similarityBreakdown.semanticScore}%, Core-Word ${result.similarityBreakdown.coreWordScore}%
-Top Conflict: ${result.clashingTitles[0] ? `${result.clashingTitles[0].title} (${result.clashingTitles[0].similarity}%)` : 'None'}
-Explanation: ${result.explanation}
-Timestamp: ${result.timestamp}`;
+Explanation: ${result.explanation}`;
 
     navigator.clipboard.writeText(text);
     setCopiedReport(true);
@@ -184,106 +184,108 @@ Timestamp: ${result.timestamp}`;
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Hero Header Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2 pb-4">
-        <div className="lg:col-span-7 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-300 text-amber-900 text-xs font-bold">
-            <Cpu className="w-3.5 h-3.5 text-amber-700" />
-            <span>Automated Press Title Verification</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-            <span>PRGI 2025 Act Compliant</span>
+    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-8 py-4 sm:py-6">
+      {/* Hero Section (Clean Poppins Typography + 3D Text & Background Shapes) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center min-h-[400px]">
+        {/* Left Copy Column */}
+        <div className="lg:col-span-6 space-y-5">
+          <div className="space-y-2">
+            <h1 className="text-3xl sm:text-5xl font-poppins font-extrabold text-[#1C1917] tracking-tight leading-[1.15]">
+              The new <br />
+              <span className="text-amber-800">Title Clearance</span> <br />
+              Platform
+            </h1>
+            <div className="text-xs sm:text-sm font-bold font-poppins text-[#75634B] tracking-[0.22em] uppercase pt-1">
+              AUTOMATED STATUTORY VERIFICATION
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-editorial font-extrabold text-[#1C1917] tracking-tight leading-[1.15]">
-            Periodical Title <br />
-            <span className="italic text-amber-800 font-serif">
-              Verification &amp; Clearance
-            </span>
-          </h1>
-
-          <p className="text-[#564735] text-sm sm:text-base leading-relaxed max-w-2xl font-sans">
-            Instantly verifies proposed newspaper and periodical titles against <strong>160,000+ registered publications</strong>. Analyzes 4-Dimensional similarity (Lexical, Phonetic, Cross-Lingual Semantic, and Core-Word) plus 6 deterministic statutory PRGI rules.
+          <p className="text-[#564735] text-sm sm:text-base leading-relaxed max-w-lg font-poppins">
+            An intelligent AI clearance platform whose multi-dimensional 4-D neural conflict detection protects national press identity and streamlines PRGI approvals.
           </p>
 
-          {/* Quick Problem Presets */}
-          <div className="space-y-2 pt-2">
-            <div className="text-xs font-bold text-[#75634B] flex items-center gap-1.5 uppercase tracking-wider font-mono">
-              <Zap className="w-3.5 h-3.5 text-amber-600" />
-              <span>Benchmark Test Scenarios:</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {PRESET_TEST_CASES.map((preset) => {
-                const isCurrent = inputTitle.toLowerCase() === preset.value.toLowerCase();
-                return (
-                  <button
-                    key={preset.value}
-                    onClick={() => {
-                      setInputTitle(preset.value);
-                      sound.playClick();
-                      handleVerify(preset.value);
-                    }}
-                    className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all text-left flex items-center gap-1.5 cursor-pointer ${
-                      isCurrent
-                        ? 'bg-[#1C1917] text-white shadow-sm font-semibold'
-                        : 'bg-white/90 hover:bg-white text-[#564735] hover:text-[#1C1917] border border-[#E2D7C5]'
-                    }`}
-                    title={preset.desc}
-                  >
-                    <span>{preset.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+          {/* Action Row */}
+          <div className="flex flex-wrap items-center gap-3.5 pt-1">
+            <button
+              onClick={() => handleVerify()}
+              disabled={isScanning || !inputTitle.trim()}
+              className="px-7 py-3 rounded-full font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] text-white shadow-md flex items-center gap-2 transition-all cursor-pointer"
+            >
+              {isScanning ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
+                  <span>Verifying...</span>
+                </>
+              ) : (
+                <>
+                  <span>Verify Now</span>
+                  <ArrowRight className="w-4 h-4 text-amber-300" />
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                const randomPreset = PRESET_TEST_CASES[Math.floor(Math.random() * PRESET_TEST_CASES.length)];
+                setInputTitle(randomPreset.value);
+                handleVerify(randomPreset.value);
+              }}
+              className="flex items-center gap-2 text-sm font-semibold text-[#564735] hover:text-[#1C1917] transition-colors cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full border border-[#DDD1BF] bg-white flex items-center justify-center group-hover:border-amber-700 shadow-xs transition-all">
+                <Play className="w-3 h-3 fill-[#1C1917] text-[#1C1917] translate-x-0.5" />
+              </div>
+              <span>Preset Scenarios</span>
+            </button>
+          </div>
+
+          {/* Preset Buttons */}
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            {PRESET_TEST_CASES.map((preset) => {
+              const isCurrent = inputTitle.toLowerCase() === preset.value.toLowerCase();
+              return (
+                <button
+                  key={preset.value}
+                  onClick={() => {
+                    setInputTitle(preset.value);
+                    sound.playClick();
+                    handleVerify(preset.value);
+                  }}
+                  className={`px-3 py-1 text-xs rounded-full transition-all cursor-pointer ${
+                    isCurrent
+                      ? 'bg-[#1C1917] text-white font-semibold shadow-xs'
+                      : 'bg-white/80 hover:bg-white text-[#564735] hover:text-[#1C1917] border border-[#E2D7C5]'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* 3D Holographic Seal Badge Showcase */}
-        <div className="lg:col-span-5 h-[320px] relative rounded-2xl bg-white border border-[#E2D7C5] p-2 overflow-hidden shadow-lg shadow-stone-900/5 flex flex-col items-center justify-center mouse-spotlight">
-          <div className="absolute top-3 left-4 z-10 flex items-center gap-2 text-xs font-mono text-[#75634B]">
-            <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-            <span className="font-bold">3D Statutory Title Seal</span>
-          </div>
-
+        {/* Right 3D Spatial Canvas (Prominent 3D Text + Aesthetic Shapes in Background) */}
+        <div className="lg:col-span-6 h-[340px] sm:h-[420px] relative rounded-3xl bg-white/60 border border-[#E2D7C5] p-2 overflow-hidden shadow-xs flex items-center justify-center mouse-spotlight">
           <Hero3DCanvas title={inputTitle} verdict={result?.verdict} isScanning={isScanning} />
-
-          <div className="absolute bottom-3 inset-x-4 z-10 flex items-center justify-between text-[11px] text-[#564735] bg-[#FAF7F2]/90 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#E8E0D2]">
-            <span className="font-mono">
-              Status:{' '}
-              <strong className={
-                result?.verdict === 'APPROVED' ? 'text-emerald-700' :
-                result?.verdict === 'REJECTED' ? 'text-rose-700' : 'text-amber-700'
-              }>
-                {isScanning ? 'SCANNING DATABASE...' : result?.verdict || 'IDLE'}
-              </strong>
-            </span>
-            <span className="font-mono">160k Records Indexed</span>
-          </div>
         </div>
       </div>
 
-      {/* Main Verification Input Console */}
-      <div className="beige-card mouse-spotlight rounded-2xl p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-[#E8E0D2] pb-4">
-          <div>
-            <h2 className="text-lg font-bold text-[#1C1917] flex items-center gap-2">
-              <Search className="w-5 h-5 text-amber-700" />
-              <span>Interactive Verification Console</span>
-            </h2>
-            <p className="text-xs text-[#75634B]">
-              Type in English or any Indic script (Hindi, Marathi, Bengali, Tamil, Telugu, Gujarati, Urdu).
-            </p>
+      {/* Main Verification Input Console Card */}
+      <div className="beige-card mouse-spotlight rounded-3xl p-6 sm:p-7 space-y-5">
+        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div className="flex items-center gap-2 text-base font-bold text-[#1C1917]">
+            <Search className="w-4 h-4 text-amber-700" />
+            <span>Interactive Verification Console</span>
           </div>
 
-          {/* Language & State Selectors */}
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          {/* Clean Dropdown Filters */}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-1.5 text-xs text-[#564735]">
               <Globe className="w-3.5 h-3.5 text-amber-700" />
-              <span className="font-semibold">Language:</span>
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="bg-white border border-[#DDD1BF] rounded-lg px-2.5 py-1.5 text-xs text-[#1C1917] font-medium focus:outline-none focus:border-amber-600 shadow-sm"
+                className="bg-white border border-[#DDD1BF] rounded-lg px-2.5 py-1 text-xs text-[#1C1917] font-medium focus:outline-none focus:border-amber-600 shadow-xs"
               >
                 <option value="English">English</option>
                 <option value="Hindi">Hindi (हिंदी)</option>
@@ -293,34 +295,31 @@ Timestamp: ${result.timestamp}`;
                 <option value="Telugu">Telugu (తెలుగు)</option>
                 <option value="Gujarati">Gujarati (ગુજરાતી)</option>
                 <option value="Urdu">Urdu (اردو)</option>
-                <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                <option value="Bilingual">Bilingual / Multi</option>
+                <option value="Bilingual">Bilingual</option>
               </select>
             </div>
 
             <div className="flex items-center gap-1.5 text-xs text-[#564735]">
               <MapPin className="w-3.5 h-3.5 text-emerald-700" />
-              <span className="font-semibold">State:</span>
               <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="bg-white border border-[#DDD1BF] rounded-lg px-2.5 py-1.5 text-xs text-[#1C1917] font-medium focus:outline-none focus:border-amber-600 shadow-sm"
+                className="bg-white border border-[#DDD1BF] rounded-lg px-2.5 py-1 text-xs text-[#1C1917] font-medium focus:outline-none focus:border-amber-600 shadow-xs"
               >
                 <option value="Maharashtra">Maharashtra</option>
                 <option value="Delhi">Delhi</option>
                 <option value="Uttar Pradesh">Uttar Pradesh</option>
                 <option value="West Bengal">West Bengal</option>
                 <option value="Tamil Nadu">Tamil Nadu</option>
-                <option value="Telangana">Telangana</option>
-                <option value="Gujarat">Gujarat</option>
                 <option value="Karnataka">Karnataka</option>
+                <option value="Gujarat">Gujarat</option>
               </select>
             </div>
           </div>
         </div>
 
-        {/* Input Field with Action Button */}
-        <div className="space-y-3">
+        {/* Input Bar */}
+        <div className="space-y-2">
           <div className="relative flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <input
@@ -328,13 +327,13 @@ Timestamp: ${result.timestamp}`;
                 value={inputTitle}
                 onChange={(e) => setInputTitle(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
-                placeholder="Enter proposed publication title (e.g. 'दैनिक भारत' or 'Times India')..."
-                className="w-full bg-white border border-[#DDD1BF] rounded-xl px-4 py-3.5 text-[#1C1917] placeholder-[#A8A29E] text-sm sm:text-base font-semibold focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/10 shadow-sm transition-all"
+                placeholder="Enter publication title (e.g. 'Times India' or 'दैनिक भारत')..."
+                className="w-full bg-white border border-[#DDD1BF] rounded-2xl px-5 py-3.5 text-[#1C1917] placeholder-[#A8A29E] text-base font-semibold focus:outline-none focus:border-amber-600 shadow-xs transition-all"
               />
               {inputTitle && (
                 <button
                   onClick={() => setInputTitle('')}
-                  className="absolute right-3 top-3.5 text-[#75634B] hover:text-[#1C1917] text-xs font-semibold"
+                  className="absolute right-4 top-3.5 text-[#75634B] hover:text-[#1C1917] text-xs font-semibold"
                 >
                   Clear
                 </button>
@@ -344,12 +343,12 @@ Timestamp: ${result.timestamp}`;
             <button
               onClick={() => handleVerify()}
               disabled={isScanning || !inputTitle.trim()}
-              className="px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-700 via-amber-800 to-stone-900 hover:from-amber-800 hover:to-stone-950 disabled:opacity-50 text-white shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="px-7 py-3.5 rounded-2xl font-bold text-sm bg-[#1C1917] hover:bg-[#382E22] disabled:opacity-50 text-white shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               {isScanning ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-amber-200" />
-                  <span>Computing 4-D Similarity...</span>
+                  <span>Verifying...</span>
                 </>
               ) : (
                 <>
@@ -360,57 +359,36 @@ Timestamp: ${result.timestamp}`;
             </button>
           </div>
 
-          {/* Transliteration Live Preview Banner */}
+          {/* Transliteration Live Preview */}
           {detected.isIndic && (
-            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[#564735]">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2 py-0.5 rounded bg-amber-200 text-amber-900 font-bold">
-                  {detected.language} ({detected.script} Script)
-                </span>
-                <span>Transliterated Roman Token:</span>
-                <code className="text-[#1C1917] font-mono font-bold bg-white px-2 py-0.5 rounded border border-amber-200">
-                  {transliteratedPreview}
-                </code>
-              </div>
-              <span className="text-[11px] text-[#75634B] font-mono">Stage 1 Normalization Active</span>
+            <div className="py-1 px-3 text-xs flex items-center gap-2 text-[#564735]">
+              <span className="font-semibold text-amber-900">{detected.language}:</span>
+              <code className="text-[#1C1917] font-mono bg-[#EFE8DC] px-2 py-0.5 rounded text-xs border border-[#DDD1BF]">
+                {transliteratedPreview}
+              </code>
             </div>
           )}
         </div>
 
-        {/* 5-Stage Verification Pipeline Indicator */}
-        <div className="pt-2">
-          <div className="text-[11px] font-bold text-[#75634B] uppercase tracking-wider mb-2 font-mono">
-            5-Stage Automated Funnel Architecture
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-            {[
-              { num: 1, name: 'Clean & Script', desc: 'Standardize & Romanize' },
-              { num: 2, name: 'Shortlist', desc: '160k → 200 Suspects' },
-              { num: 3, name: 'Score 4-D', desc: 'Edit / Sound / Vector / Root' },
-              { num: 4, name: 'Check Rules', desc: 'Deterministic Statutory' },
-              { num: 5, name: 'Explain & Advise', desc: 'Traffic Light + Citations' }
-            ].map((stage) => {
+        {/* 5-Stage Stepper Ribbon */}
+        <div className="pt-2 border-t border-[#E8E0D2]">
+          <div className="grid grid-cols-5 gap-2 text-xs">
+            {PIPELINE_STAGES.map((stage) => {
               const isCurrent = activeStage === stage.num;
               const isDone = activeStage >= stage.num;
               return (
                 <div
                   key={stage.num}
-                  className={`p-3 rounded-xl border transition-all ${
+                  className={`py-2 px-2.5 rounded-xl border text-center transition-all ${
                     isCurrent
-                      ? 'bg-amber-100/90 border-amber-400 text-[#1C1917] shadow-sm'
+                      ? 'bg-amber-100 border-amber-400 text-amber-950 font-bold'
                       : isDone
                       ? 'bg-white border-[#E2D7C5] text-[#1C1917]'
-                      : 'bg-[#F0EBE0]/60 border-[#E8E0D2] text-[#A8A29E]'
+                      : 'bg-[#F0EBE0]/50 border-transparent text-[#A8A29E]'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#F8F6F0] border border-[#DDD1BF] text-[#564735]">
-                      Stage {stage.num}
-                    </span>
-                    {isDone && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
-                  </div>
-                  <div className="font-bold text-xs truncate">{stage.name}</div>
-                  <div className="text-[10px] text-[#75634B] truncate">{stage.desc}</div>
+                  <div className="text-[10px] font-mono text-[#75634B]">0{stage.num}</div>
+                  <div className="text-xs truncate">{stage.name}</div>
                 </div>
               );
             })}
@@ -422,14 +400,13 @@ Timestamp: ${result.timestamp}`;
       {result && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Main Verdict Card */}
-          <div className={`p-6 sm:p-8 rounded-2xl border ${
+          <div className={`p-6 sm:p-7 rounded-3xl border ${
             result.verdict === 'APPROVED' ? 'beige-card-success' :
             result.verdict === 'REJECTED' ? 'beige-card-danger' : 'beige-card-warning'
           }`}>
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              {/* Status Badge & Title Details */}
               <div className="flex items-start gap-4">
-                <div className={`p-4 rounded-2xl text-white shadow-md ${
+                <div className={`p-3.5 rounded-2xl text-white shadow-sm ${
                   result.verdict === 'APPROVED' ? 'bg-emerald-700' :
                   result.verdict === 'REJECTED' ? 'bg-rose-700' : 'bg-amber-600'
                 }`}>
@@ -439,62 +416,52 @@ Timestamp: ${result.timestamp}`;
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-xs font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider ${
-                      result.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-                      result.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
-                      'bg-amber-100 text-amber-900 border border-amber-300'
-                    }`}>
-                      {result.verdict === 'APPROVED' && 'APPROVED • CLEAR FOR REGISTRATION'}
-                      {result.verdict === 'REJECTED' && 'REJECTED • HIGH CONFLICT / STATUTORY VIOLATION'}
-                      {result.verdict === 'MANUAL_REVIEW' && 'MANUAL REVIEW REQUIRED • BORDERLINE RISK'}
-                    </span>
-                    <span className="text-xs text-[#75634B] font-mono">
-                      Latency: {result.processingTimeMs}ms
-                    </span>
-                  </div>
+                  <span className={`text-[11px] font-bold uppercase px-2.5 py-0.5 rounded tracking-wide ${
+                    result.verdict === 'APPROVED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                    result.verdict === 'REJECTED' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
+                    'bg-amber-100 text-amber-900 border border-amber-300'
+                  }`}>
+                    {result.verdict === 'APPROVED' && 'Approved • Clear for Registration'}
+                    {result.verdict === 'REJECTED' && 'Rejected • High Conflict / Statutory Clash'}
+                    {result.verdict === 'MANUAL_REVIEW' && 'Manual Review Required'}
+                  </span>
 
-                  <h3 className="text-2xl sm:text-3xl font-editorial font-bold text-[#1C1917] mt-2">
+                  <h3 className="text-2xl sm:text-3xl font-poppins font-bold text-[#1C1917] mt-2">
                     "{result.inputTitle}"
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#44403C] mt-1 max-w-2xl leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#44403C] mt-1 max-w-xl leading-relaxed">
                     {result.explanation}
                   </p>
                 </div>
               </div>
 
               {/* Conflict Risk Score Gauge */}
-              <div className="flex flex-col items-center justify-center bg-white px-6 py-4 rounded-xl border border-[#DDD1BF] min-w-[170px] shadow-sm">
-                <div className="text-[11px] font-bold text-[#75634B] uppercase tracking-wider mb-1 font-mono">
-                  Conflict Risk Score
+              <div className="flex flex-col items-center justify-center bg-white px-6 py-4 rounded-2xl border border-[#DDD1BF] min-w-[140px] shadow-xs">
+                <div className="text-[10px] font-mono font-bold text-[#75634B] uppercase tracking-wider">
+                  Conflict Risk
                 </div>
                 <div className={`text-3xl sm:text-4xl font-extrabold font-mono ${
                   result.verdict === 'APPROVED' ? 'text-emerald-700' :
                   result.verdict === 'REJECTED' ? 'text-rose-700' : 'text-amber-700'
                 }`}>
-                  {result.verdictScore}<span className="text-base text-[#A8A29E]">/100</span>
-                </div>
-                <div className="text-[11px] text-[#75634B] mt-1 font-medium">
-                  {result.verdict === 'APPROVED' ? 'Safe Clearance' :
-                   result.verdict === 'REJECTED' ? 'Critical Clash' : 'Moderate Ambiguity'}
+                  {result.verdictScore}<span className="text-xs text-[#A8A29E]">/100</span>
                 </div>
               </div>
             </div>
 
-            {/* Recommended Action Ribbon */}
-            <div className="mt-6 pt-4 border-t border-[#E5DDD0] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2 text-[#44403C]">
-                <strong className="text-[#1C1917]">Guidance:</strong>
-                <span>{result.recommendedAction}</span>
+            {/* Actions Ribbon */}
+            <div className="mt-5 pt-3.5 border-t border-[#E5DDD0] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div className="text-[#564735]">
+                <strong className="text-[#1C1917]">Guidance:</strong> {result.recommendedAction}
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={copyVerificationReport}
-                  className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#F8F6F0] text-[#564735] hover:text-[#1C1917] border border-[#DDD1BF] flex items-center gap-1.5 transition-colors cursor-pointer font-semibold shadow-sm"
+                  className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#F8F6F0] text-[#564735] border border-[#DDD1BF] flex items-center gap-1.5 transition-colors cursor-pointer font-medium"
                 >
                   {copiedReport ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedReport ? 'Copied' : 'Copy Report'}</span>
+                  <span>{copiedReport ? 'Copied' : 'Copy'}</span>
                 </button>
 
                 {result.verdict === 'REJECTED' && (
@@ -503,10 +470,10 @@ Timestamp: ${result.timestamp}`;
                       sound.playClick();
                       onNavigateToAgents(result.inputTitle);
                     }}
-                    className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 text-white font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                    className="px-4 py-1.5 rounded-full bg-[#1C1917] hover:bg-[#382E22] text-white font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Generate Safe Alternatives</span>
+                    <span>Safe Alternatives</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 )}
@@ -517,90 +484,78 @@ Timestamp: ${result.timestamp}`;
           {/* 4-Dimensional Similarity Matrix & Clashing Records */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* 4-D Similarity Breakdown */}
-            <div className="lg:col-span-5 beige-card mouse-spotlight rounded-2xl p-6 space-y-4">
+            <div className="lg:col-span-5 beige-card mouse-spotlight rounded-3xl p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
                 <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
                   <TrendingUp className="w-4 h-4 text-amber-700" />
-                  <span>4-Dimensional Similarity Matrix</span>
+                  <span>4-Dimensional Similarity</span>
                 </div>
-                <span className="text-[11px] text-[#75634B] font-mono">NLP Engine</span>
+                <span className="text-[10px] text-[#75634B] font-mono">NLP Engine</span>
               </div>
 
-              <div className="space-y-4">
-                {/* 1. Lexical Similarity */}
+              <div className="space-y-3.5">
+                {/* 1. Lexical */}
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">1. Lexical &amp; Word Order Anagram</span>
+                    <span className="text-[#44403C] font-medium">Lexical Permutation</span>
                     <span className="font-mono font-bold text-amber-800">{result.similarityBreakdown.lexicalScore}%</span>
                   </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
+                  <div className="w-full bg-[#EFE8DC] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="bg-amber-700 h-full rounded-full transition-all duration-500"
                       style={{ width: `${result.similarityBreakdown.lexicalScore}%` }}
-                    ></div>
+                    />
                   </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Detects character shifts and word order inversions (e.g., Times India vs India Times).
-                  </p>
                 </div>
 
-                {/* 2. Phonetic Similarity */}
+                {/* 2. Phonetic */}
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">2. Phonetic Soundex Match</span>
+                    <span className="text-[#44403C] font-medium">Phonetic Soundex</span>
                     <span className="font-mono font-bold text-purple-800">{result.similarityBreakdown.phoneticScore}%</span>
                   </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
+                  <div className="w-full bg-[#EFE8DC] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="bg-purple-700 h-full rounded-full transition-all duration-500"
                       style={{ width: `${result.similarityBreakdown.phoneticScore}%` }}
-                    ></div>
+                    />
                   </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Detects identical pronunciation with altered spelling (e.g., Jagran vs Jaagran).
-                  </p>
                 </div>
 
-                {/* 3. Semantic / Multilingual Cross-Lingual */}
+                {/* 3. Semantic */}
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">3. Semantic Cross-Lingual Translation</span>
+                    <span className="text-[#44403C] font-medium">Semantic Cross-Lingual</span>
                     <span className="font-mono font-bold text-emerald-800">{result.similarityBreakdown.semanticScore}%</span>
                   </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
+                  <div className="w-full bg-[#EFE8DC] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="bg-emerald-700 h-full rounded-full transition-all duration-500"
                       style={{ width: `${result.similarityBreakdown.semanticScore}%` }}
-                    ></div>
+                    />
                   </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Detects identical meanings translated across languages (e.g., Daily News vs Dainik Samachar).
-                  </p>
                 </div>
 
-                {/* 4. Core-Word Match */}
+                {/* 4. Core-Word */}
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#44403C] font-semibold">4. Core-Word Distinctive Root</span>
+                    <span className="text-[#44403C] font-medium">Core Root Token</span>
                     <span className="font-mono font-bold text-stone-900">{result.similarityBreakdown.coreWordScore}%</span>
                   </div>
-                  <div className="w-full bg-[#EFE8DC] h-2 rounded-full overflow-hidden border border-[#E2D7C5]">
+                  <div className="w-full bg-[#EFE8DC] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="bg-stone-800 h-full rounded-full transition-all duration-500"
                       style={{ width: `${result.similarityBreakdown.coreWordScore}%` }}
-                    ></div>
+                    />
                   </div>
-                  <p className="text-[10px] text-[#75634B] mt-1">
-                    Strips media filler words ("The", "Daily", "Patrika") to uncover root collisions.
-                  </p>
                 </div>
               </div>
 
               {/* Extracted Core Root Tokens */}
-              <div className="p-3 bg-white rounded-xl border border-[#DDD1BF] text-xs">
-                <span className="text-[#75634B] font-semibold mr-2">Extracted Root Tokens:</span>
+              <div className="pt-2 border-t border-[#E8E0D2] text-xs flex items-center gap-2 flex-wrap">
+                <span className="text-[#75634B] text-[11px]">Root Tokens:</span>
                 {result.coreWords.map((word, idx) => (
-                  <span key={idx} className="inline-block font-mono font-bold px-2 py-0.5 mr-1.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                  <span key={idx} className="font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs">
                     {word}
                   </span>
                 ))}
@@ -608,57 +563,51 @@ Timestamp: ${result.timestamp}`;
             </div>
 
             {/* Clashing Titles Table */}
-            <div className="lg:col-span-7 beige-card mouse-spotlight rounded-2xl p-6 space-y-4">
+            <div className="lg:col-span-7 beige-card mouse-spotlight rounded-3xl p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
                 <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
                   <ShieldAlert className="w-4 h-4 text-rose-700" />
-                  <span>Top Clashing Registered Titles ({result.clashingTitles.length} Suspects)</span>
+                  <span>Top Registry Conflicts ({result.clashingTitles.length})</span>
                 </div>
-                <span className="text-[11px] text-[#75634B] font-mono">160k Registry</span>
+                <span className="text-[10px] text-[#75634B] font-mono">160k Registry</span>
               </div>
 
               {result.clashingTitles.length === 0 ? (
                 <div className="p-8 text-center text-[#75634B] space-y-2">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-700 mx-auto" />
-                  <p className="font-bold text-[#1C1917]">No Clashing Registered Titles</p>
-                  <p className="text-xs text-[#75634B]">Proposed title appears distinct and conflict-free in this jurisdiction.</p>
+                  <CheckCircle2 className="w-7 h-7 text-emerald-700 mx-auto" />
+                  <p className="font-bold text-[#1C1917] text-sm">No Registered Conflicts</p>
+                  <p className="text-xs text-[#75634B]">Title is distinct and conflict-free.</p>
                 </div>
               ) : (
                 <div className="space-y-2.5">
                   {result.clashingTitles.map((clash, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-xl bg-white border border-[#DDD1BF] hover:border-[#CFC0A8] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm"
+                      className="p-3.5 rounded-2xl bg-white border border-[#DDD1BF] flex items-center justify-between gap-3 shadow-xs"
                     >
-                      <div className="space-y-1">
+                      <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#1C1917] text-sm font-display">
+                          <span className="font-bold text-[#1C1917] text-sm">
                             {clash.title}
                           </span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F0EBE0] text-[#564735] font-mono font-semibold">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F0EBE0] text-[#564735] font-mono">
                             {clash.regNo || clash.registration_number || 'REG-MASTER'}
                           </span>
                         </div>
-                        <div className="text-[11px] text-[#75634B] flex items-center gap-2">
-                          <span>{clash.language || 'English'}</span>
-                          <span>•</span>
-                          <span>{clash.state || clash.publication_state || 'National'}</span>
-                          <span>•</span>
-                          <span className="text-[#382E22] font-medium">{clash.reason}</span>
+                        <div className="text-[11px] text-[#75634B] mt-0.5">
+                          {clash.language || 'English'} • {clash.state || clash.publication_state || 'National'} • {clash.reason}
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <div className={`text-base font-extrabold font-mono ${
-                            clash.similarity >= 80 ? 'text-rose-700' :
-                            clash.similarity >= 50 ? 'text-amber-700' : 'text-stone-700'
-                          }`}>
-                            {clash.similarity}%
-                          </div>
-                          <span className="text-[10px] uppercase tracking-wider text-[#A8A29E] font-bold font-mono">
-                            {clash.matchType}
-                          </span>
+                      <div className="text-right shrink-0">
+                        <span className={`text-base font-extrabold font-mono ${
+                          clash.similarity >= 80 ? 'text-rose-700' :
+                          clash.similarity >= 50 ? 'text-amber-700' : 'text-stone-700'
+                        }`}>
+                          {clash.similarity}%
+                        </span>
+                        <div className="text-[9px] uppercase tracking-wider text-[#A8A29E] font-mono">
+                          {clash.matchType}
                         </div>
                       </div>
                     </div>
@@ -669,49 +618,46 @@ Timestamp: ${result.timestamp}`;
           </div>
 
           {/* Deterministic PRGI Government Rules Matrix */}
-          <div className="beige-card mouse-spotlight rounded-2xl p-6 space-y-4">
+          <div className="beige-card mouse-spotlight rounded-3xl p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
               <div className="flex items-center gap-2 text-[#1C1917] font-bold text-sm">
                 <FileText className="w-4 h-4 text-amber-700" />
-                <span>Deterministic PRGI Statutory Rulebook (Member 4 Rules Engine)</span>
+                <span>Deterministic Statutory Compliance Checks</span>
               </div>
-              <span className="text-[11px] text-[#75634B] font-mono">PRGI 2025 Act</span>
+              <span className="text-[10px] text-[#75634B] font-mono">PRGI 2023 Act</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {result.ruleViolations.map((rule) => (
                 <div
                   key={rule.ruleId}
-                  className={`p-3.5 rounded-xl border ${
+                  className={`p-3.5 rounded-2xl border ${
                     rule.passed
-                      ? 'bg-white border-[#E2D7C5] text-[#292524]'
-                      : 'bg-rose-50 border-rose-200 text-[#292524]'
+                      ? 'bg-white border-[#E2D7C5]'
+                      : 'bg-rose-50 border-rose-200'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#F8F6F0] border border-[#DDD1BF] text-[#564735]">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#F8F6F0] text-[#75634B]">
                       {rule.ruleId}
                     </span>
                     {rule.passed ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                      <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>PASSED</span>
+                        <span>Pass</span>
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-rose-700">
+                      <span className="text-[11px] font-bold text-rose-700 flex items-center gap-1">
                         <XCircle className="w-3.5 h-3.5" />
-                        <span>FAILED</span>
+                        <span>Violation</span>
                       </span>
                     )}
                   </div>
 
-                  <div className="font-bold text-xs text-[#1C1917] mb-1">{rule.ruleName}</div>
-                  <p className="text-[11px] text-[#564735] mb-2 leading-relaxed">
+                  <div className="font-semibold text-xs text-[#1C1917]">{rule.ruleName}</div>
+                  <p className="text-[11px] text-[#564735] mt-1 line-clamp-2">
                     {rule.description}
                   </p>
-                  <div className="text-[10px] text-[#A8A29E] font-mono truncate">
-                    {rule.clause}
-                  </div>
                 </div>
               ))}
             </div>
