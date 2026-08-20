@@ -29,17 +29,34 @@ logger = logging.getLogger("agents.nodes.generator")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TITLE_MASTER_CSV = REPO_ROOT / "data" / "datasets" / "dataset1" / "data" / "processed" / "title_master.csv"
 
-_ALL_ROWS_CACHE: list[dict] | None = None
+# (title, language_lowercased, state_lowercased) — NOT the full csv row.
+#
+# This used to cache every VALID row as the complete 12-field dict csv
+# .DictReader hands back, which measured 93MB resident for 82,639 rows.
+# On a 512MB container that allocation is what killed the process: the
+# Render deploy died silently at exactly this step, one Groq call into
+# /v1/alternatives, with no /v1/verify ever reaching the log. Keeping only
+# the 3 fields this module actually reads, as tuples rather than dicts,
+# measures 20MB for the same rows.
+#
+# state/language are stored pre-lowercased because matches() only ever
+# compares them lowercased; doing it once at load beats doing it 82,639
+# times per filter pass.
+_ALL_ROWS_CACHE: list[tuple[str, str, str]] | None = None
 
 
-def _load_all_rows() -> list[dict]:
+def _load_all_rows() -> list[tuple[str, str, str]]:
     """Reads title_master.csv once, ever, no matter how many times
     sample_local_titles() is called — 82,713 rows is too much to re-parse
     per node invocation, let alone per retry attempt."""
     global _ALL_ROWS_CACHE
     if _ALL_ROWS_CACHE is None:
         with open(TITLE_MASTER_CSV, encoding="utf-8", newline="") as f:
-            _ALL_ROWS_CACHE = [r for r in csv.DictReader(f) if r["data_quality_status"] == "VALID"]
+            _ALL_ROWS_CACHE = [
+                (r["Title"].strip(), r["Language"].lower(), r["Publication State"].lower())
+                for r in csv.DictReader(f)
+                if r["data_quality_status"] == "VALID"
+            ]
     return _ALL_ROWS_CACHE
 
 
@@ -51,16 +68,17 @@ def sample_local_titles(state: str, language: str, n: int = 10) -> list[str]:
     rows = _load_all_rows()
     state_l, language_l = state.lower(), language.lower()
 
-    def matches(r: dict, need_state: bool, need_language: bool) -> bool:
+    def matches(row: tuple[str, str, str], need_state: bool, need_language: bool) -> bool:
+        _title, row_language, row_state = row
         ok = True
         if need_state:
-            ok = ok and state_l in r["Publication State"].lower()
+            ok = ok and state_l in row_state
         if need_language:
-            ok = ok and language_l in r["Language"].lower()
+            ok = ok and language_l in row_language
         return ok
 
     for need_state, need_language in [(True, True), (True, False), (False, True), (False, False)]:
-        pool = [r["Title"].strip() for r in rows if matches(r, need_state, need_language)]
+        pool = [row[0] for row in rows if matches(row, need_state, need_language)]
         if pool:
             # Python's built-in hash() is randomized per process for str/tuple
             # (security feature, PYTHONHASHSEED) — seeding with it would make
