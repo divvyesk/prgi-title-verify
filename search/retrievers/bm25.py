@@ -1,16 +1,15 @@
 import logging
-import os
 import platform
 import resource
 import time
 from typing import Sequence
 
-import psycopg2
 from rank_bm25 import BM25Okapi
 
 from contracts.algo import CandidateRetriever
 from contracts.contracts import Candidate
 from ml.similarity.tokens import tokens
+from search.db import connection
 
 logger = logging.getLogger(__name__)
 
@@ -34,38 +33,24 @@ def warm() -> None:
     if _warmed:
         return
 
-    db_name = os.getenv("DB_NAME", "dataset1")
-    db_user = os.getenv("DB_USER", "pruthv")
-    db_host = os.getenv("DB_HOST", "localhost")
-    db_port = os.getenv("DB_PORT", "5432")
-    db_password = os.getenv("DB_PASSWORD", "")
-
-    conn_args = {
-        "dbname": db_name,
-        "user": db_user,
-        "host": db_host,
-        "port": db_port,
-    }
-    if db_password:
-        conn_args["password"] = db_password
-
     try:
         logger.info("Connecting to database to warm BM25 index...")
-        conn = psycopg2.connect(**conn_args)
-        cur = conn.cursor()
 
         t0 = time.time()
 
-        cur.execute(
-            """
-            SELECT title_id, title_normalized, title, registration_number, 
-                   language, publication_state
-            FROM titles
-            """
-        )
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
+        # Goes through search/db.py so this uses the server's shared psycopg3
+        # pool when running inside FastAPI, and a standalone connection to the
+        # same DATABASE_URL otherwise. Previously this opened its own psycopg2
+        # connection to a hardcoded personal database.
+        with connection() as conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT title_id, title_normalized, title, registration_number,
+                       language, publication_state
+                FROM titles
+                """
+            )
+            rows = cur.fetchall()
 
         logger.info(f"Fetched {len(rows)} titles from DB. Building BM25 index...")
 
@@ -156,3 +141,9 @@ class BM25Retriever:
             )
 
         return candidates
+
+
+# ml/registry.py imports this module-level instance by name and never
+# instantiates the class itself (contracts/algo.py). Without it the retriever
+# silently never registers, which is exactly what was happening.
+RETRIEVER = BM25Retriever()

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PSS06 Presentation Script &amp; Q&amp;A Playbook</title>
+<style>
+  @page { size: 8.27in 11.69in; margin: .62in .62in .55in .62in; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root{
+    --navy:#1F497D; --deep:#12335c; --bar:#0070C0; --plum:#8064A2;
+    --red:#B01B1B; --amber:#9A6B00; --green:#1a7f37;
+    --line:#C9D6E6; --tint:#F5F9FD; --mute:#5b7ea6;
+  }
+
+  body{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:9.6pt; line-height:1.42; color:var(--navy);
+    background:#fff;
+  }
+
+  /* ---------- masthead ---------- */
+  .mast{ display:flex; align-items:flex-start; gap:.28in; margin-bottom:.20in; }
+  .mast img{ width:1.55in; height:.732in; flex:0 0 auto; }
+  .mast .t{ flex:1; padding-top:.03in; }
+  .mast h1{
+    font-family:"Times New Roman", Times, serif; font-size:23pt; font-weight:bold;
+    color:#000; line-height:1.05; letter-spacing:.2pt;
+  }
+  .mast .sub{ font-size:10.4pt; color:var(--navy); margin-top:.055in; font-weight:bold; }
+  .mast .meta{ font-size:8.8pt; color:var(--mute); margin-top:.045in; line-height:1.35; }
+
+  h2.sec{
+    font-size:13pt; font-weight:bold; color:var(--navy);
+    border-bottom:1.6pt solid var(--navy); padding-bottom:.045in;
+    margin:.26in 0 .13in;
+  }
+  h2.sec:first-of-type{ margin-top:0; }
+  h2.sec.red{ color:var(--red); border-bottom-color:var(--red); }
+
+  .note{
+    background:var(--tint); border:1pt solid var(--line); border-radius:.05in;
+    padding:.10in .13in; font-size:9.2pt; line-height:1.4; margin-bottom:.16in;
+  }
+  .note.warn{ background:#FDF3F3; border-color:#E9C4C4; }
+  .note b{ color:var(--deep); }
+  .note.warn b{ color:var(--red); }
+
+  /* ---------- timeline ---------- */
+  .tl{ display:flex; gap:.035in; margin:.02in 0 .10in; }
+  .tl .seg{
+    background:var(--navy); color:#fff; border-radius:.04in;
+    padding:.07in .04in; text-align:center; font-size:7.6pt; line-height:1.22;
+  }
+  .tl .seg b{ display:block; font-size:8.8pt; letter-spacing:.2pt; }
+  .tl .seg span{ display:block; font-size:7pt; opacity:.85; margin-top:.02in; }
+  .tl .seg.qa{ background:#7C1D1D; }
+  .tl .seg.alt{ background:#2E6DA4; }
+
+  table.map{ width:100%; border-collapse:collapse; margin-bottom:.06in; }
+  table.map th, table.map td{
+    border:1pt solid var(--line); padding:.05in .075in;
+    font-size:8.8pt; text-align:left; vertical-align:top; line-height:1.3;
+  }
+  table.map th{ background:var(--navy); color:#fff; }
+  table.map td.w{ white-space:nowrap; font-weight:bold; color:var(--deep); }
+
+  /* ---------- speaker block ---------- */
+  .spk{ margin-bottom:.20in; page-break-inside:avoid; }
+  .spk .hd{
+    display:flex; align-items:baseline; gap:.11in;
+    border-bottom:1.2pt solid var(--line); padding-bottom:.05in; margin-bottom:.085in;
+  }
+  .spk .clock{
+    background:var(--navy); color:#fff; font-size:8.6pt; font-weight:bold;
+    padding:.028in .075in; border-radius:.03in; white-space:nowrap; letter-spacing:.2pt;
+  }
+  .spk .who{ font-size:13pt; font-weight:bold; color:var(--navy); letter-spacing:.3pt; }
+  .spk .role{ font-size:8.6pt; color:var(--mute); flex:1; }
+  .spk .len{ font-size:8pt; color:var(--mute); white-space:nowrap; }
+
+  .say{ font-size:10pt; line-height:1.5; text-align:justify; }
+  .say p{ margin-bottom:.075in; }
+  .say p:last-child{ margin-bottom:0; }
+
+  .cue{
+    display:block; font-size:8.6pt; font-weight:bold; color:var(--plum);
+    letter-spacing:.25pt; margin:.055in 0; text-transform:uppercase;
+  }
+  .inline-cue{ font-weight:bold; color:var(--plum); font-size:8.8pt; letter-spacing:.2pt; }
+  .fill{ background:#FFF3C4; border-bottom:1pt solid #C9A227; padding:0 .02in; font-weight:bold; color:#6b5200; }
+
+  /* ---------- Q&A ---------- */
+  .qa{ margin-bottom:.17in; page-break-inside:avoid; }
+  .qa .owner{
+    font-size:11.5pt; font-weight:bold; color:var(--navy);
+    background:var(--tint); border-left:none; border:1pt solid var(--line);
+    border-radius:.04in; padding:.055in .1in; margin-bottom:.09in;
+  }
+  .qa .owner span{ font-size:8.6pt; font-weight:normal; color:var(--mute); }
+  .q{ margin-bottom:.105in; page-break-inside:avoid; }
+  .q .ask{ font-size:9.6pt; font-weight:bold; color:var(--deep); margin-bottom:.028in; }
+  .q .ask::before{ content:"Q  "; color:var(--mute); }
+  .q .ans{ font-size:9.4pt; line-height:1.42; text-align:justify; }
+  .q .ans::before{ content:"A  "; color:var(--mute); font-weight:bold; }
+  .q .flag{
+    display:block; font-size:8.6pt; color:var(--red); margin-top:.03in; font-style:italic;
+  }
+  .hot{ color:var(--red); }
+  .hot::after{
+    content:"HIGH RISK"; font-size:7pt; font-weight:bold; color:#fff; background:var(--red);
+    padding:.02in .05in; border-radius:.02in; margin-left:.06in; letter-spacing:.3pt;
+    vertical-align:.02in;
+  }
+
+  ol.play{ margin-left:.22in; }
+  ol.play li{ font-size:9.4pt; line-height:1.42; margin-bottom:.06in; }
+  ul.rules{ list-style:none; }
+  ul.rules li{
+    position:relative; padding-left:.2in; font-size:9.4pt; line-height:1.42; margin-bottom:.05in;
+  }
+  ul.rules li::before{ content:"\25AA"; position:absolute; left:.05in; color:var(--plum); }
+
+  .pb{ page-break-before:always; }
+  table.map tr{ page-break-inside:avoid; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PAGE 1 — PLAN ═══════════════════════ -->
+<div class="mast">
+  <img src="sih2026.png" alt="Smart India Hackathon 2026">
+  <div class="t">
+    <h1>PRESENTATION SCRIPT &amp; Q&amp;A PLAYBOOK</h1>
+    <div class="sub">PSS06 &mdash; Automated Press Title Admissibility Clearance &middot; PRGI TitleGuard</div>
+    <div class="meta">Team <b>404 Found</b> (ID 26) &middot; Divvye &middot; Pruthviraj &middot; Jai &middot; Suhani &middot; Gurpreet &middot; Darsh<br>
+      15 minutes total &mdash; 10 minutes presentation, 5 minutes Q&amp;A</div>
+  </div>
+</div>
+
+<h2 class="sec">The 15 minutes, mapped</h2>
+
+<div class="tl">
+  <div class="seg" style="flex:1.5"><b>DIVVYE</b>Open &amp; frame<span>0:00–1:30</span></div>
+  <div class="seg alt" style="flex:1.5"><b>PRUTHVIRAJ</b>Rules &amp; proof<span>1:30–3:00</span></div>
+  <div class="seg" style="flex:1.67"><b>JAI</b>4-D matching<span>3:00–4:40</span></div>
+  <div class="seg alt" style="flex:1.5"><b>SUHANI</b>Agents &amp; RAG<span>4:40–6:10</span></div>
+  <div class="seg" style="flex:1.5"><b>GURPREET</b>Live system<span>6:10–7:40</span></div>
+  <div class="seg alt" style="flex:1.5"><b>DARSH</b>Officer side<span>7:40–9:10</span></div>
+  <div class="seg" style="flex:.83"><b>DIVVYE</b>Close<span>9:10–10:00</span></div>
+  <div class="seg qa" style="flex:5"><b>Q &amp; A</b>All six on their feet<span>10:00–15:00</span></div>
+</div>
+
+<table class="map">
+  <tr><th style="width:.72in">Clock</th><th style="width:.95in">Speaker</th><th>What they cover</th><th style="width:.85in">Deck slide</th></tr>
+  <tr><td class="w">0:00–1:30</td><td class="w">Divvye</td><td>Problem, the 25–30 day gate, and the one design insight: similarity and statute are two different problems</td><td>1 → 2</td></tr>
+  <tr><td class="w">1:30–3:00</td><td class="w">Pruthviraj</td><td>The deterministic rule engine, verbatim clause citations, published coverage gaps</td><td>2</td></tr>
+  <tr><td class="w">3:00–4:40</td><td class="w">Jai</td><td>Four-dimensional similarity + the consonant-skeleton trick + fusion. <b>Live demo runs here.</b></td><td>2 → 3</td></tr>
+  <tr><td class="w">4:40–6:10</td><td class="w">Suhani</td><td>RAG explainer with the anti-hallucination guard; the 4-agent Title Studio and its retry loop</td><td>3</td></tr>
+  <tr><td class="w">6:10–7:40</td><td class="w">Gurpreet</td><td>Live/offline engine badge, tested fallback, real stage timings, one-command startup</td><td>3 → 4</td></tr>
+  <tr><td class="w">7:40–9:10</td><td class="w">Darsh</td><td>Officer docket, memorandum export, accessibility, end-to-end tests</td><td>4 → 5</td></tr>
+  <tr><td class="w">9:10–10:00</td><td class="w">Divvye</td><td>Measured numbers, the recommendation-not-decision close, references</td><td>5 → 6</td></tr>
+</table>
+
+<h2 class="sec">Rules of the room</h2>
+<ul class="rules">
+  <li><b>Hand off by name.</b> Every block ends with the next person's name. That is the cue &mdash; nobody waits to be looked at.</li>
+  <li><b>Never correct a teammate mid-sentence.</b> If something is wrong, the next speaker fixes it in one clause and moves on.</li>
+  <li><b>Route questions you do not own.</b> &ldquo;That&rsquo;s Jai&rsquo;s area &mdash; Jai?&rsquo;&rsquo; is a strong answer. Guessing in someone else&rsquo;s domain is the only way to lose credibility fast.</li>
+  <li><b>Hard clock cues.</b> If Suhani has not started by <b>4:50</b>, whoever is speaking cuts to their last sentence. At <b>9:10</b> Divvye takes over regardless of where the group is.</li>
+  <li><b>Only one person drives the laptop</b> &mdash; Gurpreet. Speakers point, they do not reach for the trackpad.</li>
+  <li><b>Every <span class="fill">highlighted</span> number below must be replaced with the real measured value before you rehearse.</b> Do not say a number you have not personally seen.</li>
+</ul>
+
+<div class="note warn">
+  <b>Read this before you rehearse.</b> The three-day plan records that the backend, rule engine, LangGraph flow, RAG explainer
+  and test suite were all still to be built when the plan was written. Whatever is genuinely finished on the day is what you claim
+  &mdash; nothing more. Where a stage is still on its stub flag, the honest answer (&ldquo;that stage is stubbed, here is what is real&rdquo;)
+  costs you far less than a claim a judge can disprove in ten seconds. The Q&amp;A answers below are written so they hold up either way.
+</div>
+
+
+<!-- ═══════════════════════ PAGE 2 — SCRIPT 1 ═══════════════════════ -->
+<div class="pb"></div>
+<h2 class="sec">The script &mdash; 10 minutes, word for word</h2>
+
+<div class="note">
+  Delivered at a normal pace this runs to time. <b>Do not memorise it verbatim</b> &mdash; learn the shape and the three or four
+  sentences that carry each block, then say it in your own words. The word counts are there so you can check your pace against a
+  stopwatch: roughly 150 words a minute.
+</div>
+
+<div class="spk">
+  <div class="hd">
+    <span class="clock">0:00 – 1:30</span>
+    <span class="who">DIVVYE</span>
+    <span class="role">Integration lead &middot; contracts, FastAPI orchestrator, semantic scoring &amp; fusion</span>
+    <span class="len">~210 words</span>
+  </div>
+  <div class="say">
+    <span class="cue">Slide 1 on screen. Stand centre. Do not start until the room is quiet.</span>
+    <p>Good morning. We&rsquo;re Team 404 Found, and we&rsquo;re here with PSS06 &mdash; automated press title admissibility clearance
+    for the Press Registrar General of India.</p>
+    <p>Here is the situation today. Under the Press and Registration of Periodicals Act, 2023, no periodical in India can publish
+    until its title has been cleared against every title already on the register. That register holds 82,713 entries. The check is
+    manual. It takes twenty-five to thirty days. And if you are rejected, you are not told why &mdash; you pay roughly a thousand
+    rupees again and start over.</p>
+    <span class="cue">Advance to slide 2.</span>
+    <p>Two completely different things can sink a title, and this is the insight the entire system is built on. One &mdash; it is
+    confusingly similar to something already registered. Two &mdash; it breaks a statutory naming rule, regardless of similarity.
+    Those are structurally different problems. The obvious move is one classifier for both. We deliberately built two separate
+    mechanisms &mdash; a four-dimensional similarity engine, and a deterministic rule engine &mdash; because only one of them is
+    allowed to guess.</p>
+    <p>I own the contracts and the FastAPI orchestrator that ties all of this into a single verify call. Pruthviraj will start with
+    the half that is <i>not</i> allowed to guess.</p>
+  </div>
+</div>
+
+<div class="spk">
+  <div class="hd">
+    <span class="clock">1:30 – 3:00</span>
+    <span class="who">PRUTHVIRAJ</span>
+    <span class="role">Rules corpus &middot; deterministic rule engine &middot; evaluation data</span>
+    <span class="len">~215 words</span>
+  </div>
+  <div class="say">
+    <p>I own the rules &mdash; which means I own whether you can trust anything else on this screen.</p>
+    <p>The PRGI Guidelines for Admissibility of Titles is a real document. I went through it one sentence at a time &mdash; every
+    &ldquo;shall not&rdquo;, every &ldquo;is not admissible&rdquo; &mdash; and turned each one into a single machine-checkable rule
+    with the clause attached <i>verbatim</i>. Not a paraphrase. The actual sentence. That is
+    <span class="fill">&nbsp;__&nbsp;</span> rules extracted, <span class="fill">&nbsp;__&nbsp;</span> implemented and tested.</p>
+    <p>Two things I want to be explicit about, because they are the difference between a demo and a product.</p>
+    <p>First &mdash; where I could not find the clause, the rule is flagged as unverified and appears in our coverage report as a
+    gap. We publish what the system <i>cannot</i> check. An invented clause number would discredit every other number we show you.</p>
+    <p>Second &mdash; the rule engine is plain Python. No language model decides admissibility. Same title, same rule, same answer,
+    every time. That is what auditability means when a rejection is a legal act.</p>
+    <p>There is exactly one rule that needs a model &mdash; catching a banned meaning hidden inside a translated title. That one
+    returns an advisory flag and requires human confirmation. It can never auto-fail a title.</p>
+    <p>Jai owns the half that <i>is</i> allowed to be fuzzy.</p>
+  </div>
+</div>
+
+<div class="spk">
+  <div class="hd">
+    <span class="clock">3:00 – 4:40</span>
+    <span class="who">JAI</span>
+    <span class="role">Lexical, phonetic, core-word &amp; BM25 matching &middot; composite scorer</span>
+    <span class="len">~255 words &middot; demo runs inside this block</span>
+  </div>
+  <div class="say">
+    <span class="cue">Gurpreet drives. Have the four demo titles pre-typed in a scratch note, not typed live.</span>
+    <p>Similarity is where the manual process actually fails, because a title does not have to be identical to be confusing. We
+    score every candidate on four independent dimensions.</p>
+    <p><b>Lexical</b> &mdash; RapidFuzz, and specifically token-sort ratio, which sorts the words before it compares them. That is
+    what catches &ldquo;Times India&rdquo; against the registered &ldquo;India Times&rdquo;.
+    <span class="inline-cue">[DEMO 1 — Times India]</span></p>
+    <p><b>Phonetic</b> &mdash; Double Metaphone. But Double Metaphone was designed for English surnames and it is weak on
+    transliterated Indian names, so we added a second signal: the consonant skeleton. Strip the vowels. <i>Jagran</i> becomes
+    J-G-R-N. <i>Jaagran</i> becomes J-G-R-N. Same code. Indian romanisation varies almost entirely in the vowels, so that one cheap
+    rule catches most of the real phonetic collisions Metaphone misses.
+    <span class="inline-cue">[DEMO 2 — Jaagran]</span></p>
+    <p><b>Semantic</b> &mdash; multilingual embeddings over pgvector. &ldquo;Dainik Samachar&rdquo; and &ldquo;Daily News&rdquo; mean
+    the same thing in two languages and land in the same vector neighbourhood. Nothing about the characters is similar.
+    <span class="inline-cue">[DEMO 3 — Dainik Samachar]</span></p>
+    <p><b>Core-root</b> &mdash; strip the media filler words: <i>The, Daily, Weekly, Express, News</i>. &ldquo;The Vidarbha Daily
+    Express&rdquo; reduces to <i>Vidarbha</i>, and collides with the registered <i>Vidarbha Patrika</i>.
+    <span class="inline-cue">[DEMO 4 — The Vidarbha Daily Express]</span></p>
+    <p>Those four are merged with Reciprocal Rank Fusion, which combines ranked lists by <i>position</i> rather than score &mdash;
+    because a trigram score and a cosine similarity are not on the same scale and cannot be averaged.</p>
+    <p>And one rule overrides the blend: a perfect clash on any single dimension is disqualifying on its own. A title that
+    <i>sounds</i> exactly like an existing one is a conflict even if it is spelt completely differently. Suhani.</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ PAGE 3 — SCRIPT 2 ═══════════════════════ -->
+
+<div class="spk">
+  <div class="hd">
+    <span class="clock">4:40 – 6:10</span>
+    <span class="who">SUHANI</span>
+    <span class="role">Agentic Title Studio &middot; RAG explainer &middot; presentation</span>
+    <span class="len">~225 words</span>
+  </div>
+  <div class="say">
+    <p>Catching a bad title is half a product. Telling the applicant what to do next is the other half. Two pieces.</p>
+    <p><b>The explanation.</b> When a rule fires, we do not ask a model &ldquo;why was this rejected&rdquo;. We retrieve the actual
+    guideline passage from the database first &mdash; vector search over the chunked guideline text &mdash; and only then ask the
+    model to phrase <i>that retrieved text</i> in two plain sentences. Retrieve, then generate.</p>
+    <p>And there is a guard. If the model&rsquo;s output cites a clause that was not in what we retrieved, we throw the output away
+    and quote the clause verbatim instead. That is how we can <i>say</i> we did not hallucinate, rather than hope.</p>
+    <p><b>The Agentic Title Studio.</b> Four agents in a LangGraph graph &mdash; Interviewer, Generator, Verifier, Ranker. The
+    Interviewer takes the publication&rsquo;s genre, state and language and writes a brief. The Generator proposes fifteen to
+    twenty candidates. The Verifier sends all of them back through the same five-stage pipeline you just watched &mdash; not a
+    lighter check, the real one. And if fewer than five survive, it loops back to the Generator with the rejection reasons
+    attached, up to three times.</p>
+    <span class="cue">[DEMO 5 — run the studio. Point at the retry when it fires. That moment is the most persuasive thing in the demo.]</span>
+    <p>So every alternative we put in front of an applicant has already passed the exact test that failed their original. We never
+    show an unverified suggestion. Gurpreet.</p>
+  </div>
+</div>
+
+<div class="spk">
+  <div class="hd">
+    <span class="clock">6:10 – 7:40</span>
+    <span class="who">GURPREET</span>
+    <span class="role">Frontend&harr;backend integration &middot; live/offline engine &middot; Docker</span>
+    <span class="len">~205 words</span>
+  </div>
+  <div class="say">
+    <p>I connect that engine to the interface, and I own what happens when it breaks.</p>
+    <p>Every result carries a badge saying which engine produced it &mdash; <b>LIVE</b>, against the full 82,713-title registry, or
+    <b>OFFLINE</b>, against a local sample. The two are not guaranteed to agree, so the user is told which one answered rather than
+    left to assume.</p>
+    <p>The live call aborts after two and a half seconds. If the backend hangs we do not spin forever &mdash; we fall back to the
+    offline engine and say so on screen.</p>
+    <span class="cue">[DEMO 6 — kill the backend, re-run the same title, let the badge flip. Do this deliberately and slowly.]</span>
+    <p>That is not a slide claim. We killed the backend on purpose and ran the whole demo through the fallback, twice, on two
+    different days. An untested fallback is not a fallback.</p>
+    <p>You are also not watching a generic spinner. The pipeline shows which of the five stages is running, and when the response
+    lands it snaps to the real measured per-stage timings &mdash;
+    <span class="fill">&nbsp;normalize __ ms &middot; shortlist __ ms &middot; score __ ms&nbsp;</span>. Measured, not animated.</p>
+    <p>And the whole thing is one command. <span style="font-family:'Courier New',monospace">docker compose up</span> brings up
+    PostgreSQL with pgvector, the backend and the frontend. There is also a thirty-second path without Docker, because a laptop
+    building a PyTorch image at nine in the morning is how demos die. Darsh.</p>
+  </div>
+</div>
+
+<div class="spk">
+  <div class="hd">
+    <span class="clock">7:40 – 9:10</span>
+    <span class="who">DARSH</span>
+    <span class="role">Officer docket &middot; registry explorer &middot; memorandum export &middot; accessibility &amp; E2E tests</span>
+    <span class="len">~230 words</span>
+  </div>
+  <div class="say">
+    <p>Everything so far serves the applicant. This half serves the officer who has to sign the decision.</p>
+    <p>The Review Docket sorts <b>amber first</b> &mdash; the borderline cases at the top, by descending risk. That is the
+    docket&rsquo;s entire purpose: the officer&rsquo;s attention goes to the genuinely difficult cases, not the obvious ones.</p>
+    <p>Opening a case shows <i>exactly</i> the same evidence the applicant saw &mdash; all four sub-scores, the top five clashing
+    titles with their state and language, and every rule triggered with its verbatim clause. Same components, not a second display,
+    so the officer and the applicant can never be looking at different facts.</p>
+    <p>Two actions: <i>Endorse &amp; Approve</i>, or <i>Issue Rejection Order</i>. Each produces a recorded artifact with a
+    reference token and a timestamp. The memo itself is drafted by the system but fully editable, and requires an explicit officer
+    action before it counts &mdash; it is a drafting aid, never an automated decision.</p>
+    <span class="cue">[DEMO 7 — open a case, endorse it, then export the memorandum.]</span>
+    <p>One click exports the whole thing as an official memorandum &mdash; title, verdict, all four scores, the clash table, every
+    clause &mdash; to clipboard or to PDF.</p>
+    <p>On accessibility: no verdict is ever signalled by colour alone. Every colour is paired with a text label, and the verdict
+    region announces itself to a screen reader when it arrives.</p>
+    <p>And we have <span class="fill">&nbsp;__&nbsp;</span> end-to-end browser tests &mdash; one per benchmark scenario, plus one
+    that runs with the backend deliberately stopped. Divvye.</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ PAGE 4 — CLOSE + Q&A 1 ═══════════════════════ -->
+
+<div class="spk">
+  <div class="hd">
+    <span class="clock">9:10 – 10:00</span>
+    <span class="who">DIVVYE</span>
+    <span class="role">Close</span>
+    <span class="len">~125 words</span>
+  </div>
+  <div class="say">
+    <span class="cue">Slide 5. Slow down. These are the sentences they will remember.</span>
+    <p>To close with numbers rather than adjectives.</p>
+    <p>82,713 titles indexed. Shortlist recall at two hundred candidates:
+    <span class="fill">&nbsp;__ %&nbsp;</span>, measured on a <span class="fill">&nbsp;__&nbsp;</span>-pair evaluation set we built
+    ourselves. Median end-to-end latency: <span class="fill">&nbsp;__ ms&nbsp;</span>.
+    <span class="fill">&nbsp;__&nbsp;</span> statutory rules implemented and tested, with our coverage gaps published rather than
+    hidden.</p>
+    <p>Twenty-five to thirty days becomes under two seconds &mdash; and every verdict cites the clause it rests on.</p>
+    <p>One thing we want to be completely clear about. This system <b>recommends</b>. It never decides. The PRGI officer holds the
+    legal authority, exactly as the Act requires. What we have removed is the waiting and the guessing &mdash; not the judgement.</p>
+    <p>We&rsquo;re Team 404 Found. Happy to take your questions.</p>
+  </div>
+</div>
+
+<div class="pb"></div>
+<h2 class="sec">Q &amp; A &mdash; 5 minutes</h2>
+<div class="note">
+  Expect six to ten questions, not thirty. <b>Answer in three sentences and stop.</b> A long answer eats a question someone else
+  could have answered better. If you do not know: &ldquo;We haven&rsquo;t measured that &mdash; here is what we do know&rdquo; is a
+  respected answer; inventing a number is not recoverable.
+</div>
+
+<div class="qa">
+  <div class="owner">DIVVYE <span>&mdash; architecture, backend, integration, performance</span></div>
+
+  <div class="q">
+    <div class="ask hot">Is this actually working, or is it a mockup?</div>
+    <div class="ans">Working. What you just saw came over HTTP from a FastAPI service querying PostgreSQL &mdash; the badge on the
+      result says which engine answered, and I can show you the network tab. The offline engine is a genuine fallback against a
+      smaller sample, not a fake.
+      <span class="flag">If any pipeline stage is still on its stub flag on the day, name that stage explicitly and say what is real. Do not round up.</span>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Six people, three days. How did you not step on each other?</div>
+    <div class="ans">Contracts frozen at noon on day one &mdash; every request and response shape defined once, in Pydantic and in
+      Zod, plus seven hand-written fixture files. After that nobody waited for anybody: Suhani&rsquo;s agents ran against a fixture
+      client, Darsh&rsquo;s docket against fixture cases. Swapping a fixture for a real HTTP call is one line. On top of that,
+      strict folder ownership &mdash; no two people edit the same directory.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">How do you actually hit under two seconds?</div>
+    <div class="ans">Four things. The embedding model loads once at startup, not per request &mdash; that alone is the difference
+      between thirty seconds and thirty milliseconds. The four retrievers run concurrently. The two hundred shortlisted candidates
+      are fetched in one query, not two hundred. And there is an in-memory cache on the normalised title.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Why merge with Reciprocal Rank Fusion instead of averaging the scores?</div>
+    <div class="ans">Because a trigram similarity and a cosine similarity are not on the same scale, so averaging them is
+      meaningless. RRF only looks at position &mdash; first place in any list is worth one over sixty-one, tenth is worth one over
+      seventy. A title near the top of two different lists beats one that is first in only one, and it needs no calibration between
+      scorers that were never comparable.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Why PostgreSQL and not a real vector database?</div>
+    <div class="ans">82,713 vectors is small &mdash; Pinecone and Milvus are built for hundreds of millions. Adding one would mean
+      a second service, a second network hop per query, and keeping relational metadata and vectors in sync across two systems, for
+      no gain at this size. With pgvector, one query filters on state and language and ranks by vector distance at the same time.
+      If the register grows by two orders of magnitude that gets revisited &mdash; it is documented as a future migration, not an
+      oversight.</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ PAGE 5 — Q&A 2 ═══════════════════════ -->
+
+<div class="qa">
+  <div class="owner">PRUTHVIRAJ <span>&mdash; rules, citations, evaluation data, script coverage</span></div>
+
+  <div class="q">
+    <div class="ask hot">Show me the guideline clause behind that rejection. Where exactly does it come from?</div>
+    <div class="ans">[Open the rule and read the clause field aloud.] That sentence is copied verbatim from section
+      <span class="fill">&nbsp;__&nbsp;</span> of the Guidelines for Admissibility of Titles. Every rule row carries the sentence
+      and the section it came from, and the rule code reads its citation out of that file at import time &mdash; so the code and the
+      citation physically cannot drift apart. And here is the coverage report: every restriction we found in the document, and
+      whether we implemented it.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">What happens when you could not find the clause?</div>
+    <div class="ans">The rule is flagged unverified and shows up as a gap in the coverage report. We publish what the system cannot
+      check. A missing rule is a documented limitation; an invented clause number would discredit every citation in the system, so
+      we never write one.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Your keyword lists will over-fire. Won&rsquo;t &ldquo;News&rdquo; flag half the register as commercial?</div>
+    <div class="ans">That is exactly the failure we tested for. A single common word never triggers a rule on its own &mdash; we
+      require a phrase or a second signal. We ran the whole rule set against fifty known-good registered titles and counted the
+      false positives.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask hot">Your dataset is entirely Latin script. How can you claim multi-script support?</div>
+    <div class="ans">Correct, and we say so on the slide. The 82,713 real records are Latin-script only &mdash; that is a property
+      of the source data, not a design choice. To demonstrate the cross-script path we generated a small native-script set with the
+      indic-transliteration library, flagged in the database as synthetic. It is a demonstration set, back-transliteration is lossy,
+      and it is labelled that way everywhere. The pipeline handles the script; we simply do not have real native-script registry
+      data yet.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask hot">What is your accuracy?</div>
+    <div class="ans">We report shortlist recall at two hundred &mdash; <span class="fill">&nbsp;__ %&nbsp;</span> on a
+      <span class="fill">&nbsp;__&nbsp;</span>-pair evaluation set built from real near-duplicates in the register, the six benchmark
+      scenarios, and hand-made reorderings, misspellings and translations. We deliberately do <i>not</i> quote a precision figure,
+      because there is no ground-truth set of historical PRGI rejections to measure against. That is listed as an open risk, and it
+      is exactly why a human stays in the loop on amber cases.</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="owner">JAI <span>&mdash; matching algorithms, scoring, tuning</span></div>
+
+  <div class="q">
+    <div class="ask">Why four dimensions? Isn&rsquo;t one good model enough?</div>
+    <div class="ans">Because they fail in different places. Lexical cannot see that <i>Dainik Samachar</i> means <i>Daily News</i>.
+      Semantic cannot see that <i>Jaagran</i> sounds like <i>Jagran</i>. Core-root catches <i>Vidarbha</i> buried inside
+      <i>The Vidarbha Daily Express</i>, which nothing else does cleanly. Each is cheap; together they cover the failure modes the
+      manual process actually misses.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Double Metaphone is English-centric. Doesn&rsquo;t it break on Indian names?</div>
+    <div class="ans">It does &mdash; which is why we added the consonant skeleton alongside it. Strip the vowels and compare what
+      is left: <i>Jagran</i>, <i>Jaagran</i> and <i>Jagaran</i> all reduce to J-G-R-N. Indian romanisation varies almost entirely in
+      the vowels, so that one rule catches most of what Metaphone misses. We take the higher of the two signals.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Where do the weights come from? Aren&rsquo;t they arbitrary?</div>
+    <div class="ans">They live in a config file loaded at startup, never hardcoded, because the spec requires them tunable. They
+      were tuned against the evaluation set &mdash; we tried several combinations and kept the one with the best recall, and the
+      committed file records the number it scored.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Scoring two hundred candidates on four dimensions &mdash; isn&rsquo;t that slow?</div>
+    <div class="ans">Under three hundred milliseconds for all four. Nothing loops in Python over candidates &mdash; the lexical
+      scorer runs vectorised in C++ against all two hundred at once, and the semantic scorer encodes the whole batch in a single
+      call.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">What is BM25 doing that trigram search isn&rsquo;t?</div>
+    <div class="ans">Trigram matching treats every character sequence as equally informative. BM25 weights by rarity &mdash;
+      matching &ldquo;Vidarbha&rdquo;, which appears in about forty of 82,713 titles, counts enormously more than matching
+      &ldquo;News&rdquo;, which appears in thousands. That distinction is precisely what this problem needs.</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ PAGE 6 — Q&A 3 + PLAYBOOK ═══════════════════════ -->
+
+<div class="qa">
+  <div class="owner">SUHANI <span>&mdash; agents, RAG, explanation integrity</span></div>
+
+  <div class="q">
+    <div class="ask hot">How do you know the explanation isn&rsquo;t hallucinated?</div>
+    <div class="ans">Two things. Order &mdash; we retrieve the guideline passage <i>before</i> the model is called, and the prompt
+      instructs it to use only that text. And a guard &mdash; we check that the output cites a clause that was actually in what we
+      retrieved. If it does not, we discard the output and quote the clause verbatim. So the worst case is a blunter explanation,
+      never a fabricated one.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Why LangGraph rather than CrewAI or AutoGen?</div>
+    <div class="ans">Because this is not an open-ended agent conversation &mdash; it is a fixed four-step sequence with exactly one
+      bounded retry. LangGraph expresses that as explicit nodes and edges with inspectable state at every step. The autonomous
+      frameworks are built for looser collaboration, which here makes behaviour harder to constrain and audit &mdash; a
+      disadvantage when the output has to be traceable.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Are those generated titles actually verified, or just generated?</div>
+    <div class="ans">Actually verified, through the same five-stage pipeline, in one batch call &mdash; not a lighter check. If a
+      generated title fails, it never reaches the applicant. That is why the Verifier is a node <i>inside</i> the graph rather than
+      a step after it.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">What if the loop never finds five good titles? Or the API dies mid-demo?</div>
+    <div class="ans">The loop is bounded at three attempts, then returns whatever survived with an honest count &mdash; there is no
+      unbounded loop anywhere in the graph. For the API: there is a deterministic template generator built on day one, and responses
+      are cached on disk keyed by prompt hash, so a repeated run is instant and needs no network.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Isn&rsquo;t suggesting titles overstepping? That&rsquo;s the applicant&rsquo;s creative decision.</div>
+    <div class="ans">It is optional, and it is a starting point rather than a submission &mdash; the applicant edits them or ignores
+      them entirely. The value is that the ones we show have already cleared the check that failed their original, so they are not
+      walking into a second rejection blind.</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="owner">GURPREET <span>&mdash; integration, resilience, deployment</span></div>
+
+  <div class="q">
+    <div class="ask hot">What happens if your backend goes down mid-demo?</div>
+    <div class="ans">[Do it, live.] The client aborts after two and a half seconds, falls back to the offline engine, and the badge
+      changes to say so. We tested this by deliberately killing the backend and running the whole demo through the fallback, on two
+      separate days. An untested fallback is not a fallback.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Then is the offline result trustworthy?</div>
+    <div class="ans">It runs against a local sample, not the full register, and the badge says exactly that. The two engines are not
+      guaranteed to agree &mdash; which is precisely why we surface which one answered instead of hiding it.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Those stage timings &mdash; real, or animation?</div>
+    <div class="ans">The indicator advances optimistically while the request is in flight, then snaps to the real measured per-stage
+      timings that come back in the response. The numbers you see are measured.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Your document says Next.js and this is React with Vite. Why the mismatch?</div>
+    <div class="ans">The document was out of date and we chose to correct the document rather than the codebase. There is no
+      server-side rendering requirement here, and migrating a working interface three days before a demo is how you lose a demo.
+      It is a recorded decision, not an accident.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Could we run this ourselves?</div>
+    <div class="ans">One command &mdash; <span style="font-family:'Courier New',monospace">docker compose up</span> brings up the
+      database, backend and frontend, with an example environment file listing every variable. There is also a no-Docker path that
+      starts in about thirty seconds.</div>
+  </div>
+</div>
+
+<div class="qa">
+  <div class="owner">DARSH <span>&mdash; officer workflow, audit trail, accessibility, testing</span></div>
+
+  <div class="q">
+    <div class="ask hot">Does this replace the PRGI officer?</div>
+    <div class="ans">No &mdash; and the interface is deliberately built so it cannot read that way. The system produces a
+      recommendation with evidence; the officer takes one of two explicit actions. Even the memo is editable and requires an officer
+      action before it counts. The District Magistrate&rsquo;s endorsement step is untouched; it is out of scope by design.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Why does the officer see the same screen as the applicant?</div>
+    <div class="ans">So they cannot be looking at different facts. We reuse the same components rather than building a second
+      display, which means no version of the evidence exists on only one side. If the applicant is told their title clashes with
+      <i>India Times</i> at ninety-four percent, that is the exact number in the officer&rsquo;s docket.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">What is the audit trail on a decision?</div>
+    <div class="ans">Each action produces a recorded artifact &mdash; a reference token and a timestamp appended to the case record.
+      The exportable memorandum then contains the full basis for that decision: the title, the verdict, all four sub-scores, the
+      clash table, every rule violated with its verbatim clause, and the plain-language summary.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Have you actually tested this, or does it only work in your demo?</div>
+    <div class="ans"><span class="fill">&nbsp;__&nbsp;</span> end-to-end browser tests that drive a real browser &mdash; type the
+      title, click verify, assert the verdict and the clash table &mdash; one per benchmark scenario. Plus one that runs with the
+      backend deliberately stopped, so the fallback is covered by a test rather than by hope.</div>
+  </div>
+
+  <div class="q">
+    <div class="ask">Is it usable by a colourblind officer?</div>
+    <div class="ans">Every verdict colour is paired with an explicit text label &mdash; approved, manual review, rejected &mdash;
+      never colour alone. The verdict region announces itself to a screen reader when it arrives, the docket is fully
+      keyboard-navigable, and we specifically checked the amber-on-warm-background contrast, which is the combination that usually
+      fails.</div>
+  </div>
+</div>
+
+<h2 class="sec red">Everyone must be able to answer these five</h2>
+<div class="note warn">
+  These are asked of whoever is nearest, not of the person who owns the area. If you are asked one of these, answer it &mdash; do
+  not deflect to a teammate.
+</div>
+<ol class="play">
+  <li><b>&ldquo;Is it real?&rdquo;</b> &mdash; point at the engine badge, offer the network tab. Name any stubbed stage rather than
+    letting it be discovered.</li>
+  <li><b>&ldquo;Show me a citation.&rdquo;</b> &mdash; open the actual clause. If it is one of the unverified ones, say so
+    immediately and show the coverage report. That answer wins; a bluff loses everything else you said.</li>
+  <li><b>&ldquo;What&rsquo;s your accuracy?&rdquo;</b> &mdash; recall at two hundred, with the evaluation set size. Never claim a
+    precision figure. Name the missing ground truth as a known limitation.</li>
+  <li><b>&ldquo;Who is liable when it is wrong?&rdquo;</b> &mdash; nobody, because it does not decide. Recommendation only; the
+    officer decides; the Act is unchanged.</li>
+  <li><b>&ldquo;What have you <i>not</i> solved?&rdquo;</b> &mdash; pick one and answer honestly: no ground-truth rejection data;
+    the register being Latin-script only; &ldquo;confusingly similar&rdquo; being a legal judgement rather than a threshold. Judges
+    reward a real answer here and punish &ldquo;nothing&rdquo;.</li>
+</ol>
+
+<h2 class="sec">If something goes wrong</h2>
+<table class="map">
+  <tr><th style="width:2.0in">Situation</th><th>What you do</th></tr>
+  <tr><td class="w">The live demo fails</td><td>Gurpreet says one sentence &mdash; &ldquo;that&rsquo;s the fallback doing its job&rdquo; &mdash; and plays the recorded capture. Do not debug on stage. Never apologise twice.</td></tr>
+  <tr><td class="w">You are running long</td><td>Cut demo 3 and demo 4 first &mdash; the semantic and core-root cases. Keep Times India and Jaagran; they land fastest.</td></tr>
+  <tr><td class="w">A judge interrupts mid-block</td><td>Answer in one sentence, then &ldquo;I&rsquo;ll come back to that in the Q&amp;A&rdquo; and resume. Do not let one question consume a speaking slot.</td></tr>
+  <tr><td class="w">You are asked something outside your area</td><td>&ldquo;That&rsquo;s Pruthviraj&rsquo;s &mdash; Pruthviraj?&rsquo;&rsquo; Six specialists routing cleanly reads as a team; one person guessing reads as a solo project with passengers.</td></tr>
+  <tr><td class="w">You genuinely do not know</td><td>&ldquo;We haven&rsquo;t measured that. What we do know is &hellip;&rdquo; then give the nearest thing you <i>have</i> measured.</td></tr>
+  <tr><td class="w">A teammate says something wrong</td><td>Let it stand. Fix it in one clause when your turn comes, without naming the error.</td></tr>
+</table>
+
+
+</body>
+</html>

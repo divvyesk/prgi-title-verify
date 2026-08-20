@@ -102,8 +102,22 @@ def explain(title: str, verdict: str, clashing_titles: list, rule_violations: li
             [],
         )
 
-    query_parts = [v.rule_name for v in rule_violations] + [c.match_type for c in clashing_titles[:1]]
-    chunks = vector_search(" ".join(query_parts) or verdict, k=3)
+    # Retrieve on the rule's own verbatim clause text and matched phrase, not
+    # just its name. ml/rules/engine.py and the guideline corpus use different
+    # rule-id namespaces (the engine fails R-GOV-05, the corpus only knows
+    # R-GOV-01), so ids cannot be joined directly — but the clause wording is
+    # the same source document on both sides, which makes it by far the
+    # strongest retrieval signal available. On a title containing "Police",
+    # the name alone ("Government Organizations") retrieved the generic-word
+    # rule; adding the clause and the trigger phrase pulls the actual
+    # government-association clause to the top.
+    query_parts: list[str] = []
+    for v in rule_violations:
+        query_parts.append(getattr(v, "rule_name", "") or "")
+        query_parts.append(getattr(v, "clause", "") or "")
+        query_parts.append(getattr(v, "trigger_phrase", None) or "")
+    query_parts += [c.match_type for c in clashing_titles[:1]]
+    chunks = vector_search(" ".join(p for p in query_parts if p) or verdict, k=3)
 
     top_clash = clashing_titles[0] if clashing_titles else None
     prompt = _EXPLAIN_PROMPT.format(

@@ -10,10 +10,19 @@ logger = logging.getLogger("app.routers.alternatives")
 router = APIRouter(tags=["alternatives"])
 
 # Real wiring point: Suhani's LangGraph 4-agent Title Studio (agents/).
-# Expected interface: agents.studio.run_studio(genre, state, language,
-# tone, audience) -> list[GeneratedCandidate]. Same resilience pattern as
-# ml/registry.py — try once at import time, log a warning and stay on
-# fixture data if it isn't there (or isn't finished) yet.
+# Interface: agents.studio.run_studio(details: dict, on_step=None)
+# -> list[GeneratedCandidate]. Same resilience pattern as ml/registry.py —
+# try once at import time, log a warning and stay on fixture data if it
+# isn't there (or isn't finished) yet.
+#
+# This comment used to predict a five-positional-argument signature, written
+# before agents/studio.py existed. It landed taking a single details dict,
+# and nothing re-checked the call below, so every request raised TypeError
+# and fell through to the fixture branch. Because that fallback returns 200
+# with plausible-looking candidates, the endpoint looked fine — it just
+# always answered with the same Maharashtra/Marathi fixtures, even for a
+# Tamil Nadu request. The keys below are exactly the ones the graph's nodes
+# read via details.get(...).
 try:
     from agents.studio import run_studio as _run_studio
 except Exception as exc:
@@ -25,7 +34,13 @@ except Exception as exc:
 def alternatives(body: AlternativesRequest) -> AlternativesResponse:
     if _run_studio is not None:
         try:
-            candidates = _run_studio(body.genre, body.state, body.language, body.tone, body.audience)
+            candidates = _run_studio({
+                "genre": body.genre,
+                "state": body.state,
+                "language": body.language,
+                "tone": body.tone,
+                "audience": body.audience,
+            })
             return AlternativesResponse(candidates=candidates)
         except Exception:
             logger.exception("run_studio() raised — falling back to fixture data for this request")

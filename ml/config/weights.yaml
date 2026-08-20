@@ -6,5 +6,21 @@ weights:
   core_word: 0.15
 thresholds:
   reject: 75
-  review: 45
+  # Raised from 45 after calibrating against the full 82,713-title corpus.
+  #
+  # 45 was set when only the semantic scorer was registered and the database
+  # was empty. With all four scorers live against the real corpus, the fuzzy
+  # matchers have a floor around 50 — the closest of 200 shortlisted titles
+  # out of 82k always shares *something* with a short query string. The
+  # result was that nothing could ever be APPROVED: six entirely invented
+  # titles (Blorptium Vexnar, Kwyjibo Zarnax Journal, ...) all scored
+  # 51.06-56.77 and landed in MANUAL_REVIEW.
+  #
+  # Measured separation on this corpus:
+  #   exact duplicates (6/6) ........ 100.00
+  #   real near-clashes ............. 79.58 - 97.24
+  #   invented / clean (6/6) ........ 51.06 - 56.77
+  # Nothing at all falls in 57-79, so 62 sits mid-gap: ~5 points of margin
+  # above the clean ceiling and ~13 below the lowest genuine clash.
+  review: 62
 max_signal_override: 90

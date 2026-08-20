@@ -22,7 +22,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.alias_generators import to_camel
 
 
@@ -244,6 +244,20 @@ class VerifyRequest(Base):
     title: str
     language: Optional[str] = None
     state: Optional[str] = None
+
+    @field_validator("title")
+    @classmethod
+    def _reject_blank(cls, v: str) -> str:
+        """PRD: "reject empty or whitespace-only submissions with a clear
+        error." Without this, an empty title ran the whole pipeline and came
+        back REJECTED with a 90.0 conflict score, because a zero-length
+        string trips a CRITICAL length rule. Submitting nothing and being
+        told your title conflicts with the national register is both wrong
+        and a bad look in front of judges: this is a malformed request, not
+        a verdict."""
+        if not v or not v.strip():
+            raise ValueError("title must not be empty or whitespace-only")
+        return v
 
 
 class CandidatesRequest(Base):

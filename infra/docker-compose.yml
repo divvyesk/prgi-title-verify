@@ -1,3 +1,21 @@
+# What this stack does and does not give you.
+#
+# It brings up Postgres with the SCHEMA only. The initdb mount below applies
+# data/datasets/dataset1/database/*.sql in alphabetical order — that now
+# succeeds (00_extensions.sql creates pg_trgm before 02_indexes.sql needs
+# gin_trgm_ops; it used to abort there), but schema is all it does:
+#
+#   * no titles are loaded — the 82,713-row corpus comes from
+#     scripts/load_titles.py, which is not run here;
+#   * title_phonetic / title_skeleton / ts_normalized are NOT created, because
+#     they live in search/database/*.sql and only one directory can be mounted
+#     at /docker-entrypoint-initdb.d. The phonetic retriever needs those
+#     columns;
+#   * STUB_MODE defaults to 1 below, so the backend serves fixtures.
+#
+# So `docker compose up` gives you a running, wired, EMPTY system — useful for
+# checking the three services talk to each other, not for a real demo. For
+# that, run scripts/bootstrap_db.sh against the database and set STUB_MODE=0.
 services:
   db:
     image: pgvector/pgvector:pg17
@@ -32,6 +50,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       PORT: ${PORT:-8000}
       STUB_MODE: ${STUB_MODE:-1}
+      # Without this the container starts fine and verification works, but
+      # every RAG explanation logs "LLM call failed entirely" and falls back
+      # to verbatim clause text, and /v1/alternatives cannot generate. The
+      # key lives in agents/.env on a dev machine, which is gitignored and
+      # never reaches the image — it has to come through the environment.
+      # Export it before `docker compose up`, or put it in infra/.env.
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
     ports:
       - "${PORT:-8000}:8000"
     depends_on:

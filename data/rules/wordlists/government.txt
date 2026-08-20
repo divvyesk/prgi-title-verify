@@ -1,7 +1,19 @@
-# rules/wordlists/government.txt
+# data/rules/wordlists/government.txt
 # Words indicating misleading government/institutional association.
 # Source: PRGI Guideline 11 and 12 (verbatim examples) + frontend/src/utils/rulesEngine.ts
 # One entry per line. Lowercase. Phrases matched as substrings.
+#
+# The armed-forces and crime block below was missing entirely: PSS06 names
+# the disallowed set as "Police, Crime, Corruption, CBI, CID, Army", and only
+# police/cbi/cid were present, so "Indian Army Times" passed every rule.
+army
+navy
+air force
+armed forces
+military
+paramilitary
+crime
+corruption
 government
 sarkari
 sarkar

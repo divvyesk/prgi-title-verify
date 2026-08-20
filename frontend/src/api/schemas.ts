@@ -59,7 +59,11 @@ export const RuleViolationSchema = z.object({
   description: z.string(),
   clause: z.string(),
   passed: z.boolean(),
-  triggerPhrase: z.string().optional(),
+  // Must be .nullable() as well as .optional() — see contracts/contracts.js.
+  // Python sends trigger_phrase: null for every rule that passed, and
+  // .optional() on its own rejects null, which failed the entire
+  // /v1/verify response and silently dropped the UI to the OFFLINE engine.
+  triggerPhrase: z.string().optional().nullable(),
   requiresHumanConfirmation: z.boolean().default(false),
 });
 

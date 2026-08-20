@@ -80,7 +80,13 @@ export const RuleViolationSchema = z.object({
   description: z.string(),
   clause: z.string(),
   passed: z.boolean(),
-  triggerPhrase: z.string().optional(),
+  // .nullable() matters as much as .optional(): the Python side declares
+  // trigger_phrase as Optional[str] = None, which serialises to JSON null,
+  // not to an absent key. Zod's .optional() alone accepts undefined and
+  // REJECTS null, so every rule that passed (no trigger phrase) failed
+  // validation and took the whole /v1/verify response down with it. Every
+  // other nullable field in this file already pairs the two.
+  triggerPhrase: z.string().optional().nullable(),
   requiresHumanConfirmation: z.boolean().default(false),
 });
 

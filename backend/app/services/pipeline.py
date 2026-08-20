@@ -329,34 +329,68 @@ def run_score(title: str, candidates: list[str]) -> list[CandidateScore]:
 # Stage 4 — CHECK
 # ---------------------------------------------------------------------------
 
+# ml/rules/engine.py has its own RuleViolation dataclass whose field names
+# only partly line up with contracts/contracts.py's model. The important
+# mismatch is the guideline text: the engine calls it `source_clause`, the
+# contract calls it `clause`, and `clause` is REQUIRED.
+#
+# This mapping is why it matters: without it, constructing the contract model
+# raised ValidationError on every single title, run_rules() swallowed the
+# error and fell back to stub.check_rules(), and the API returned zero rule
+# violations for everything — the entire 36-rule engine was silently dead in
+# the live pipeline while looking healthy (requests still returned 200 with a
+# plausible verdict from the similarity stages alone).
+_VIOLATION_FIELD_ALIASES = {
+    # contract field -> candidate source attribute names, in priority order
+    "clause": ("clause", "source_clause", "guideline_clause"),
+    "trigger_phrase": ("trigger_phrase", "matched_text"),
+}
+
+
+def _to_contract_violation(v) -> RuleViolation:
+    """Coerce whatever ml/rules/engine.py returned into the contract model."""
+    if isinstance(v, RuleViolation):
+        return v
+
+    if isinstance(v, dict):
+        data = dict(v)
+    elif hasattr(v, "model_dump"):
+        data = v.model_dump()
+    elif hasattr(v, "__dict__"):
+        data = dict(vars(v))
+    else:
+        data = {}
+
+    def pick(field: str, default):
+        for name in _VIOLATION_FIELD_ALIASES.get(field, (field,)):
+            if data.get(name) not in (None, ""):
+                return data[name]
+        return default
+
+    severity = str(pick("severity", "INFO")).upper()
+    if severity not in ("CRITICAL", "WARNING", "INFO"):
+        severity = "INFO"
+
+    return RuleViolation(
+        rule_id=str(pick("rule_id", "R-UNKNOWN")),
+        rule_name=str(pick("rule_name", "Unknown Rule")),
+        severity=severity,
+        description=str(pick("description", "")),
+        # Never invent a citation: an empty clause is honest, a made-up one
+        # is the failure mode AGENTS.md Known Problem #1 exists to prevent.
+        clause=str(pick("clause", "")),
+        passed=bool(data.get("passed", True)),
+        trigger_phrase=pick("trigger_phrase", None),
+        requires_human_confirmation=bool(data.get("requires_human_confirmation", False)),
+    )
+
+
 def run_rules(title: str) -> list[RuleViolation]:
     if STUB["rules"]:
         return stub.check_rules(title)
     try:
         raw_violations = _real_rules_check(title)
-        violations: list[RuleViolation] = []
-        for v in raw_violations:
-            if isinstance(v, RuleViolation):
-                violations.append(v)
-            elif hasattr(v, "model_dump"):
-                violations.append(RuleViolation.model_validate(v.model_dump()))
-            elif hasattr(v, "dict"):
-                violations.append(RuleViolation.model_validate(v.dict()))
-            elif isinstance(v, dict):
-                violations.append(RuleViolation.model_validate(v))
-            else:
-                violations.append(RuleViolation(
-                    rule_id=getattr(v, "rule_id", "R-UNKNOWN"),
-                    rule_name=getattr(v, "rule_name", "Unknown Rule"),
-                    category=getattr(v, "category", "GENERAL"),
-                    severity=getattr(v, "severity", "MEDIUM"),
-                    passed=getattr(v, "passed", True),
-                    description=getattr(v, "description", ""),
-                    guideline_clause=getattr(v, "guideline_clause", None),
-                    citation_verified=getattr(v, "citation_verified", False),
-                    matched_text=getattr(v, "matched_text", None),
-                ))
-        return violations
+        return [_to_contract_violation(v) for v in raw_violations]
     except Exception:
         logger.exception("ml.rules.engine.check() raised — falling back to stub rule check for this request")
         return stub.check_rules(title)
@@ -487,19 +521,32 @@ async def run_verification(
             verdict = "REJECTED"
             verdict_score = max(verdict_score, 90.0)
 
+        # run_rules() returns every rule's OUTCOME (36 of them), because the
+        # contract carries `passed` and the UI renders the full compliance
+        # checklist. The explainer means something narrower by the same word:
+        # ml/rag/explain.py builds its retrieval query from
+        # [v.rule_name for v in rule_violations], so handing it all 36 turns
+        # the query into every rule name in the system at once and retrieval
+        # returns near-arbitrary clauses. "Times India" genuinely fails
+        # R-GEN-04/R-GEN-05 (generic prefixing) but was being explained as a
+        # matrimonial-classifieds violation under R-COM-01 — a real clause,
+        # correctly quoted, attached to the wrong title. Pass only the rules
+        # that actually failed.
+        failed_violations = [v for v in rule_violations if not v.passed]
+
         if STUB["explain"]:
             explanation, recommended_action, guideline_citations = stub.template_explanation(
-                title, verdict, clashing_titles, rule_violations
+                title, verdict, clashing_titles, failed_violations
             )
         else:
             try:
                 explanation, recommended_action, guideline_citations = _real_explain(
-                    title, verdict, clashing_titles, rule_violations
+                    title, verdict, clashing_titles, failed_violations
                 )
             except Exception:
                 logger.exception("ml.rag.explain.explain() raised — falling back to templated prose for this request")
                 explanation, recommended_action, guideline_citations = stub.template_explanation(
-                    title, verdict, clashing_titles, rule_violations
+                    title, verdict, clashing_titles, failed_violations
                 )
         engine = "LIVE"
     timings["explain"] = round(stub.now_ms() - t4, 2)

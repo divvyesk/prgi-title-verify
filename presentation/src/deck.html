@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SIH 2026 — PSS06 Idea Submission</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
+
+  :root{
+    --navy: #1F497D;      /* theme tx2 */
+    --bar:  #0070C0;      /* template footer bar */
+    --plum: #8064A2;      /* theme accent4 — oval outline */
+    --ink:  #000000;
+  }
+
+  .slide{
+    position: relative;
+    width: 13.333in; height: 7.5in;
+    overflow: hidden;
+    background: #fff;
+    page-break-after: always;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--navy);
+  }
+  .slide:last-child{ page-break-after: auto; }
+
+  /* ---------- template chrome (identical on every content slide) ---------- */
+  .bar{ position:absolute; left:0; top:6.95in; width:13.333in; height:.55in; background:var(--bar); }
+  .footer{
+    position:absolute; left:5.08in; top:6.95in; width:3.50in; height:.40in;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12pt; color:#fff;
+  }
+  .logo{ position:absolute; left:10.6957in; top:.0016in; width:2.4605in; height:1.1617in; }
+  .oval{
+    position:absolute; left:.3605in; top:.2758in; width:1.3686in; height:.8827in;
+    border:1.5pt solid var(--plum); border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:11pt; color:#000; line-height:1.15; padding:0 .06in;
+  }
+  h1.title{
+    position:absolute; left:.67in; top:-.05in; width:12.00in; height:1.25in;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Times New Roman", Times, serif; font-weight:bold; font-size:36pt;
+    color:#000; letter-spacing:.2pt;
+  }
+
+  /* ---------- shared content primitives ---------- */
+  .body{ position:absolute; left:.67in; right:.67in; top:1.20in; bottom:.75in; }
+  .sec{
+    font-size:15pt; font-weight:bold; text-decoration:underline;
+    text-underline-offset:2.5pt; color:var(--navy); margin-bottom:.07in;
+  }
+  ul{ list-style:none; }
+  li{
+    position:relative; padding-left:.24in; font-size:11.2pt; line-height:1.34;
+    color:var(--navy); margin-bottom:.055in; text-align:justify;
+  }
+  li::before{ content:"•"; position:absolute; left:.06in; top:-.005in; font-size:12pt; }
+  li.dia::before{ content:"\276F"; font-size:8.5pt; top:.022in; }
+  b{ color:#12335c; }
+  .lead{ color:#12335c; }
+
+  .card{
+    border:1pt solid #C9D6E6; border-radius:.06in; background:#F7FAFD;
+    padding:.11in .14in;
+  }
+
+  /* ---------- title slide ---------- */
+  .honey{ position:absolute; left:6.1841in; top:.9312in; width:5.0729in; height:5.6376in; }
+  /* PowerPoint srcRect r="59916" — keep the left 40.084% of the source logo */
+  .bulb{ position:absolute; left:7.4944in; top:1.8765in; width:3.5022in; height:3.7469in; overflow:hidden; }
+  .bulb img{ display:block; width:8.7371in; height:3.7455in; }
+  .sihtitle{
+    position:absolute; left:.3605in; top:-.5768in; width:11.3300in; height:2.2700in;
+    display:flex; align-items:center; justify-content:center;
+    font-family:Garamond, "Times New Roman", serif; font-weight:bold;
+    font-size:40pt; color:var(--navy);
+  }
+  .titlepage{
+    position:absolute; left:1.3620in; top:.7092in; width:9.3333in; height:1.9166in;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Times New Roman", Times, serif; font-weight:bold; font-size:24pt; color:#000;
+  }
+  .psbox{ position:absolute; left:.3605in; top:2.30in; width:6.48in; }
+  .psbox .row{ font-size:19pt; font-weight:bold; color:#000; margin-bottom:.30in; line-height:1.22; }
+  .psbox .row span.v{ font-weight:bold; color:var(--navy); }
+  .blank{ display:inline-block; min-width:1.55in; border-bottom:1.2pt solid #9aa7b6; }
+
+  /* ---------- diagram bits ---------- */
+  .flow{ display:flex; align-items:stretch; gap:.055in; }
+  .step{
+    flex:1; border-radius:.05in; background:var(--navy); color:#fff;
+    padding:.075in .05in; text-align:center; font-size:8.2pt; line-height:1.2;
+  }
+  .step .n{ display:block; font-size:9.5pt; font-weight:bold; letter-spacing:.4pt; }
+  .step.alt{ background:#2E6DA4; }
+  .arrow{ align-self:center; color:#7f95ad; font-size:11pt; }
+
+  .layer{ border:1pt solid #C9D6E6; border-radius:.06in; padding:.075in .1in; margin-bottom:.07in; background:#fff; }
+  .layer .lh{ font-size:8.6pt; font-weight:bold; letter-spacing:.5pt; color:#5b7ea6; text-transform:uppercase; }
+  .mods{ display:flex; gap:.06in; margin-top:.055in; }
+  .mod{ flex:1; background:#EAF1F9; border-radius:.04in; padding:.055in .06in; font-size:8.6pt; line-height:1.22; text-align:center; }
+  .mod b{ display:block; font-size:9pt; }
+
+  .stats{ display:flex; gap:.12in; }
+  .stat{ flex:1; text-align:center; border:1pt solid #C9D6E6; border-radius:.06in; padding:.09in .05in; background:#F7FAFD; }
+  .stat .big{ display:block; font-size:21pt; font-weight:bold; color:var(--navy); line-height:1; }
+  .stat .lbl{ display:block; font-size:8.4pt; color:#5b7ea6; margin-top:.045in; line-height:1.2; }
+
+  table.risk{ width:100%; border-collapse:collapse; }
+  table.risk th, table.risk td{
+    border:1pt solid #C9D6E6; padding:.055in .08in; font-size:9.6pt;
+    text-align:left; vertical-align:top; line-height:1.26;
+  }
+  table.risk th{ background:var(--navy); color:#fff; font-size:9.6pt; }
+  table.risk td.r{ width:47%; }
+
+  .two{ display:flex; gap:.26in; }
+  .col{ flex:1; min-width:0; }
+  .col.wide{ flex:1.15; }
+  .col.narrow{ flex:.85; }
+
+  /* slides with lighter content — scale up so the page reads full, not half-empty */
+  .airy .sec{ font-size:16.5pt; margin-bottom:.09in; }
+  .airy li{ font-size:12.6pt; line-height:1.42; margin-bottom:.10in; }
+  .airy li::before{ font-size:13pt; }
+  .airy li.dia::before{ font-size:9.5pt; top:.035in; }
+  ol.refs{ list-style:none; counter-reset:ref; }
+  ol.refs li{
+    position:relative; padding-left:.34in; font-size:10.2pt; line-height:1.31;
+    color:var(--navy); margin-bottom:.085in; text-align:left;
+  }
+  ol.refs li::before{
+    counter-increment:ref; content:"[" counter(ref) "]";
+    position:absolute; left:0; top:0; font-size:10.2pt; font-weight:bold; color:#12335c;
+  }
+  .url{ font-size:9.4pt; color:#5b7ea6; overflow-wrap:anywhere; word-break:normal; }
+
+  .airy.tight li{ font-size:11.5pt; line-height:1.36; margin-bottom:.075in; }
+  .airy.tight .sec{ font-size:15.5pt; margin-bottom:.07in; }
+</style>
+</head>
+<body>
+
+<!-- ============================ SLIDE 1 — TITLE PAGE ============================ -->
+<section class="slide">
+  <svg class="honey" viewBox="0 0 6184806 5154967" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" fill="rgba(128,128,128,0.15)" d="M363179,3125191 C363179,3125191 363179,3125191 898270,3125191 C931786,3125191 964145,3143614 980326,3173551 C980326,3173551 980326,3173551 1248448,3635277 C1265784,3664063 1265784,3700909 1248448,3729695 C1248448,3729695 1248448,3729695 980326,4191421 C964145,4221358 931786,4239781 898270,4239781 C898270,4239781 898270,4239781 363179,4239781 C328508,4239781 297305,4221358 279969,4191421 C279969,4191421 279969,4191421 13002,3729695 C-4334,3700909 -4334,3664063 13002,3635277 C13002,3635277 13002,3635277 279969,3173551 C297305,3143614 328508,3125191 363179,3125191 Z M2489721,570035 C2489721,570035 2489721,570035 2764862,570035 L2796959,570035 L2827587,622777 C2870233,696217 2919858,781675 2977604,881117 C3004153,925204 3004153,981634 2977604,1025720 C2977604,1025720 2977604,1025720 2566968,1732863 C2542188,1778712 2492629,1806927 2441299,1806927 C2441299,1806927 2441299,1806927 1621798,1806927 C1608523,1806927 1595580,1805163 1583218,1801802 L1556683,1790677 L1572899,1762630 C1719523,1509042 1907201,1184448 2147429,768968 C2218739,645819 2347099,570035 2489721,570035 Z M1573268,0 C1573268,0 1573268,0 2497662,0 C2555561,0 2611463,31828 2639415,83546 C2639415,83546 2639415,83546 2887862,511387 L2915928,559720 L2893844,559720 L2789466,559720 L2744122,481634 C2570885,183309 2570885,183309 2570885,183309 C2546104,137459 2496545,109243 2445216,109243 C1625714,109243 1625714,109243 1625714,109243 C1572615,109243 1524825,137459 1498276,183309 C1089410,890450 1089410,890450 1089410,890450 C1062860,934537 1062860,990967 1089410,1035054 C1498276,1742196 1498276,1742196 1498276,1742196 C1511551,1765121 1530135,1783637 1552039,1796422 L1558260,1799029 L1524911,1856707 L1500108,1899604 L1525834,1910390 C1539779,1914181 1554378,1916170 1569352,1916170 C2493745,1916170 2493745,1916170 2493745,1916170 C2551645,1916170 2607546,1884345 2635498,1832627 C3098693,1034974 3098693,1034974 3098693,1034974 C3128641,985246 3128641,921593 3098693,871863 C3040794,772157 2990132,684914 2945803,608576 L2923422,570035 L3027104,570035 C3349535,570035 3865424,570035 4690846,570035 C4828714,570035 4961827,645819 5028384,768968 C5028384,768968 5028384,768968 6131323,2668304 C6202634,2786717 6202634,2938285 6131323,3056698 C6131323,3056698 6131323,3056698 5028384,4956035 C4961827,5079184 4828714,5154967 4690846,5154967 C4690846,5154967 4690846,5154967 2489721,5154967 C2347099,5154967 2218739,5079184 2147429,4956035 C2147429,4956035 2147429,4956035 1049243,3056698 C977932,2938285 977932,2786717 1049243,2668304 C1049243,2668304 1049243,2668304 1457007,1963067 L1491373,1903634 L1490164,1903127 C1465456,1888705 1444493,1867820 1429519,1841960 C1429519,1841960 1429519,1841960 968320,1044307 C938371,994579 938371,930926 968320,881196 C968320,881196 968320,881196 1429519,83546 C1459466,31828 1513373,0 1573268,0 Z"/>
+  </svg>
+  <div class="bulb"><img src="sihbulb.png" alt=""></div>
+  <div class="sihtitle">SMART INDIA HACKATHON 2026</div>
+  <div class="titlepage">TITLE PAGE</div>
+
+  <div class="psbox">
+    <div class="row">Problem Statement ID &ndash; <span class="v">PSS06</span></div>
+    <div class="row">Problem Statement Title&ndash; <span class="v">Automated Press Title<br>Admissibility Clearance (PRGI)</span></div>
+    <div class="row">Theme&ndash; <span class="v">Smart Automation</span></div>
+    <div class="row">PS Category&ndash; <span class="v">Software</span></div>
+    <div class="row">Team ID&ndash; <span class="v">26 (SR Number)</span></div>
+    <div class="row">Team Name&ndash; <span class="v">404 Found</span></div>
+  </div>
+
+  <img class="logo" src="sih2026.png" alt="Smart India Hackathon 2026">
+</section>
+
+<!-- ============================ SLIDE 2 — IDEA TITLE ============================ -->
+<section class="slide">
+  <h1 class="title">IDEA TITLE</h1>
+  <div class="oval">404 Found</div>
+
+  <div class="body airy tight">
+    <div class="sec">Proposed Solution (Describe your Idea/Solution/Prototype)</div>
+    <div class="two" style="margin-top:.05in">
+      <div class="col wide">
+        <ul>
+          <li><b>PRGI TitleGuard</b> — an explainable, agentic decision-support system that clears a proposed
+              periodical title against <b>82,713</b> registered titles in <b>under 2 seconds</b>, replacing a manual
+              cycle that today takes <b>25&ndash;30 days</b> per attempt.</li>
+          <li>Similarity is measured on <b>four independent dimensions</b>, not plain text match — <b>Lexical</b>
+              (pg_trgm + RapidFuzz), <b>Phonetic</b> (Double Metaphone), <b>Cross-lingual Semantic</b>
+              (self-hosted multilingual embeddings over pgvector/HNSW) and <b>Core-Root</b> (media filler-word stripping).</li>
+          <li>A <b>separate deterministic rule engine</b> checks statutory admissibility in plain code — never an LLM —
+              so the same title always yields the same verdict, clause by clause.</li>
+          <li>The <b>Agentic Title Studio</b> (LangGraph: Interviewer &rarr; Generator &rarr; Verifier &rarr; Ranker)
+              proposes alternative titles that are <b>pre-verified to pass</b> — no unverified suggestion is ever shown.</li>
+        </ul>
+        <div class="sec" style="margin-top:.09in">How it addresses the problem</div>
+        <ul>
+          <li class="dia">Catches the collisions manual checking misses: <i>Times India</i> vs <i>India Times</i>,
+              <i>Jaagran</i> vs <i>Jagran</i>, <i>Dainik Samachar</i> vs <i>Daily News</i>,
+              <i>The Vidarbha Daily Express</i> vs <i>Vidarbha Patrika</i>.</li>
+          <li class="dia">Ends officer-to-officer inconsistency with one standardised, reproducible score — and returns a
+              specific, actionable reason instead of a silent rejection that costs the applicant ~&#8377;1,000 and a full restart.</li>
+        </ul>
+      </div>
+
+      <div class="col narrow">
+        <div class="card" style="padding:.1in .12in">
+          <div style="font-size:9pt;font-weight:bold;letter-spacing:.5pt;color:#5b7ea6;text-transform:uppercase;margin-bottom:.075in">5-Stage Verification Pipeline</div>
+          <div class="flow">
+            <div class="step"><span class="n">1</span>NORMALIZE<br>Script&nbsp;&amp;<br>Romanize</div>
+            <div class="step"><span class="n">2</span>SHORTLIST<br>82k&nbsp;&rarr;&nbsp;200<br>suspects</div>
+            <div class="step"><span class="n">3</span>SCORE 4-D<br>Lex &middot; Sound<br>Vector &middot; Core</div>
+            <div class="step"><span class="n">4</span>CHECK<br>RULES<br>PRGI 2023</div>
+            <div class="step alt"><span class="n">5</span>EXPLAIN<br>Traffic light<br>+ citations</div>
+          </div>
+          <div style="margin-top:.1in;font-size:9.6pt;line-height:1.3;text-align:center;color:var(--navy)">
+            Verdict: <b style="color:#1a7f37">APPROVED</b> &middot;
+            <b style="color:#b8860b">MANUAL&nbsp;REVIEW</b> &middot;
+            <b style="color:#C00000">REJECTED</b><br>
+            <span style="font-size:8.6pt;color:#5b7ea6">— always a recommendation, never a determination</span>
+          </div>
+        </div>
+
+        <div class="sec" style="margin-top:.11in">Innovation and uniqueness of the solution</div>
+        <ul>
+          <li class="dia"><b>Retrieve-then-generate citations:</b> the guideline clause is fetched verbatim from the
+              actual PRGI text before any wording is generated — a fabricated citation is impossible by construction.</li>
+          <li class="dia"><b>Two purpose-built mechanisms, not one classifier:</b> fuzzy similarity and deterministic
+              statute are structurally different failures and are checked separately.</li>
+          <li class="dia"><b>Suggestions that already passed:</b> generated alternatives re-enter the same 5-stage
+              pipeline before they are ever displayed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar"></div>
+  <div class="footer">@SIH Idea submission- PSS06</div>
+  <img class="logo" src="sih2026.png" alt="Smart India Hackathon 2026">
+</section>
+
+<!-- ======================= SLIDE 3 — TECHNICAL APPROACH ======================= -->
+<section class="slide">
+  <h1 class="title">TECHNICAL APPROACH</h1>
+  <div class="oval">404 Found</div>
+
+  <div class="body">
+    <div class="sec">Technologies to be used</div>
+    <ul style="margin-bottom:.09in">
+      <li><b>Backend:</b> Python 3.11, FastAPI (native async, Pydantic-validated contracts, auto-generated OpenAPI docs).</li>
+      <li><b>Data &amp; search:</b> PostgreSQL 16 with <b>pg_trgm</b> (trigram lexical) and <b>pgvector + HNSW</b> (semantic) —
+          relational metadata and embeddings on the same row, one system, one query.</li>
+      <li><b>AI/ML:</b> RapidFuzz (C++ lexical), Double Metaphone (phonetic), self-hosted multilingual
+          Sentence-Transformers (LaBSE-class) for cross-lingual meaning, RAG over the guideline corpus for explanations.</li>
+      <li><b>Agents:</b> LangGraph — explicit nodes, explicit edges, inspectable state, one bounded retry loop.</li>
+      <li><b>Frontend:</b> Next.js + TypeScript + Tailwind CSS; Zod schemas generated from the same API contract as the backend Pydantic models.</li>
+      <li><b>Quality &amp; delivery:</b> Pytest (one test per rule), Playwright end-to-end, Docker Compose, GitHub Actions.</li>
+    </ul>
+
+    <div class="sec">Methodology and process for implementation</div>
+    <div class="two" style="margin-top:.06in;gap:.2in">
+      <div class="col" style="flex:1.02">
+        <div class="layer">
+          <div class="lh">Layer 3 — Application &amp; Agents</div>
+          <div class="mods">
+            <div class="mod"><b>Verification Console</b>Next.js / TS / Tailwind</div>
+            <div class="mod"><b>FastAPI Gateway</b>/v1/verify orchestrator</div>
+            <div class="mod"><b>Agentic Studio</b>Interviewer&rarr;Gen&rarr;Verify&rarr;Rank</div>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="lh">Layer 2 — AI/ML &amp; Statutory Rules</div>
+          <div class="mods">
+            <div class="mod"><b>4-D Similarity Engine</b>Lexical &middot; Sound &middot; Semantic &middot; Core</div>
+            <div class="mod"><b>Deterministic Rule Engine</b>PRP Act 2023 + citations</div>
+          </div>
+        </div>
+        <div class="layer" style="margin-bottom:0">
+          <div class="lh">Layer 1 — Data &amp; Candidate Search</div>
+          <div class="mods">
+            <div class="mod" style="flex:0 0 auto;width:100%"><b>PostgreSQL + pgvector HNSW</b>82,713 titles &middot; trigram + vector indexes &middot; guideline clause store</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col" style="flex:.98">
+        <div class="card" style="height:100%">
+          <div style="font-size:8.8pt;font-weight:bold;letter-spacing:.5pt;color:#5b7ea6;text-transform:uppercase;margin-bottom:.07in">Request path — every verification</div>
+          <ul style="margin:0">
+            <li style="font-size:9.6pt;margin-bottom:.05in"><b>1 Normalize</b> — detect Devanagari/Bengali/Tamil/Telugu/Gujarati/Urdu, romanize to standard phonetic tokens.</li>
+            <li style="font-size:9.6pt;margin-bottom:.05in"><b>2 Shortlist</b> — parallel trigram + HNSW query narrows 82,713 titles to ~200 suspects.</li>
+            <li style="font-size:9.6pt;margin-bottom:.05in"><b>3 Score</b> — each suspect scored 0&ndash;100 on all four dimensions in one batch, not one round-trip per candidate.</li>
+            <li style="font-size:9.6pt;margin-bottom:.05in"><b>4 Rules</b> — character limits, generic single-word ban, commercial/matrimonial catalogue ban, URL syntax, Emblems &amp; Names Act.</li>
+            <li style="font-size:9.6pt;margin-bottom:0"><b>5 Explain</b> — retrieve the verbatim clause, then phrase it; emit verdict, evidence, and an exportable officer memorandum.</li>
+          </ul>
+          <div style="margin-top:.08in;font-size:8.8pt;color:#5b7ea6;line-height:1.28">
+            Every request is traced end-to-end across all five stages with per-stage timing against the &lt;2&nbsp;s target.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar"></div>
+  <div class="footer">@SIH Idea submission- PSS06</div>
+  <img class="logo" src="sih2026.png" alt="Smart India Hackathon 2026">
+</section>
+
+<!-- =================== SLIDE 4 — FEASIBILITY AND VIABILITY =================== -->
+<section class="slide">
+  <h1 class="title">FEASIBILITY AND VIABILITY</h1>
+  <div class="oval">404 Found</div>
+
+  <div class="body">
+    <div class="sec">Analysis of the feasibility of the idea</div>
+    <ul style="margin-bottom:.11in">
+      <li><b>The data already exists and is already loaded.</b> 82,713 real PRGI title records
+          (<span style="font-family:'Courier New',monospace;font-size:10pt">title_master.csv</span>) are in PostgreSQL with trigram
+          and vector indexes built; trigram search has been validated against live queries and correctly surfaces genuine close matches.</li>
+      <li><b>The workload is small by modern standards.</b> 82,713 vectors is well inside what pgvector/HNSW serves
+          sub-second on commodity hardware — no GPU, no dedicated vector database, no per-query billing, no extra network hop.</li>
+      <li><b>Self-hostable and offline-capable end to end.</b> Models run locally, so no title data leaves government
+          infrastructure and there is no third-party terms-of-service dependency for a public service.</li>
+      <li><b>Reproducible from a clean machine</b> — a 30-second local path (<span style="font-family:'Courier New',monospace;font-size:10pt">./scripts/dev.sh</span>)
+          and a full Docker Compose stack, with no undocumented manual steps.</li>
+      <li><b>It fits the existing chain.</b> The system slots in at the first gate (Applicant &rarr; Press Sewa Portal &rarr;
+          District Magistrate &rarr; PRGI) without replacing any statutory step.</li>
+    </ul>
+
+    <div class="sec" style="margin-bottom:.07in">Potential challenges and risks &mdash; and the strategy for each</div>
+    <table class="risk">
+      <tr><th class="r">Challenge / risk</th><th>Strategy for overcoming it</th></tr>
+      <tr>
+        <td class="r">No ground-truth historical rejection data, so precision/recall cannot yet be proven against real outcomes.</td>
+        <td>Publish accuracy as an estimate, not a claim; keep a human officer in the loop for every ambiguous case until real evaluation data exists.</td>
+      </tr>
+      <tr>
+        <td class="r">Multilingual and phonetic models are weaker on proper nouns and lower-resource languages.</td>
+        <td>Never auto-reject on a borderline similarity score alone — a rejection requires rule-engine corroboration.</td>
+      </tr>
+      <tr>
+        <td class="r">Transliteration between scripts is inherently not one-to-one.</td>
+        <td>Accept as a bounded, documented limitation; run phonetic matching on the romanized form rather than chasing a &ldquo;perfect&rdquo; transliterator.</td>
+      </tr>
+      <tr>
+        <td class="r">&ldquo;Confusingly similar&rdquo; is a legal judgment, not a numeric threshold — the system could be treated as more authoritative than intended.</td>
+        <td>Product and interface consistently frame every output as a recommendation; final legal determination stays with the PRGI officer.</td>
+      </tr>
+      <tr>
+        <td class="r">An unconverted guideline clause is a rule the engine silently cannot check.</td>
+        <td>Track rule coverage explicitly against the source document so gaps are visible in the interface, not silent.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="bar"></div>
+  <div class="footer">@SIH Idea submission- PSS06</div>
+  <img class="logo" src="sih2026.png" alt="Smart India Hackathon 2026">
+</section>
+
+<!-- ===================== SLIDE 5 — IMPACT AND BENEFITS ===================== -->
+<section class="slide">
+  <h1 class="title">IMPACT AND BENEFITS</h1>
+  <div class="oval">404 Found</div>
+
+  <div class="body airy">
+    <div class="stats" style="margin-bottom:.15in">
+      <div class="stat"><span class="big">25&ndash;30 days<br>&rarr; &lt;2 s</span><span class="lbl">Verification latency, warm</span></div>
+      <div class="stat"><span class="big">82,713</span><span class="lbl">Registered titles checked every time</span></div>
+      <div class="stat"><span class="big">4-D</span><span class="lbl">Independent similarity signals per match</span></div>
+      <div class="stat"><span class="big">&#8805;95%</span><span class="lbl">Shortlist recall target</span></div>
+      <div class="stat"><span class="big">100%</span><span class="lbl">Verdicts traceable to a cited clause</span></div>
+    </div>
+
+    <div class="two" style="gap:.3in">
+      <div class="col">
+        <div class="sec">Potential impact on the target audience</div>
+        <ul>
+          <li><b>Applicants</b> get an answer in seconds instead of weeks, and a specific reason instead of silence —
+              removing the ~&#8377;1,000 cost and full restart that every blind rejection currently forces.</li>
+          <li><b>PRGI officers</b> get a standardised 4-D score, a review docket, and one-click
+              <i>Endorse &amp; Approve</i> / <i>Issue Rejection Order</i> actions, each producing a recorded decision artifact —
+              so the outcome no longer depends on which officer picked up the file.</li>
+          <li><b>Regional and vernacular publishers</b> are served in their own script: multi-script input, romanization
+              preview, and cross-lingual matching mean a Devanagari or Tamil applicant is not disadvantaged.</li>
+        </ul>
+      </div>
+
+      <div class="col">
+        <div class="sec">Benefits of the solution</div>
+        <ul>
+          <li><b>Social —</b> equal, transparent access to the press registration process regardless of language,
+              region, or familiarity with the bureaucracy; verdicts are conveyed by text label as well as colour,
+              so the interface holds up for colourblind users.</li>
+          <li><b>Economic —</b> zero per-query cost and no vendor lock-in: self-hosted models and one PostgreSQL
+              instance on commodity hardware, so the cost of the ten-thousandth check equals the cost of the first.</li>
+          <li><b>Governance —</b> every rule-based rejection cites a real clause and every similarity flag names the
+              conflicting titles and their scores; an unsupported rejection is treated as a defect, not an output.</li>
+          <li><b>Environmental —</b> a paperless, resubmission-free first gate removes repeated physical filing cycles
+              from the approval chain.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:.10in">
+      <div style="font-size:11pt;line-height:1.34;color:var(--navy)">
+        <b>Scale of the benefit:</b> the PRP Act, 2023 puts every periodical title in India through this one gate, and every
+        applicant waits <b>25&ndash;30 days</b> for the answer. Compressing it to <b>under two seconds</b>, with each verdict citing the
+        clause it rests on, turns press registration&rsquo;s slowest step into its most auditable — authority unchanged.
+      </div>
+    </div>
+  </div>
+
+  <div class="bar"></div>
+  <div class="footer">@SIH Idea submission- PSS06</div>
+  <img class="logo" src="sih2026.png" alt="Smart India Hackathon 2026">
+</section>
+
+<!-- =================== SLIDE 6 — RESEARCH AND REFERENCES =================== -->
+<section class="slide">
+  <h1 class="title">RESEARCH AND REFERENCES</h1>
+  <div class="oval">404 Found</div>
+
+  <div class="body">
+    <div class="two" style="gap:.30in">
+      <div class="col">
+        <div class="sec">Statutory sources and registry data</div>
+        <ol class="refs">
+          <li>Office of the Press Registrar General of India, &ldquo;Registered Titles Database Search,&rdquo; PRGI,
+              Ministry of Information &amp; Broadcasting, Govt. of India, 2026. [Online].
+              Available: <span class="url">https://prgi.gov.in/registration-title-details</span></li>
+          <li>Government of India, &ldquo;The Press and Registration of Periodicals Act, 2023,&rdquo;
+              <i>The Gazette of India</i>, Legislative Department, Ministry of Law and Justice, Feb. 2024. [Online].
+              Available: <span class="url">https://prgi.gov.in/sites/default/files/2024-02/press_and_registration_of_periodicals_act_2023.pdf</span></li>
+          <li>Office of the Press Registrar General of India, &ldquo;Guidelines for Admissibility of Titles for
+              Registration of Periodicals,&rdquo; PRGI, Ministry of Information &amp; Broadcasting, Govt. of India, Jul. 2025.
+              [Online]. Available: <span class="url">https://prgi.gov.in/policy/guidelines-admissibility-titles</span></li>
+        </ol>
+
+        <div class="sec" style="margin-top:.13in">How each source is used</div>
+        <ul>
+          <li style="font-size:10.4pt;line-height:1.32;margin-bottom:.07in">[1] supplies the <b>82,713</b> reference title records the
+              similarity engine scores against; [2] establishes the statutory gate the system automates; [3] is the
+              clause-level text from which <b>every</b> deterministic rule and every citation is derived.</li>
+          <li style="font-size:10.4pt;line-height:1.32;margin-bottom:0">[4] and [5] are the two retrieval primitives the shortlist
+              rests on — trigram lexical matching and multilingual sentence embeddings — queried in parallel over the same store.</li>
+        </ul>
+
+        <div class="card" style="margin-top:.16in">
+          <div style="font-size:10.4pt;line-height:1.32;color:var(--navy)">
+            <b>Standing constraint carried through every source above:</b> the system is a decision-support tool.
+            It makes the determination fast, consistent, and explainable &mdash; a PRGI officer always makes it.
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="sec">Technical references</div>
+        <ol class="refs" style="counter-reset:ref 3">
+          <li>PostgreSQL Global Development Group, &ldquo;pg_trgm — support for similarity of text using trigram
+              matching,&rdquo; <i>PostgreSQL 18 Documentation</i>, Appendix F: Additional Supplied Modules and Extensions, 2026.
+              [Online]. Available: <span class="url">https://postgresql.org</span></li>
+          <li>N. Reimers and I. Gurevych, &ldquo;Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks,&rdquo;
+              in <i>Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing (EMNLP)</i>,
+              Association for Computational Linguistics, Nov. 2019. [Online].
+              Available: <span class="url">https://github.com/UKPLab/sentence-transformers</span></li>
+          <li>Y. Malkov and D. Yashunin, &ldquo;Efficient and Robust Approximate Nearest Neighbor Search using
+              Hierarchical Navigable Small World Graphs,&rdquo; <i>IEEE Trans. Pattern Anal. Mach. Intell.</i>, 2020 —
+              the HNSW index behind sub-second shortlisting.</li>
+          <li>L. Philips, &ldquo;The Double Metaphone Search Algorithm,&rdquo; <i>C/C++ Users Journal</i>, vol. 18, no. 6,
+              Jun. 2000 — dual-code phonetic encoding, chosen over Soundex for transliterated proper nouns.</li>
+          <li>P. Lewis <i>et al.</i>, &ldquo;Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,&rdquo;
+              in <i>Advances in Neural Information Processing Systems (NeurIPS)</i>, 2020 — the retrieve-then-generate
+              ordering that makes a fabricated legal citation structurally impossible.</li>
+        </ol>
+
+        <div class="sec" style="margin-top:.12in">Project artefacts</div>
+        <ul>
+          <li style="font-size:10.4pt;line-height:1.32;margin-bottom:.06in"><b>Repository —</b> github.com/divvyesk/prgi-title-verify
+              (PRD, architecture, API contract, database schema, rule set, front-end reference implementation).</li>
+          <li style="font-size:10.4pt;line-height:1.32;margin-bottom:0"><b>Datasets —</b>
+              <span style="font-family:'Courier New',monospace;font-size:9.6pt">title_master.csv</span> (82,713 records) and the
+              structured admissibility-rules corpus with section references and retrieval-ready passages.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar"></div>
+  <div class="footer">@SIH Idea submission- PSS06</div>
+  <img class="logo" src="sih2026.png" alt="Smart India Hackathon 2026">
+</section>
+
+</body>
+</html>

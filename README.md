@@ -82,18 +82,38 @@ We provide two separate execution paths:
 
 #### Or Run in 3 Separate Terminal Tabs:
 
-**Terminal 1 — Database (if using local PostgreSQL with pgvector):**
+**Terminal 1 — Database (PostgreSQL 17 with pgvector):**
 ```bash
-psql -U postgres -d prgi -f data/datasets/dataset1/database/01_schema.sql
+./scripts/bootstrap_db.sh
 ```
+Creates the database, applies the migrations in the correct order, loads all
+82,713 titles, backfills phonetic codes and builds the search indexes. Safe to
+re-run — it skips whatever is already done.
+
+Do **not** run the individual `.sql` files in filename order: `02_indexes.sql`
+uses `gin_trgm_ops`, but the `pg_trgm` extension is created in
+`search/database/03_phonetic.sql`, so the indexes fail. The script handles that
+ordering.
+
+Embeddings are opt-in (`./scripts/bootstrap_db.sh --embeddings`) because the
+pass takes ~25 minutes and competes with the backend for the GPU. Only the
+vector retriever depends on them; the other three cover the full corpus without.
+**Never run it during a demo** — a 5s verification was measured at 194s while
+embeddings were generating.
 
 **Terminal 2 — FastAPI Backend (Port 8000):**
 ```bash
 cd backend
 export PYTHONPATH="..:."
-export STUB_MODE=1
 python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+Reads `backend/.env`. Set `STUB_MODE=0` and point `DATABASE_URL` at the database
+you just built to run the real pipeline; `STUB_MODE=1` serves fixtures and needs
+no database at all.
+
+On startup, confirm the log line reads `registry ready: 4/4 scorers, 4/4
+retrievers`. Anything less means a component silently failed to load — the
+server will still answer requests, just with less of the pipeline running.
 
 **Terminal 3 — Vite Frontend (Port 5173):**
 ```bash
