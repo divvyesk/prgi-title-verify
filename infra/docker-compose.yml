@@ -63,7 +63,13 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/v1/health')\" || exit 1"]
+      # /health, not /v1/health. The health route is registered without the
+      # /v1 prefix (backend/app/routers/health.py), so the old path returned
+      # 404 and this container could never report healthy — which also meant
+      # anything using `depends_on: condition: service_healthy` would wait
+      # forever. Verified against the deployed backend: /health -> 200,
+      # /v1/health -> 404.
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3

@@ -1,203 +1,174 @@
-# PRGI TitleGuard • Automated Press Title Verification & Agentic System
-> **Smart India Hackathon • Problem Statement PSS06: Automated Press Title Admissibility Clearance**  
-> **Repository:** `https://github.com/divvyesk/prgi-title-verify`
+# PRGI TitleGuard
+
+**Checking whether a newspaper title is already taken, in about two seconds instead of a month.**
+
+Smart India Hackathon 2026 · Problem Statement PSS06 · Team 404 Found
+
+[**Try it live →**](https://prgi-title-verify.vercel.app)
 
 ---
 
-## 🏛️ Executive Summary
+## The problem
 
-Under the **Press and Registration of Periodicals Act, 2023**, the **Press Registrar General of India (PRGI)** must verify every proposed periodical and newspaper title against **82,713 existing registered titles**.
+If you want to start a newspaper or magazine in India, the law says your title has to be genuinely new. The Press Registrar General of India has to check your proposed title against **82,713 titles that already exist**, and today that check is largely manual. It takes somewhere between 25 and 30 days.
 
-### Key Problem Challenges Solved:
-1. **Word Order / Anagram Variations:** Detecting collisions like *Times India* vs registered *India Times*.
-2. **Phonetic Spelling Shifts:** Detecting sounding equivalents like *Jaagran Weekly* vs registered *Jagran*.
-3. **Cross-Lingual Semantic Concept Collisions:** Matching *Dainik Samachar* vs registered *Daily News* or *Vivah Suchi* vs *Matrimonial List*.
-4. **Prefix / Suffix & Core Root Collisions:** Stripping media stop words (*The, Daily, Patrika, Express, News*) so *The Vidarbha Daily Express* immediately collides with registered *Vidarbha Patrika* on the root token *vidarbha*.
-5. **Deterministic Statutory Rule Violations:** Rule 4.1a commercial/matrimonial catalog ban, Rule 3.2b internet domain/URL ban, Rule 1.1a single generic word ban, Rule 7.2a character length limits, and Emblems and Names Act.
+The hard part isn't spotting exact copies. It's everything close to a copy:
 
----
+| What slips through | Example |
+| :--- | :--- |
+| Shuffled words | *Times India* vs the registered *India Times* |
+| Different spelling, same sound | *Namascar Bharat* vs the registered *Namaskar* |
+| Same meaning, different language | *Dainik Samachar* vs the registered *Daily News* |
+| A generic word bolted on | *The Vidarbha Daily Express* vs the registered *Vidarbha Patrika* |
+| Words the rules simply ban | Anything containing *Police*, *Army*, *Crime*, *Corruption* |
 
-## 🏗️ 3-Layer System Architecture & Work Division
+A human reviewer catches these by knowing the register well. That knowledge is hard to scale and slow to apply.
 
-```mermaid
-graph TD
-    subgraph Layer 3 — Application & Agents
-        M6["Frontend & 3D Verification Console (Vite / React / Tailwind)"]
-        M1["FastAPI Orchestrator Gateway (/v1/verify)"]
-        M5["Agentic Studio (Interviewer → Gen → Verifier → Ranker)"]
-    end
+## What this does
 
-    subgraph Layer 2 — AI/ML & Rules
-        M2["NLP/ML 4-D Similarity Engine (Lexical, Sound, Semantic, Core)"]
-        M4["Deterministic Statutory Rules & Legal Citations (PRGI 2023)"]
-    end
+You type a title. Two seconds later you get one of three answers, and the reason behind it.
 
-    subgraph Layer 1 — Data & Candidate Search
-        M3["PostgreSQL + pgvector HNSW Index (82,713 Titles)"]
-    end
+🟢 **Approved** · nothing close enough to worry about
+🟡 **Manual review** · borderline, an officer should look
+🔴 **Rejected** · it clashes, and here's exactly which title or which rule
 
-    M6 <--> M1
-    M1 <--> M3
-    M1 <--> M2
-    M1 <--> M4
-    M5 <--> M1
-```
+The reason matters as much as the verdict. Every rejection quotes the actual PRGI guideline text it rests on, and names the registered title it collided with. No black box.
 
----
+**One thing we want to be clear about: this system recommends. It never decides.** The PRGI officer holds the legal authority, exactly as the Act requires. What we removed is the waiting and the guessing, not the judgement.
 
-## ⚡ 5-Stage Verification Pipeline
+## How it works
+
+Five stages, running in order:
 
 ```mermaid
 graph LR
-    S1["1. NORMALIZE<br/>(Script & Romanize)"] --> S2["2. SHORTLIST<br/>(82k → 200 Suspects)"]
-    S2 --> S3["3. SCORE 4-D<br/>(Lexical, Sound, Vector, Core)"]
-    S3 --> S4["4. CHECK RULES<br/>(PRGI Guidelines 2023)"]
-    S4 --> S5["5. EXPLAIN<br/>(Traffic Light + Real Citations)"]
+    S1["1 · NORMALIZE<br/>clean up the text"] --> S2["2 · SHORTLIST<br/>82,713 → 200"]
+    S2 --> S3["3 · SCORE<br/>4 kinds of similarity"]
+    S3 --> S4["4 · CHECK RULES<br/>36 statutory rules"]
+    S4 --> S5["5 · EXPLAIN<br/>verdict + citation"]
 ```
 
-1. **Stage 1 (Normalize & Romanize):** Detects Indic scripts (Devanagari, Bengali, Tamil, Telugu, Gujarati, Urdu) and standardizes Roman phonetic tokens.
-2. **Stage 2 (Candidate Shortlist):** Parallel lexical + pgvector HNSW shortlist over 82,713 titles.
-3. **Stage 3 (4-Dimensional Similarity Scoring):** Computes Lexical (0–100%), Phonetic (0–100%), Semantic Multilingual (0–100%), and Core Root Token (0–100%) collision scores.
-4. **Stage 4 (Deterministic Rule Checks):** Evaluates character limits, commercial term bans, URL syntax, and Emblems Act.
-5. **Stage 5 (Explain & Advise):** Generates Traffic Light verdict (`APPROVED` 🟢, `MANUAL_REVIEW` 🟡, `REJECTED` 🔴) with real legal citations and actionable recommendations.
+**1 · Normalize.** Indic scripts (Devanagari, Bengali, Tamil, Telugu, Gujarati, Urdu) get romanized so everything is comparable.
 
----
+**2 · Shortlist.** Comparing your title against all 82,713 would be slow, so four different search methods each grab their best guesses, and the results get merged into roughly 200 candidates worth a closer look. Using four methods matters, because each catches something the others miss:
 
-## 🚀 Quick Start Guide
+- *Trigram* finds misspellings by matching character chunks
+- *BM25* finds shared keywords
+- *Phonetic* finds titles that sound alike
+- *Vector* finds titles that mean the same thing in another language
 
-We provide two separate execution paths:
-- **Path A: Fast Local Development (No Docker)** — Starts in **30 seconds** (recommended for laptops & demos).
-- **Path B: Full Docker Container Stack** — Multi-container production stack with PostgreSQL pgvector.
+**3 · Score.** Each of the 200 candidates gets scored on four separate scales: spelling, sound, meaning, and root word. Those four blend into one number between 0 and 100.
 
----
+**4 · Check rules.** 36 statutory checks run against the title itself, independent of what's in the register. Banned words, generic-word-only titles, government body names, that sort of thing.
 
-### Path A: Fast Local Development (No Docker — Starts in 30 Seconds)
+**5 · Explain.** The verdict is assembled, and a language model writes the plain-English reason. It's only allowed to cite guideline text that was actually retrieved from the rulebook, so it can't invent a rule that doesn't exist.
 
-> **Why this path:** The full ML Docker container can take 15+ minutes to build on a laptop (downloading PyTorch and BGE-M3 models). The no-Docker path launches the entire local stack in under 30 seconds using native environments.
+## The numbers
 
-#### One-Command Runner:
-```bash
-./scripts/dev.sh
-```
+Measured against the real 82,713-title database, not estimated:
 
-#### Or Run in 3 Separate Terminal Tabs:
+| | |
+| :--- | :--- |
+| Titles indexed | 82,713 |
+| Shortlist recall | 100% (160/160 tested variations found their original) |
+| Statutory rules implemented | 36 |
+| Of those, citation-verified against real PRGI text | 29 (the other 7 are flagged, not hidden) |
+| Response time, cached | ~13 ms |
+| Response time, a title nobody has typed before | ~2.6 s |
 
-**Terminal 1 — Database (PostgreSQL 17 with pgvector):**
+The recall test worked by taking real registered titles and deliberately mangling them: shuffling the words, adding a prefix, introducing typos, and all three at once. In every case the original still surfaced in the shortlist.
+
+## Running it yourself
+
+Three pieces need to be running: a database, the backend, and the frontend.
+
+### 1. Database
+
 ```bash
 ./scripts/bootstrap_db.sh
 ```
-Creates the database, applies the migrations in the correct order, loads all
-82,713 titles, backfills phonetic codes and builds the search indexes. Safe to
-re-run — it skips whatever is already done.
 
-Do **not** run the individual `.sql` files in filename order: `02_indexes.sql`
-uses `gin_trgm_ops`, but the `pg_trgm` extension is created in
-`search/database/03_phonetic.sql`, so the indexes fail. The script handles that
-ordering.
+This creates the database, applies the migrations in the right order, loads all 82,713 titles, fills in phonetic codes, and builds the search indexes. It's safe to run again; it skips whatever is already done.
 
-Embeddings are opt-in (`./scripts/bootstrap_db.sh --embeddings`) because the
-pass takes ~25 minutes and competes with the backend for the GPU. Only the
-vector retriever depends on them; the other three cover the full corpus without.
-**Never run it during a demo** — a 5s verification was measured at 194s while
-embeddings were generating.
+Don't run the `.sql` files yourself in filename order. `02_indexes.sql` needs an extension that `03_phonetic.sql` creates, so going alphabetically fails. The script handles that.
 
-**Terminal 2 — FastAPI Backend (Port 8000):**
-```bash
-cd backend
-export PYTHONPATH="..:."
-python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
-```
-Reads `backend/.env`. Set `STUB_MODE=0` and point `DATABASE_URL` at the database
-you just built to run the real pipeline; `STUB_MODE=1` serves fixtures and needs
-no database at all.
+Embeddings are optional (`./scripts/bootstrap_db.sh --embeddings`). They take about 25 minutes and only the vector retriever uses them; the other three cover the whole database without. **Don't run this during a demo.** It competes with the backend for the GPU badly enough that a 5-second verification took 194 seconds while it was running.
 
-On startup, confirm the log line reads `registry ready: 4/4 scorers, 4/4
-retrievers`. Anything less means a component silently failed to load — the
-server will still answer requests, just with less of the pipeline running.
-
-**Terminal 3 — Vite Frontend (Port 5173):**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open **`http://localhost:5173`** in your browser.
-
----
-
-### Path B: Full Docker Stack (Production Containers)
-
-1. **Copy environment variables template:**
-   ```bash
-   cp infra/.env.example infra/.env
-   ```
-
-2. **Validate the compose file:**
-   ```bash
-   docker compose -f infra/docker-compose.yml config
-   ```
-
-3. **Start the complete stack:**
-   ```bash
-   docker compose -f infra/docker-compose.yml down -v
-   docker compose -f infra/docker-compose.yml up --build
-   ```
-
-**Services Launched:**
-| Service | Image / Context | Port | Healthcheck |
-| :--- | :--- | :--- | :--- |
-| **`db`** | `pgvector/pgvector:pg17` | `5432` | `pg_isready` check on init |
-| **`backend`** | `../backend` (FastAPI) | `8000` | HTTP GET `/v1/health` |
-| **`frontend`** | `../frontend` (Vite / React) | `5173` | Starts after backend is up |
-
----
-
-## 🛠️ Troubleshooting Guide
-
-### 1. Port Already in Use (`8000`, `5173`, or `5432`)
-If a port collision occurs:
-```bash
-# Find process using the port (e.g. 8000 or 5173)
-lsof -i :8000
-lsof -i :5173
-lsof -i :5432
-
-# Terminate lingering process
-kill -9 <PID>
-```
-Or specify alternate ports in `infra/.env` (e.g. `PORT=8001`, `FRONTEND_PORT=5174`).
-
----
-
-### 2. Database Not Ready on Boot
-PostgreSQL can accept TCP handshakes moments before the catalog is fully initialized.  
-- In Docker, our `docker-compose.yml` includes an explicit `healthcheck` (`pg_isready -U postgres -d prgi`) and `depends_on: db: condition: service_healthy` so FastAPI will never start against an unready database.
-- For local dev, verify PostgreSQL is running: `pg_isready -h localhost -p 5432`.
-
----
-
-### 3. Model Download Slow on First Run
-- Running full ML semantic search downloads BGE-M3 embedding weights (~2.2 GB).
-- For rapid testing and demos without internet dependency, start with `STUB_MODE=1` (or click **Offline Engine** in the UI header). This runs the embedded heuristic engine with 0 latency.
-
----
-
-### 4. Cross-Origin Resource Sharing (CORS)
-- In development, the Vite dev server uses a zero-CORS reverse proxy forwarding all `/api/*` traffic directly to `http://localhost:8000`.
-- If connecting the frontend directly to an external backend host, configure `VITE_API_BASE=http://<host>:8000` in `frontend/.env`.
-
----
-
-## 🧪 Testing & Validation
+### 2. Backend
 
 ```bash
-# Test Frontend Build
-cd frontend && npm run build
-
-# Test 4-State Error Handling & Fallbacks
-node frontend/src/tests/test_all_states.mjs
-
-# Test API Contracts
-pytest backend/tests/
+cd backend && export PYTHONPATH="..:." && python3 -m uvicorn app.main:app --port 8000
 ```
+
+Settings come from `backend/.env`. Set `STUB_MODE=0` and point `DATABASE_URL` at the database you just built. (`STUB_MODE=1` serves fixed sample data and needs no database at all, which is handy for frontend work.)
+
+**Check the startup log says `registry ready: 4/4 scorers, 4/4 retrievers`.** Anything less means a piece failed to load quietly. The server will still answer requests, just with less of the pipeline actually running, which is worse than an obvious crash. Also worth grepping the log for `falling back`.
+
+### 3. Frontend
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+Open **http://localhost:5173**.
+
+### Or use Docker
+
+```bash
+cp infra/.env.example infra/.env
+docker compose -f infra/docker-compose.yml up --build
+```
+
+Worth knowing what this gives you: the containers come up wired together correctly, but the database is **empty**. Compose only creates the schema. For anything real, run `scripts/bootstrap_db.sh` against it and set `STUB_MODE=0`.
+
+## How it's deployed
+
+The live version runs across three free services:
+
+| Piece | Where | Why there |
+| :--- | :--- | :--- |
+| Frontend | Vercel | Static files, nothing special needed |
+| Backend | Render | Needs a server process that stays alive |
+| Database | Neon | Postgres with the pgvector extension |
+
+The backend can't go on Vercel. Vercel runs short-lived functions that start and stop per request, and this backend keeps a database connection pool open and (normally) a 2 GB model loaded in memory. That doesn't survive being restarted constantly.
+
+**A real limitation, stated plainly:** Render's free tier gives 512 MB of RAM, and the BGE-M3 embedding model needs 2 to 3 GB. It doesn't fit. The live deployment runs with `DISABLE_SEMANTIC=1`, which skips that model entirely and runs on the other three retrievers and three scorers. Everything else is real: the actual database, all 36 rules, real duplicate detection, real generated explanations. What you lose is cross-language matching, so *Dainik Samachar* vs *Daily News* won't be caught on the hosted version. Run it locally and that comes back.
+
+The verdict thresholds were re-tested without the semantic dimension and still get 10 out of 10 on the calibration set, so nothing needed retuning.
+
+## Running the tests
+
+```bash
+pytest tests/                              # 127 backend tests
+pytest tests/golden/runner.py              # 51 scorer accuracy cases
+node frontend/src/tests/test_all_states.mjs   # frontend states
+cd frontend && npm run build               # typecheck + build
+```
+
+## Who built what
+
+Six people, six areas:
+
+| Area | Owner |
+| :--- | :--- |
+| Frontend and the verification console | Gurpreet |
+| Officer docket and registry explorer UI | Darsh |
+| FastAPI backend and the 5-stage pipeline | Divvye |
+| Similarity scoring | Jai |
+| Database, search retrievers, rule data | Pruthviraj |
+| Agentic Title Studio and RAG explanations | Suhani |
+
+## If something breaks
+
+**Port already in use.** `lsof -i :8000` to find what's holding it, then `kill -9 <PID>`.
+
+**Frontend shows "Offline Engine" instead of "Live".** It couldn't reach the backend and fell back to local sample data. Check the backend is actually running, and open the browser console: a CORS error means `CORS_ORIGINS` in the backend's environment doesn't list the frontend's exact URL.
+
+**First run is slow.** The embedding model is a 2.2 GB download. Set `STUB_MODE=1` to skip it entirely while you're working on other things.
+
+**Everything returns a verdict but no rules ever fire.** Check the startup log for `falling back`. The pipeline is built to degrade instead of crash when a component is missing, which is good for reliability and bad for noticing breakage. Treat those log lines as alarms.
+
+---
+
+*Built for Smart India Hackathon 2026 under the Press and Registration of Periodicals Act, 2023.*
