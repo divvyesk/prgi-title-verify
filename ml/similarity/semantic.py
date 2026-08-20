@@ -20,9 +20,12 @@ import logging
 import os
 import threading
 import time
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
 
-from sentence_transformers import SentenceTransformer
+if TYPE_CHECKING:
+    # Type-checking only. The real import lives inside get_model() — see the
+    # DISABLE_SEMANTIC note below for why it must not happen at module level.
+    from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger("ml.similarity.semantic")
 
@@ -38,13 +41,22 @@ MODEL_NAME = "BAAI/bge-m3"
 # exception — no amount of try/except downstream can catch it. So this flag
 # refuses the load BEFORE it starts, turning "the process dies" into "one
 # more ordinary exception every consumer already knows how to handle."
+#
+# Refusing to load the MODEL turned out not to be enough on its own, because
+# `from sentence_transformers import SentenceTransformer` at module scope
+# pulls in torch whether or not the model is ever used. Measured: 13MB for a
+# bare interpreter, 358MB after that one import. 345MB of an unused library,
+# on a host with 512MB total — roughly 72% of the idle footprint, which is
+# why /v1/alternatives could still tip the process over with the flag set.
+# The import now happens inside get_model(), so a DISABLE_SEMANTIC=1 process
+# never pays for torch at all.
 DISABLE_SEMANTIC = os.environ.get("DISABLE_SEMANTIC", "").strip().lower() in ("1", "true", "yes")
 
-_model: SentenceTransformer | None = None
+_model: "SentenceTransformer | None" = None
 _model_lock = threading.Lock()
 
 
-def get_model() -> SentenceTransformer:
+def get_model() -> "SentenceTransformer":
     """Lazy module-level singleton. Loading BGE-M3 costs 10-30 seconds —
     call preload() once at FastAPI startup so this never happens inside a
     request. Thread-safe double-checked locking because uvicorn can serve
@@ -55,6 +67,10 @@ def get_model() -> SentenceTransformer:
             "lexical/phonetic/core_word scoring and trigram/bm25/phonetic "
             "retrieval only"
         )
+
+    # Deliberately not a module-level import: see DISABLE_SEMANTIC above.
+    from sentence_transformers import SentenceTransformer
+
     global _model
     if _model is None:
         with _model_lock:
