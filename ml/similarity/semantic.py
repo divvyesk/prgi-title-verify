@@ -17,6 +17,7 @@ only a semantic embedding can see.
 from __future__ import annotations
 
 import logging
+import os
 import threading
 import time
 from typing import Sequence
@@ -27,6 +28,18 @@ logger = logging.getLogger("ml.similarity.semantic")
 
 MODEL_NAME = "BAAI/bge-m3"
 
+# Deliberate escape hatch for RAM-constrained hosts (Render's free tier
+# gives 512MB; BGE-M3 needs ~2-3GB resident). Every caller of get_model() —
+# SemanticScorer, VectorRetriever, ml/rag/retrieve.py's embedding search —
+# already wraps its call in a try/except and degrades gracefully (empty
+# retrieval results, a 0.0 score, keyword-overlap RAG fallback), by design.
+# What they can't survive is what actually happened on the 512MB tier: the
+# OS OOM-killing the whole process mid-load. That's a SIGKILL, not a Python
+# exception — no amount of try/except downstream can catch it. So this flag
+# refuses the load BEFORE it starts, turning "the process dies" into "one
+# more ordinary exception every consumer already knows how to handle."
+DISABLE_SEMANTIC = os.environ.get("DISABLE_SEMANTIC", "").strip().lower() in ("1", "true", "yes")
+
 _model: SentenceTransformer | None = None
 _model_lock = threading.Lock()
 
@@ -36,6 +49,12 @@ def get_model() -> SentenceTransformer:
     call preload() once at FastAPI startup so this never happens inside a
     request. Thread-safe double-checked locking because uvicorn can serve
     concurrent requests that all race to trigger the first load."""
+    if DISABLE_SEMANTIC:
+        raise RuntimeError(
+            "semantic model disabled via DISABLE_SEMANTIC=1 — running on "
+            "lexical/phonetic/core_word scoring and trigram/bm25/phonetic "
+            "retrieval only"
+        )
     global _model
     if _model is None:
         with _model_lock:
@@ -99,4 +118,22 @@ class SemanticScorer:
             return ""
 
 
-SCORER = SemanticScorer()
+# Not exported at all when disabled — deliberately, not just "will fail if
+# used." score_batch() above catches its own exceptions and returns
+# [0.0, ...] (scorers are contractually forbidden from raising — see
+# contracts/algo.py rule 4), which means pipeline.py's weighted blend would
+# see a normal-looking all-zero result and average it in at full weight,
+# silently dragging every composite score down as if 0% semantic similarity
+# had actually been measured. Measured on a real request: 90.5 (correct,
+# renormalized across the other 3 dimensions) vs 63.3 (wrong, semantic
+# counted as a genuine zero) for the identical title.
+#
+# ml/registry.py imports this module and does getattr(module, "SCORER")
+# inside its own try/except — the same path it uses for a teammate's
+# unfinished module (0 bytes, no SCORER attribute defined yet). Not
+# exporting SCORER here reuses that exact, already-tested mechanism: the
+# scorer never registers, pipeline.py's renormalization only ever sees the
+# 3 dimensions that are actually available, and nothing computes a fake
+# measurement for a dimension that never ran.
+if not DISABLE_SEMANTIC:
+    SCORER = SemanticScorer()

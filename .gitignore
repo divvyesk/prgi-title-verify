@@ -47,3 +47,7 @@ models/
 agents/cache/*
 !agents/cache/seed
 !agents/cache/seed/*
+
+# Claude Code local tooling config — dev-server pointer for this machine only,
+# not needed by teammates or by deployment.
+.claude/

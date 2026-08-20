@@ -66,11 +66,23 @@ async def lifespan(app: FastAPI):
     # same gate db.open_pool() above already uses, so STUB_MODE is the one
     # switch that decides whether this process touches anything heavy.
     if not settings.stub_mode and semantic is not None:
-        try:
-            load_s = semantic.preload()
-            logger.info("BGE-M3 loaded in %.1fs", load_s)
-        except Exception as exc:
-            logger.warning("BGE-M3 preload failed: %s (will retry on first request)", exc)
+        if semantic.DISABLE_SEMANTIC:
+            # Deliberate, not a failure — logged distinctly from the except
+            # branch below so a RAM-constrained deploy doesn't read like a
+            # broken one. See ml/similarity/semantic.py for the full reasoning.
+            logger.info(
+                "DISABLE_SEMANTIC set — skipping BGE-M3 entirely. "
+                "Running on lexical/phonetic/core_word scoring and "
+                "trigram/bm25/phonetic retrieval only; semantic scorer, "
+                "vector retriever, and RAG's embedding search all degrade "
+                "to their existing fallback paths."
+            )
+        else:
+            try:
+                load_s = semantic.preload()
+                logger.info("BGE-M3 loaded in %.1fs", load_s)
+            except Exception as exc:
+                logger.warning("BGE-M3 preload failed: %s (will retry on first request)", exc)
 
         # Runs a full verification for each of the six demo titles: warms
         # every code path (model, pool, retrievers, scorers) before the

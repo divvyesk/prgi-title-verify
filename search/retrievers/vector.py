@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from ml.similarity.semantic import get_model
+from ml.similarity.semantic import DISABLE_SEMANTIC, get_model
 from search.db import connection
 
 if TYPE_CHECKING:
@@ -72,4 +72,13 @@ class VectorRetriever:
             return []
 
 
-RETRIEVER = VectorRetriever()
+# Not exported when the semantic model is disabled (DISABLE_SEMANTIC=1).
+# Unlike the semantic scorer, an always-failing retriever isn't a
+# correctness bug — RRF fusion over the other 3 retrievers' results is
+# unaffected by one source contributing nothing, and 100% shortlist recall
+# was already measured with just trigram/bm25/phonetic. This guard exists
+# for operational cleanliness only: without it, every single request would
+# attempt a doomed model load and log a full ERROR-level traceback, drowning
+# out logs that actually matter.
+if not DISABLE_SEMANTIC:
+    RETRIEVER = VectorRetriever()
